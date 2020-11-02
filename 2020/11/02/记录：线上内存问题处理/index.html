@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="记录：线上内存问题处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录：线上内存问题处理">
+<meta property="og:url" content="http://example.com/2020/11/02/%E8%AE%B0%E5%BD%95%EF%BC%9A%E7%BA%BF%E4%B8%8A%E5%86%85%E5%AD%98%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/index.html">
+<meta property="og:site_name" content="Kinly">
+<meta property="og:description" content="记录：线上内存问题处理">
+<meta property="og:locale">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png01.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png02.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png03.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png04.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png05.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/64memory.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png06.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png07.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png08.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png09.png">
+<meta property="og:image" content="http://example.com/images/ArenaMemory/png10.gif">
+<meta property="article:published_time" content="2020-11-02T09:30:10.000Z">
+<meta property="article:modified_time" content="2020-11-02T13:57:18.635Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/ArenaMemory/png01.png">
+
+<link rel="canonical" href="http://example.com/2020/11/02/%E8%AE%B0%E5%BD%95%EF%BC%9A%E7%BA%BF%E4%B8%8A%E5%86%85%E5%AD%98%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>记录：线上内存问题处理 | Kinly</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Kinly</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Kinly's 记录</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/02/%E8%AE%B0%E5%BD%95%EF%BC%9A%E7%BA%BF%E4%B8%8A%E5%86%85%E5%AD%98%E9%97%AE%E9%A2%98%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly_avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Kinly's 记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kinly">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记录：线上内存问题处理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-11-02 17:30:10 / 修改时间：21:57:18" itemprop="dateCreated datePublished" datetime="2020-11-02T17:30:10+08:00">2020-11-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index"><span itemprop="name">知识积累</span></a>
+                </span>
+            </span>
+
+          
+            <div class="post-description">记录：线上内存问题处理</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h4><p><code>线上环境配置：Centos 7.5 3.10.0 2核 4G</code><br>游戏上线，其中2组服务器遇到了内存增长异常的问题</p>
+<p><img src="/images/ArenaMemory/png01.png"></p>
+<ol>
+<li><p>程序内存泄漏？<br><code>程序内部对象都是以对象池方式分配的, 唯一malloc的地方是网络buffer缓冲</code></p>
+<ul>
+<li>grep -rn ‘chunk’ ./*     log 目录, 查对象池分配日志<br><img src="/images/ArenaMemory/png02.png"><br><code>对象池没有新分配的内容</code> 这些都是原始的分配，分别是 gate 管理的 user 对象 &amp; timer 定时器对象（1个chunk 1024 个对象）</li>
+<li>涉及malloc free的内存，跟随net session的accept &amp; bedelete<br><img src="/images/ArenaMemory/png03.png"><br><code>上图指令分别是: accept次数, bedelete次数, 当前连接数</code> socket-session 对象建立，每个session 1M (send-buffer) + 1M (recv-buffer)，不是session没有释放导致的</li>
+<li>pmap 看具体占用<br><img src="/images/ArenaMemory/png04.png"><br><code>大量没有释放出来的内存  64M</code><br>程序是不会分配这么大的内存的，内存分配器是glibc，glibc官方说明<br><code>Starting with glibc 2.11 (for example, customers upgrading from RHEL 5 to RHEL 6), by default, when glibc malloc detects mutex contention (i.e. concurrent mallocs), then the native malloc heap is broken up into sub-pools called arenas. This is achieved by assigning threads their own memory pools and by avoiding locking in some situations. The amount of additional memory used for the memory pools (if any) can be controlled using the environment variables MALLOC_ARENA_TEST and MALLOC_ARENA_MAX. MALLOC_ARENA_TEST specifies that a test for the number of cores is performed once the number of memory pools reaches this value. MALLOC_ARENA_MAX sets the maximum number of memory pools used, regardless of the number of cores. The default maximum arena size is 1MB on 32-bit and 64MB on 64-bit. The default maximum number of arenas is the number of cores multiplied by 2 for 32-bit and 8 for 64-bit. This can increase fragmentation because the free trees are separate. In principle, the net performance impact should be positive of per thread arenas, but testing different arena numbers and sizes may result in performance improvements depending on your workload. You can revert the arena behavior with the environment variable MALLOC_ARENA_MAX=1</code><br>解释: glibc 在多线程竞争malloc时候，会创建新的arena块，一个arena是64M（64位系统上） 截图里面 64516 + 1020 = 65536 64M<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ldd gate  <span class="comment"># 查libc.so所在目录 (libc)</span></span><br><span class="line">/lib64/libc.so.6  <span class="comment"># 查版本</span></span><br></pre></td></tr></table></figure>
+<img src="/images/ArenaMemory/png05.png"></li>
+</ul>
+</li>
+<li><p>线上只有两组服务器有内存增长过快的问题，是否和系统版本、环境变量有关？</p>
+<ul>
+<li>kernel 确认相同</li>
+<li>程序使用的环境变量 cat /proc/2948/environ | tr ‘\000’ ‘\n’  基本相同（相差的对内存问题没有关系）</li>
+<li>SA 帮忙确认宿主机内核、glibc版本对内存没有影响</li>
+</ul>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://sourceware.org/glibc/wiki/MallocInternals">glibc的内存管理</a></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://sploitfun.wordpress.com/2015/02/11/syscalls-used-by-malloc/">内存布局</a><br><img src="/images/ArenaMemory/64memory.png"></li>
+<li>malloc 内存分配的系统调用<br><code>brk() sbrk()</code><br>申请heap(移动最高地址指针，性能损耗小)<br>内存碎片的产生：先申请了10 指针移动到curr += 10, 然后申请20 指针移动到curr += 20; 释放10 当前指针在20位置，20还在使用，无法释放。<code>只有高地址内存释放了，低地址才会释放</code><br><code>mmap() munmap()</code><br>申请memory mapping segment(在虚拟地址空间找空闲的内存，性能损耗稍大)<br>整页分配，整页释放<br><code>linux内存管理的基本思想: 内存延迟分配，分配的是虚拟内存，只有真正访问的时候才建立虚拟内存和物理内存的映射</code></li>
+<li>glibc的malloc<br>size &lt; M_MMAP_THRESHOLD 先尝试从brk已经释放的内存中获取，获取不到，调用sbrk<br>size &gt;= M_MMAP_THRESHOLD 调用mmap<br><code>M_MMAP_THRESHOLD default:(128 * 1024) min:(0) max(512 * 1024 or 4 * 1024 * 1024)</code></li>
+<li><a target="_blank" rel="noopener" href="https://sploitfun.wordpress.com/2015/02/10/understanding-glibc-malloc/">glibc 内存分配算法</a><br><code>Arena</code>: 管理堆内存链表的; 每个线程有自己的arena区域，arena有上限 <code>32-bit: 2 * cores; 64-bit: 8 * cores</code><br>当线程数量超过arena上限的时候，多个线程会共享一个arena区域，多线程竞争时加锁处理<br><code>Chunk</code>: 每次分配的堆内存，会根据需要被分割成&gt;=1的chunk<br><code>Bins</code>: 管理已经被释放的chunk链表<ul>
+<li>fastbin</li>
+<li>unsorted bin [free’d]</li>
+<li>small bin (2-63) [&lt; 512 bytes]</li>
+<li>large bin (64-126) [&gt;= 512 bytes]<br><code>分配策略</code>: fastbin -&gt; unsortedbin -&gt; smallbin -&gt; largebin -&gt; top chunk -&gt; 系统分配，并把多余的内存放回到bins里面<br><code>释放策略</code>：在释放某个时检查附近的块是不是free的，如果是，那么合并添加到unsortedbin里面 </li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<ol start="3">
+<li><p>写测试程序测试验证内存分配问题</p>
+<ul>
+<li><p>测试代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;malloc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> K (1024)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> M (1024 * 1024)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> K_NUM 500000</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> M_NUM  500</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> block_size = K;</span><br><span class="line"><span class="keyword">int</span> block_num = K_NUM;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> BLOCK_M</span></span><br><span class="line">block_size = M;</span><br><span class="line">block_num = M_NUM;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;----- block M&quot;</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> M_MMAP</span></span><br><span class="line">mallopt(M_MMAP_THRESHOLD, M * <span class="number">2</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;----- glibc mmap threshold&quot;</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> *ptrs[K_NUM];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; block_num; ++i)</span><br><span class="line">&#123;</span><br><span class="line">    ptrs[i] = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span> * block_size);</span><br><span class="line">    <span class="built_in">memset</span>(ptrs[i], <span class="number">0</span>, <span class="number">1</span> * block_size);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> ONE_MORE</span></span><br><span class="line"><span class="keyword">char</span> *tmp1 = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span>);</span><br><span class="line"><span class="built_in">memset</span>(tmp1, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;----- one more 1 malloc&quot;</span>);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//malloc_info(0, stdout);</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;##### malloc done&quot;</span>);</span><br><span class="line">getchar();</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;##### start free memory&quot;</span>);</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; block_num; ++i) &#123;</span><br><span class="line">    <span class="built_in">free</span>(ptrs[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;##### free done&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//malloc_info(0, stdout);</span></span><br><span class="line"></span><br><span class="line">getchar();</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/ArenaMemory/png06.png"><br><img src="/images/ArenaMemory/png07.png"><br><img src="/images/ArenaMemory/png08.png"><br><img src="/images/ArenaMemory/png09.png"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -g -o memory_test01 -std=c++11 memory_test01.cpp -lpthread -DBLOCK_M</span><br></pre></td></tr></table></figure>
+<p>这次编译结果 ./strace -f ./memory_test 可以看到调用都是mmap</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -g -o memory_test01 -std=c++11 memory_test01.cpp -lpthread -DBLOCK_M -DM_MMAP</span><br></pre></td></tr></table></figure>
+<p>这次编译结果 ./strace -f ./memory_test 可以看到调用都是brk</p>
+</li>
+<li><p>测试2：线程内存分配</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mutex&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> K (1024)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_NUM 500000</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_THREAD 10</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::mutex lock_;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">char</span>*&gt; ptrs;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt; func_create = [&amp;]() &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MAX_NUM / MAX_THREAD; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="built_in">std</span>::lock_guard&lt;<span class="built_in">std</span>::mutex&gt; _lock(lock_);</span><br><span class="line">                ptrs.emplace_back((<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span> * K));</span><br><span class="line">                <span class="built_in">memset</span>(ptrs.back(), <span class="number">0</span>, <span class="number">1</span> * K);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span> *tmp1 = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="built_in">memset</span>(tmp1, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::thread&gt; tasks;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MAX_THREAD; ++i) &#123;</span><br><span class="line">        tasks.push_back(<span class="built_in">std</span>::thread(func_create));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::for_each(tasks.begin(), tasks.end(), [](<span class="built_in">std</span>::thread&amp; t)&#123;t.join();&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> *tmp1 = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="built_in">memset</span>(tmp1, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;malloc done&quot;</span>);</span><br><span class="line">    getchar();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;start free memory&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MAX_NUM; ++i) &#123;</span><br><span class="line">        <span class="built_in">free</span>(ptrs[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;free done&quot;</span>);</span><br><span class="line"></span><br><span class="line">    getchar();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用测试1类似的办法，可以看到多线程内存的分配和释放</p>
+</li>
+<li><p>测试3：内存一边分配一边释放，监控内存占用</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;chrono&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;atomic&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;mutex&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;queue&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;google/malloc_extension.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;malloc.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span>*                           <span class="keyword">pvoid_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">const</span> <span class="keyword">void</span>*                             <span class="keyword">cvoid_t</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> XGC_MIN( a, b ) ((a)&gt;(b)?(b):(a))</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">asio_NetBuffer</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">pvoid_t</span>     base_;</span><br><span class="line">    <span class="keyword">size_t</span>      size_;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">size_t</span> tag_;</span><br><span class="line">    <span class="keyword">volatile</span> <span class="keyword">size_t</span> len_;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    asio_NetBuffer()</span><br><span class="line">      : base_(<span class="literal">nullptr</span>)</span><br><span class="line">        , size_(<span class="number">0</span>)</span><br><span class="line">        , tag_(<span class="number">0</span>)</span><br><span class="line">        , len_(<span class="number">0</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">    asio_NetBuffer(<span class="keyword">size_t</span> size)</span><br><span class="line">      : base_(<span class="built_in">malloc</span>(size))</span><br><span class="line">        , size_(size)</span><br><span class="line">        , tag_(<span class="number">0</span>)</span><br><span class="line">        , len_(<span class="number">0</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    </span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">    ~asio_NetBuffer()</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// std::cout &lt;&lt; &quot;free buffer: &quot; &lt;&lt; size_ &lt;&lt; &quot; thread: &quot; &lt;&lt; std::this_thread::get_id() &lt;&lt; std::endl;</span></span><br><span class="line">      <span class="built_in">free</span>(base_);</span><br><span class="line"></span><br><span class="line">      base_ = <span class="literal">nullptr</span>;</span><br><span class="line">      size_ = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">      tag_ = len_ = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">open</span><span class="params">(<span class="keyword">size_t</span> size)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      reset();</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (!(size &gt; tag_ + len_))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">pvoid_t</span> base = <span class="built_in">realloc</span>(base_, size);</span><br><span class="line">      <span class="keyword">if</span> (!(base))</span><br><span class="line">        <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">      base_ = base;</span><br><span class="line">      size_ = size;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// std::cout &lt;&lt; &quot;open buffer: &quot; &lt;&lt; size_ &lt;&lt; &quot; thread: &quot; &lt;&lt; std::this_thread::get_id() &lt;&lt; std::endl;</span></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">pvoid_t</span> <span class="title">base</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> base_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">cvoid_t</span> <span class="title">base</span><span class="params">()</span><span class="keyword">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> base_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">pvoid_t</span> <span class="title">begin</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> (<span class="keyword">char</span>*)base_ + tag_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">cvoid_t</span> <span class="title">begin</span><span class="params">()</span><span class="keyword">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> (<span class="keyword">const</span> <span class="keyword">char</span>*)base_ + tag_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">pvoid_t</span> <span class="title">end</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> (<span class="keyword">char</span>*)base_ + tag_ + len_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">cvoid_t</span> <span class="title">end</span><span class="params">()</span><span class="keyword">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> (<span class="keyword">const</span> <span class="keyword">char</span>*)base_ + tag_ + len_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">capacity</span><span class="params">()</span><span class="keyword">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> size_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">length</span><span class="params">()</span><span class="keyword">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> len_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">space</span><span class="params">()</span><span class="keyword">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> size_ - tag_ - len_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">space</span><span class="params">(<span class="keyword">size_t</span> max)</span><span class="keyword">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> XGC_MIN(<span class="keyword">size_t</span>(size_ - tag_ - len_), max);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">enough</span><span class="params">(<span class="keyword">size_t</span> reserve = <span class="number">0</span>)</span> <span class="keyword">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (reserve &gt; size_)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> size_ - reserve &gt;= tag_ + len_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      memmove(base_, begin(), len_);</span><br><span class="line">      tag_ = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">push</span><span class="params">(<span class="keyword">size_t</span> size)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (!(size &lt;= space()))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">      len_ += size;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">pop</span><span class="params">(<span class="keyword">size_t</span> size)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">size_t</span> copy = XGC_MIN(size, len_);</span><br><span class="line"></span><br><span class="line">      tag_ += copy;</span><br><span class="line">      len_ -= copy;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> copy;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">put</span><span class="params">(<span class="keyword">pvoid_t</span> data, <span class="keyword">size_t</span> size)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (!(size &lt;= space()))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">      <span class="built_in">memcpy</span>(end(), data, size);</span><br><span class="line">      push(size);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> size;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">size_t</span> <span class="title">get</span><span class="params">(<span class="keyword">pvoid_t</span> data, <span class="keyword">size_t</span> size)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      <span class="keyword">size_t</span> copy = XGC_MIN(size, len_);</span><br><span class="line"></span><br><span class="line">      <span class="built_in">memcpy</span>(data, begin(), copy);</span><br><span class="line"></span><br><span class="line">      tag_ += copy;</span><br><span class="line">      len_ -= copy;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> copy;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">pvoid_t</span> <span class="title">release</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">      reset();</span><br><span class="line"></span><br><span class="line">      <span class="keyword">auto</span> base = base_;</span><br><span class="line"></span><br><span class="line">      base_ = <span class="literal">nullptr</span>;</span><br><span class="line">      size_ = tag_ = len_ = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">return</span> base;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">session</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  asio_NetBuffer _send_buffer;</span><br><span class="line">  asio_NetBuffer _recv_buffer;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">NetEvent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">pvoid_t</span> session;</span><br><span class="line">  <span class="keyword">uint32_t</span> handle;</span><br><span class="line">  <span class="keyword">uint32_t</span> event;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">NetData</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">int32_t</span> length;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NET_PACKET_SIZE( Length ) (sizeof(NetEvent) + sizeof(NetData) + Length)</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">queue</span>&lt; <span class="built_in">std</span>::tuple&lt; <span class="keyword">pvoid_t</span>, <span class="keyword">size_t</span> &gt; &gt; event_queue_;</span><br><span class="line"><span class="built_in">std</span>::mutex lock_queue_;</span><br><span class="line"><span class="keyword">char</span>* _1Mdata;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Push</span><span class="params">( <span class="keyword">pvoid_t</span> data, <span class="keyword">size_t</span> size )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">std</span>::lock_guard&lt; <span class="built_in">std</span>::mutex &gt; _lock( lock_queue_ );</span><br><span class="line">  event_queue_.push( <span class="built_in">std</span>::make_tuple( data, size ) );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">Kick</span><span class="params">( <span class="keyword">pvoid_t</span> &amp;data, <span class="keyword">size_t</span> &amp;size )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="built_in">std</span>::lock_guard&lt; <span class="built_in">std</span>::mutex &gt; _lock( lock_queue_ );</span><br><span class="line">  <span class="keyword">if</span>( event_queue_.empty() )</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">auto</span> pkg = event_queue_.front();</span><br><span class="line">  data = <span class="built_in">std</span>::get&lt;<span class="number">0</span>&gt;( pkg );</span><br><span class="line">  size = <span class="built_in">std</span>::get&lt;<span class="number">1</span>&gt;( pkg );</span><br><span class="line"></span><br><span class="line">  event_queue_.pop();</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_THREAD 10</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::atomic&lt;<span class="keyword">int</span>&gt; _index;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;random&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="built_in">std</span>::mt19937&amp; <span class="title">get_random_driver</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">static</span> <span class="built_in">std</span>::mt19937 <span class="title">mt</span><span class="params">( (<span class="keyword">int32_t</span>) time( <span class="literal">nullptr</span> ) )</span></span>;</span><br><span class="line">  <span class="keyword">return</span> mt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">template</span> &lt; <span class="class"><span class="keyword">class</span> <span class="title">T1</span>, <span class="keyword">class</span> <span class="title">T2</span>, <span class="title">typename</span> <span class="title">std</span>:</span>:enable_if&lt; !<span class="built_in">std</span>::is_floating_point&lt; T1 &gt;::value &amp;&amp; !<span class="built_in">std</span>::is_floating_point&lt;T2&gt;::value, <span class="keyword">bool</span> &gt;::type = <span class="literal">true</span> &gt;</span><br><span class="line"><span class="keyword">auto</span> random_range( T1 Min, T2 Max )-&gt;<span class="keyword">decltype</span>( Min + Max )</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span>( Min == Max )</span><br><span class="line">    <span class="keyword">return</span> Min;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">using</span> NewT = <span class="keyword">decltype</span>( Min + Max );</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span>( Min &gt; Max )</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::uniform_int_distribution&lt;NewT&gt;( Max, Min )( get_random_driver() );</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">std</span>::uniform_int_distribution&lt;NewT&gt;( Min, Max )( get_random_driver() );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">  _1Mdata = (<span class="keyword">char</span>*)<span class="built_in">malloc</span>(<span class="number">80</span> * <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line">  <span class="built_in">memset</span>(_1Mdata, <span class="string">&#x27;a&#x27;</span>, <span class="number">80</span> * <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt; func_create = [_index]()&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;thread : &quot;</span>&lt;&lt;<span class="built_in">std</span>::this_thread::get_id() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">    session* _ss = <span class="keyword">new</span> session();</span><br><span class="line">    _ss-&gt;_send_buffer.open(<span class="number">10</span> * <span class="number">10024</span> * <span class="number">1024</span>);</span><br><span class="line">    _ss-&gt;_recv_buffer.open(<span class="number">10</span> * <span class="number">10024</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> event_id = _index.load();</span><br><span class="line">    _index += <span class="number">1000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// for (int i = 0; i &lt; 60; ++i)</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">int</span> packet_length = random_range(<span class="number">10</span>, <span class="number">80</span> * <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line">      NetEvent evt;</span><br><span class="line">      evt.session = <span class="literal">nullptr</span>;</span><br><span class="line">      evt.handle = <span class="number">1</span>;</span><br><span class="line">      evt.event = event_id++;</span><br><span class="line">      NetData dat;</span><br><span class="line">      dat.length = packet_length;</span><br><span class="line">      <span class="function">asio_NetBuffer <span class="title">packet</span><span class="params">(NET_PACKET_SIZE(packet_length))</span></span>;</span><br><span class="line">      packet.put(&amp;evt, <span class="keyword">sizeof</span>(evt));</span><br><span class="line">      packet.put(&amp;dat, <span class="keyword">sizeof</span>(dat));</span><br><span class="line">      packet.put(_1Mdata, packet_length);</span><br><span class="line"></span><br><span class="line">      Push(packet.release(), NET_PACKET_SIZE(packet_length));</span><br><span class="line">      <span class="comment">// std::cout &lt;&lt; &quot;event input:&quot; &lt;&lt; evt.event &lt;&lt; std::endl;</span></span><br><span class="line">      <span class="comment">//</span></span><br><span class="line">      <span class="comment">// free(packet.release());</span></span><br><span class="line"></span><br><span class="line">      <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::milliseconds(<span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">      <span class="comment">// _ss-&gt;_send_buffer.reset();</span></span><br><span class="line">      <span class="comment">// _ss-&gt;_recv_buffer.reset();</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">delete</span> _ss;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;thread end : &quot;</span> &lt;&lt;<span class="built_in">std</span>::this_thread::get_id() &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::seconds(<span class="number">30</span>));</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::thread&gt; tasks;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MAX_THREAD; ++i) &#123;</span><br><span class="line">    tasks.push_back(<span class="built_in">std</span>::thread(func_create));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// char *buf;</span></span><br><span class="line">  <span class="comment">// size_t size;</span></span><br><span class="line">  <span class="comment">// FILE *fp = open_memstream(&amp;buf, &amp;size);</span></span><br><span class="line">  <span class="comment">// malloc_info(0, fp);</span></span><br><span class="line">  <span class="comment">// fclose(fp);</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// std::cout &lt;&lt; &quot;--------: &quot; &lt;&lt; buf &lt;&lt; std::endl;</span></span><br><span class="line">  <span class="comment">// free(buf);</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// for (int i = 0; i &lt; 1000; ++i)</span></span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">pvoid_t</span> data = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="keyword">size_t</span> size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (Kick(data, size))</span><br><span class="line">    &#123;</span><br><span class="line">      NetEvent* pHeader = (NetEvent*)data;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// std::cout &lt;&lt; &quot;event:&quot; &lt;&lt; pHeader-&gt;event &lt;&lt; std::endl;</span></span><br><span class="line"></span><br><span class="line">      <span class="built_in">free</span>(data);</span><br><span class="line"></span><br><span class="line">      <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::milliseconds(<span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::for_each(tasks.begin(), tasks.end(), [](<span class="built_in">std</span>::thread&amp; t)&#123;t.join();&#125;);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">free</span>(_1Mdata);</span><br><span class="line"></span><br><span class="line">  MallocExtension::instance()-&gt;ReleaseFreeMemory();</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;threads joined ... &quot;</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">  <span class="built_in">std</span>::this_thread::sleep_for(<span class="built_in">std</span>::chrono::seconds(<span class="number">30</span>));</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Shell</code>: </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ((i=1; i&lt;100; i++)); <span class="keyword">do</span> pmap -x 4454 | grep total; sleep 1; <span class="keyword">done</span> </span><br></pre></td></tr></table></figure>
+<p><code>RSS在3.5G左右会有一次比较大的空间释放</code><br><img src="/images/ArenaMemory/png10.gif"></p>
+</li>
+</ul>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/02/mysql-sequence-%E7%94%9F%E6%88%90-%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/" rel="prev" title="mysql sequence 生成 & 遇到的问题">
+      <i class="fa fa-chevron-left"></i> mysql sequence 生成 & 遇到的问题
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly_avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Kinly's 记录</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
