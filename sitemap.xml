@@ -2,20 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://example.com/googlee5eca42aa8150455.html</loc>
-    
-    <lastmod>2020-11-11</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://example.com/baidu_verify_code-MnCVGiKuSH.html</loc>
-    
-    <lastmod>2020-11-11</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://example.com/2020/10/30/%E5%A4%87%E5%BF%98/</loc>
     
     <lastmod>2020-11-11</lastmod>
@@ -114,14 +100,14 @@
   </url>
   
   <url>
-    <loc>http://example.com/2020/10/30/gdb-%E7%9A%84%E5%B8%B8%E7%94%A8/</loc>
+    <loc>http://example.com/2020/10/30/linux-%E8%B0%83%E8%AF%95%E7%9B%B8%E5%85%B3/</loc>
     
     <lastmod>2020-10-30</lastmod>
     
   </url>
   
   <url>
-    <loc>http://example.com/2020/10/30/linux-%E8%B0%83%E8%AF%95%E7%9B%B8%E5%85%B3/</loc>
+    <loc>http://example.com/2020/10/30/gdb-%E7%9A%84%E5%B8%B8%E7%94%A8/</loc>
     
     <lastmod>2020-10-30</lastmod>
     
@@ -144,6 +130,13 @@
   </url>
   
   <url>
+    <loc>http://example.com/tags/%E5%B8%B8%E7%94%A8%E5%A4%87%E5%BF%98/</loc>
+    <lastmod>2020-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://example.com/tags/gdb/</loc>
     <lastmod>2020-11-11</lastmod>
     <changefreq>daily</changefreq>
@@ -152,13 +145,6 @@
   
   <url>
     <loc>http://example.com/tags/C-C/</loc>
-    <lastmod>2020-11-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://example.com/tags/%E5%B8%B8%E7%94%A8%E5%A4%87%E5%BF%98/</loc>
     <lastmod>2020-11-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -216,13 +202,6 @@
   </url>
   
   <url>
-    <loc>http://example.com/categories/%E5%A4%87%E5%BF%98/</loc>
-    <lastmod>2020-11-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>http://example.com/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/</loc>
     <lastmod>2020-11-11</lastmod>
     <changefreq>daily</changefreq>
@@ -231,6 +210,13 @@
   
   <url>
     <loc>http://example.com/categories/%E4%BB%A3%E7%A0%81/</loc>
+    <lastmod>2020-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://example.com/categories/%E5%A4%87%E5%BF%98/</loc>
     <lastmod>2020-11-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
