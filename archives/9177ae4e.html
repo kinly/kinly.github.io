@@ -31,7 +31,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://kinly.github.io/images/Game/MMO-service.png">
 <meta property="article:published_time" content="2020-11-17T11:16:12.000Z">
-<meta property="article:modified_time" content="2020-11-18T08:10:46.296Z">
+<meta property="article:modified_time" content="2020-11-18T13:31:48.370Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="游戏开发">
 <meta name="twitter:card" content="summary">
@@ -200,7 +200,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-18 16:10:46" itemprop="dateModified" datetime="2020-11-18T16:10:46+08:00">2020-11-18</time>
+                <time title="修改时间：2020-11-18 21:31:48" itemprop="dateModified" datetime="2020-11-18T21:31:48+08:00">2020-11-18</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -296,7 +296,25 @@
 </ul>
 </li>
 </ul>
-<h4 id="大区概念的网络"><a href="#大区概念的网络" class="headerlink" title="大区概念的网络"></a>大区概念的网络</h4>
+<hr>
+<h4 id="大区概念的网络"><a href="#大区概念的网络" class="headerlink" title="大区概念的网络"></a>大区概念的网络</h4><ul>
+<li><strong>跨大洲的网络通讯</strong>：物理距离在我的理解里是无法避免的<ul>
+<li>一条消息从亚洲到欧洲，平均需要200ms，这只是平均值，在极端情况这个值会很大，大到玩家觉得游戏很卡</li>
+<li>传说一些有钱的游戏购买了运营商的专线网络做加速，但是那个成本实在太高了</li>
+<li>考虑如何减轻网络延迟的影响，或者想办法把玩家尽量放到离他很近的游戏服务器（需要基于游戏玩法本身考虑）</li>
+<li>确保在跨区交互上也是符合CP（参考CAP）</li>
+<li>下面的一些描述基于游戏是一个开房间的方式，战斗服务器需要在战斗开始拿且仅拿一次数据，结算返回到逻辑服务器（离数据近的服务器）做数据更新</li>
+<li>战斗开始，战斗服务器拿到的数据是否可以相信客户端发送到服务器的数据（客户端从数据服务器拿到战斗需要的加密数据包，并在战斗开始的时候发送到战斗服务器，战斗服务器解密并验证数据合法性），这样做可以避免跨大洲的数据交互</li>
+<li>战斗结算，以类似战斗开始的方式由客户端转发结算数据到逻辑服务器</li>
+<li>理论上，上面描述的方式是可行的</li>
+<li>如果战斗服务器的算力很强大，延迟只考虑网络的情况，给玩家选择战斗服务器的时候需要就近选择（ping值较优的那台）</li>
+<li>玩家登录后获取所有（尽可能多的）战斗服务器的列表，并做ICMP的网络探测并上报数据给到匹配服务器（匹配战斗服务器用的一组服务器Matchmaking）</li>
+<li>匹配服务器基于一定的规则，尽量把玩家分配到网络较优的战斗服务器上</li>
+</ul>
+</li>
+</ul>
+<p>（待续….）</p>
+
     </div>
 
     
