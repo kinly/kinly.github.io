@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://kinly.github.io/images/CharacterEncode/utf16-be-hexdump.png">
 <meta property="og:image" content="https://kinly.github.io/images/CharacterEncode/utf16-le-hexdump.png">
 <meta property="article:published_time" content="2020-11-19T01:40:12.000Z">
-<meta property="article:modified_time" content="2020-11-19T06:30:14.519Z">
+<meta property="article:modified_time" content="2020-11-19T11:02:10.281Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="知识备忘">
 <meta name="twitter:card" content="summary">
@@ -198,7 +198,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-11-19 09:40:12 / 修改时间：14:30:14" itemprop="dateCreated datePublished" datetime="2020-11-19T09:40:12+08:00">2020-11-19</time>
+              <time title="创建时间：2020-11-19 09:40:12 / 修改时间：19:02:10" itemprop="dateCreated datePublished" datetime="2020-11-19T09:40:12+08:00">2020-11-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -309,7 +309,7 @@
 <li>语言： C/C++ 处理的是二进制数据，所以本身是没有默认编码，而编码是跟源文件（代码文件、读取的磁盘文件）</li>
 </ul>
 <h3 id="区域设置"><a href="#区域设置" class="headerlink" title="区域设置"></a>区域设置</h3><ul>
-<li><p>既然语言如 C/C++ 处理的是二进制数据（字符集本身是二进制数据的拼合），又有那么多编码并且各个编码所占字节又不同的情况下，我们需要告知程序在做字符转换的时候用那种拆分方式拆分一个字符串数据.<br><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/setlocale.3.html"><code>setlocale</code></a><br>告知程序在做<code>多字符-宽字符</code> <a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdlib/mbstowcs/">mbstowcs</a>, <a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdlib/wcstombs/">wcstombs</a> 互相转换的时候如何解码字符 (需要注意的是这里linux、windows设置是不一样的) <code>linux:</code> (<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man7/locale.7.html">https://man7.org/linux/man-pages/man7/locale.7.html</a>) <code>windows:</code> (<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/cpp/c-runtime-library/country-region-strings?view=msvc-160">https://docs.microsoft.com/en-us/cpp/c-runtime-library/country-region-strings?view=msvc-160</a>)</p>
+<li><p>既然语言如 C/C++ 处理的是二进制数据（字符集本身是二进制数据的拼合），又有那么多编码并且各个编码所占字节又不同的情况下，我们需要告知程序在做字符转换的时候用那种拆分方式拆分一个字符串数据.<br><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/setlocale.3.html"><code>setlocale</code></a><br>告知程序在做<code>多字符-宽字符</code> <a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdlib/mbstowcs/">mbstowcs</a>, <a target="_blank" rel="noopener" href="http://www.cplusplus.com/reference/cstdlib/wcstombs/">wcstombs</a> 互相转换的时候如何解码字符 (需要注意的是这里linux、windows设置是不一样的)<br><code>linux:</code> (<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man7/locale.7.html">https://man7.org/linux/man-pages/man7/locale.7.html</a>)<br><code>windows:</code> (<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/cpp/c-runtime-library/country-region-strings?view=msvc-160">https://docs.microsoft.com/en-us/cpp/c-runtime-library/country-region-strings?view=msvc-160</a>)</p>
 </li>
 <li><p>如果你不需要做字符转换（UTF-8 是用途最广的编码方式），只需要保证程序读取的文件都是相同编码（UTF-8）的，如果你的程序里有（比如：中文这种），也需要保证你的源文件是（UTF-8）编码的</p>
 </li>
@@ -340,7 +340,10 @@
     <a href="/archives/d610ad0a.html" rel="prev" title="分享：音乐">
       <i class="fa fa-chevron-left"></i> 分享：音乐
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/archives/3388bb24.html" rel="next" title="网络：基础">
+      网络：基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -415,20 +418,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
