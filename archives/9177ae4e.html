@@ -30,8 +30,9 @@
 <meta property="og:description" content="如何设计分布式的&quot;小&quot;游戏">
 <meta property="og:locale">
 <meta property="og:image" content="https://kinly.github.io/images/Game/MMO-service.png">
+<meta property="og:image" content="https://kinly.github.io/images/Game/distributed-service.png">
 <meta property="article:published_time" content="2020-11-17T11:16:12.000Z">
-<meta property="article:modified_time" content="2020-11-18T13:31:48.370Z">
+<meta property="article:modified_time" content="2020-11-23T02:01:06.092Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="游戏开发">
 <meta name="twitter:card" content="summary">
@@ -200,7 +201,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-18 21:31:48" itemprop="dateModified" datetime="2020-11-18T21:31:48+08:00">2020-11-18</time>
+                <time title="修改时间：2020-11-23 10:01:06" itemprop="dateModified" datetime="2020-11-23T10:01:06+08:00">2020-11-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -297,6 +298,11 @@
 </li>
 </ul>
 <hr>
+<ul>
+<li><strong>简易的消息流程</strong><br><img src="/images/Game/distributed-service.png"></li>
+<li>其中 <code>Operator Change Avatar</code> 标识一次 <code>Package for battle</code> 内部数据修改应重传一次 <code>Package for battle</code> encode 数据</li>
+<li>加密方式有很多种，简单的如图示，数据服务器持公钥编码，战斗服务器持私钥解码</li>
+</ul>
 <h4 id="大区概念的网络"><a href="#大区概念的网络" class="headerlink" title="大区概念的网络"></a>大区概念的网络</h4><ul>
 <li><strong>跨大洲的网络通讯</strong>：物理距离在我的理解里是无法避免的<ul>
 <li>一条消息从亚洲到欧洲，平均需要200ms，这只是平均值，在极端情况这个值会很大，大到玩家觉得游戏很卡</li>
@@ -332,8 +338,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/archives/ec0ed877.html" rel="prev" title="std::shared_ptr 线程安全？">
-      <i class="fa fa-chevron-left"></i> std::shared_ptr 线程安全？
+    <a href="/archives/136816a5.html" rel="prev" title="cmake 常用备忘">
+      <i class="fa fa-chevron-left"></i> cmake 常用备忘
     </a></div>
       <div class="post-nav-item">
     <a href="/archives/d610ad0a.html" rel="next" title="分享：音乐">
@@ -413,7 +419,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-count">21</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
