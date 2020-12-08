@@ -39,8 +39,8 @@
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/trace02.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/trace03.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/ECMP01.gif">
-<meta property="article:published_time" content="2020-11-28T02:49:22.000Z">
-<meta property="article:modified_time" content="2020-12-01T12:45:25.441Z">
+<meta property="article:published_time" content="2020-11-27T13:48:44.000Z">
+<meta property="article:modified_time" content="2020-12-08T02:16:21.750Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="网络">
 <meta name="twitter:card" content="summary">
@@ -202,14 +202,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-11-28 10:49:22" itemprop="dateCreated datePublished" datetime="2020-11-28T10:49:22+08:00">2020-11-28</time>
+              <time title="创建时间：2020-11-27 21:48:44" itemprop="dateCreated datePublished" datetime="2020-11-27T21:48:44+08:00">2020-11-27</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-01 20:45:25" itemprop="dateModified" datetime="2020-12-01T20:45:25+08:00">2020-12-01</time>
+                <time title="修改时间：2020-12-08 10:16:21" itemprop="dateModified" datetime="2020-12-08T10:16:21+08:00">2020-12-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -297,10 +297,20 @@
 <li>上面这些差错报告，是可能由路由层发出的，而路由层解包的是IP层的协议，ICMP可以看做是IP协议的子类</li>
 </ul>
 <h4 id="ICMP-报文类型"><a href="#ICMP-报文类型" class="headerlink" title="ICMP 报文类型"></a><a href="(https://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E6%8E%A7%E5%88%B6%E6%B6%88%E6%81%AF%E5%8D%8F%E8%AE%AE)">ICMP 报文类型</a></h4><p><img src="/images/network/ICMP/ICMP05.png"><br><img src="/images/network/ICMP/ICMP06.png"></p>
-<h3 id="ICMP-工具"><a href="#ICMP-工具" class="headerlink" title="ICMP 工具"></a>ICMP 工具</h3><h4 id="ping"><a href="#ping" class="headerlink" title="ping"></a>ping</h4><ul>
+<h3 id="ICMP-工具"><a href="#ICMP-工具" class="headerlink" title="ICMP 工具"></a>ICMP 工具</h3><h4 id="1-ping"><a href="#1-ping" class="headerlink" title="1. ping"></a>1. ping</h4><ul>
 <li>最常用的工具了，上面介绍ICMP也用的这个</li>
 </ul>
-<h4 id="traceroute-路径探测"><a href="#traceroute-路径探测" class="headerlink" title="traceroute 路径探测"></a>traceroute 路径探测</h4><p><code>wiki</code>: (<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Traceroute">https://en.wikipedia.org/wiki/Traceroute</a>)<br><code>man page</code>: (<a target="_blank" rel="noopener" href="https://linux.die.net/man/8/traceroute">https://linux.die.net/man/8/traceroute</a>)</p>
+<h4 id="2-why-dose-ping-need-setuid-permission"><a href="#2-why-dose-ping-need-setuid-permission" class="headerlink" title="2. why dose ping need setuid permission"></a>2. why dose ping need setuid permission</h4><p><a target="_blank" rel="noopener" href="https://unix.stackexchange.com/questions/382771/why-does-ping-need-setuid-permission">https://unix.stackexchange.com/questions/382771/why-does-ping-need-setuid-permission</a>; 这个问题包含的知识挺多的</p>
+<ul>
+<li><code>suid</code> : <a target="_blank" rel="noopener" href="https://www.cnblogs.com/sparkdev/p/9651622.html">https://www.cnblogs.com/sparkdev/p/9651622.html</a></li>
+<li><code>raw network socket</code> : <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/14774668/what-is-raw-socket-in-socket-programming">https://stackoverflow.com/questions/14774668/what-is-raw-socket-in-socket-programming</a></li>
+<li><code>raw network socket</code> wiki: <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Network_socket">https://en.wikipedia.org/wiki/Network_socket</a></li>
+<li><code>getcap</code>: <a target="_blank" rel="noopener" href="https://www.man7.org/linux/man-pages/man8/getcap.8.html">https://www.man7.org/linux/man-pages/man8/getcap.8.html</a></li>
+<li>traceroute -T 需要<code>root</code>也是应为<code>socket_raw</code>的关系</li>
+<li><code>windows</code> 的 <code>tracert</code> 没有 <code>tcp</code> 的选项，但是可以自己写程序模拟，但是自己的程序需要<code>administrator</code>权限</li>
+<li>有时候icmp的路径探测是不准确的，(不同协议路由的路径很可能不同); 这时候我们需要个tcp的路径探测包在自己的程序里，(TTL递增)代码很简单，只是需要记得需要<code>管理员权限</code></li>
+</ul>
+<h4 id="3-traceroute-路径探测"><a href="#3-traceroute-路径探测" class="headerlink" title="3. traceroute 路径探测"></a>3. traceroute 路径探测</h4><p><code>wiki</code>: (<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Traceroute">https://en.wikipedia.org/wiki/Traceroute</a>)<br><code>man page</code>: (<a target="_blank" rel="noopener" href="https://linux.die.net/man/8/traceroute">https://linux.die.net/man/8/traceroute</a>)</p>
 <ul>
 <li><p>默认是UDP探测，利用IP协议TTL字段，第一次TTL=1探测一个路由节点，收到ICMP Type=11, Code=0的Time Exceeded<br><img src="/images/network/ICMP/trace01.png"></p>
 </li>
@@ -326,6 +336,8 @@
 <li><p>如果几乎所有的探测导致某种无法到达的情况，traceroute将放弃并退出。</p>
 </li>
 <li><p>traceroute <code>* * *</code> Qos/ACL</p>
+</li>
+<li><p>根据差错报文的规则，我们用<code>TCP+TTL</code>访问一个不存在的端口，就可以探测出<code>TCP的路由路径</code>，<code>TTL超时（type=11 code=0)</code>表示没有到达目标点，<code>RST（type=3 code=3 也有可能是其他）</code>、<code>connected</code>表示到达了目标点</p>
 </li>
 </ul>
 <h3 id="ECMP-等价多路径"><a href="#ECMP-等价多路径" class="headerlink" title="ECMP 等价多路径"></a>ECMP 等价多路径</h3><p><code>wiki</code>: (<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Equal-cost_multi-path_routing">https://en.wikipedia.org/wiki/Equal-cost_multi-path_routing</a>)</p>
@@ -358,12 +370,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/archives/3b5f401c.html" rel="prev" title="网络：TCP">
-      <i class="fa fa-chevron-left"></i> 网络：TCP
+    <a href="/archives/3388bb24.html" rel="prev" title="网络：基础">
+      <i class="fa fa-chevron-left"></i> 网络：基础
     </a></div>
       <div class="post-nav-item">
-    <a href="/archives/1fb5c021.html" rel="next" title="网络：NAT">
-      网络：NAT <i class="fa fa-chevron-right"></i>
+    <a href="/archives/3b5f401c.html" rel="next" title="网络：TCP">
+      网络：TCP <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -423,7 +435,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93%E6%88%91%E4%BB%AC%E5%88%A4%E6%96%AD%E7%BD%91%E7%BB%9C%E6%98%AF%E5%90%A6%E5%8F%AF%E7%94%A8%E7%9A%84%E6%97%B6%E5%80%99"><span class="nav-number">1.</span> <span class="nav-text">当我们判断网络是否可用的时候</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP-%E4%BD%9C%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">ICMP 作用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%AE%E9%94%99%E6%8A%A5%E6%96%87"><span class="nav-number">2.2.</span> <span class="nav-text">差错报文</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ICMP-%E6%8A%A5%E6%96%87%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.3.</span> <span class="nav-text">ICMP 报文类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP-%E5%B7%A5%E5%85%B7"><span class="nav-number">3.</span> <span class="nav-text">ICMP 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ping"><span class="nav-number">3.1.</span> <span class="nav-text">ping</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#traceroute-%E8%B7%AF%E5%BE%84%E6%8E%A2%E6%B5%8B"><span class="nav-number">3.2.</span> <span class="nav-text">traceroute 路径探测</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ECMP-%E7%AD%89%E4%BB%B7%E5%A4%9A%E8%B7%AF%E5%BE%84"><span class="nav-number">4.</span> <span class="nav-text">ECMP 等价多路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">5.</span> <span class="nav-text">说明</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93%E6%88%91%E4%BB%AC%E5%88%A4%E6%96%AD%E7%BD%91%E7%BB%9C%E6%98%AF%E5%90%A6%E5%8F%AF%E7%94%A8%E7%9A%84%E6%97%B6%E5%80%99"><span class="nav-number">1.</span> <span class="nav-text">当我们判断网络是否可用的时候</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP-%E4%BD%9C%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">ICMP 作用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%AE%E9%94%99%E6%8A%A5%E6%96%87"><span class="nav-number">2.2.</span> <span class="nav-text">差错报文</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ICMP-%E6%8A%A5%E6%96%87%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.3.</span> <span class="nav-text">ICMP 报文类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP-%E5%B7%A5%E5%85%B7"><span class="nav-number">3.</span> <span class="nav-text">ICMP 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-ping"><span class="nav-number">3.1.</span> <span class="nav-text">1. ping</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-why-dose-ping-need-setuid-permission"><span class="nav-number">3.2.</span> <span class="nav-text">2. why dose ping need setuid permission</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-traceroute-%E8%B7%AF%E5%BE%84%E6%8E%A2%E6%B5%8B"><span class="nav-number">3.3.</span> <span class="nav-text">3. traceroute 路径探测</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ECMP-%E7%AD%89%E4%BB%B7%E5%A4%9A%E8%B7%AF%E5%BE%84"><span class="nav-number">4.</span> <span class="nav-text">ECMP 等价多路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">5.</span> <span class="nav-text">说明</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
