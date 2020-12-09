@@ -249,13 +249,6 @@
   </url>
   
   <url>
-    <loc>https://kinly.github.io/tags/%E7%9F%A5%E8%AF%86%E5%A4%87%E5%BF%98/</loc>
-    <lastmod>2020-12-09</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://kinly.github.io/tags/%E9%9F%B3%E4%B9%90/</loc>
     <lastmod>2020-12-09</lastmod>
     <changefreq>daily</changefreq>
@@ -264,6 +257,13 @@
   
   <url>
     <loc>https://kinly.github.io/tags/%E5%88%86%E4%BA%AB/</loc>
+    <lastmod>2020-12-09</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://kinly.github.io/tags/%E7%9F%A5%E8%AF%86%E5%A4%87%E5%BF%98/</loc>
     <lastmod>2020-12-09</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
