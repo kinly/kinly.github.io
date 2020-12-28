@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://kinly.github.io/images/network/NAT/stun-proto.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/NAT/stun-proto-2.png">
 <meta property="article:published_time" content="2020-11-28T02:49:28.000Z">
-<meta property="article:modified_time" content="2020-12-28T12:37:34.084Z">
+<meta property="article:modified_time" content="2020-12-28T12:44:13.676Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="网络">
 <meta name="twitter:card" content="summary">
@@ -206,7 +206,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-28 20:37:34" itemprop="dateModified" datetime="2020-12-28T20:37:34+08:00">2020-12-28</time>
+                <time title="修改时间：2020-12-28 20:44:13" itemprop="dateModified" datetime="2020-12-28T20:44:13+08:00">2020-12-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -312,6 +312,13 @@
 <li>step 2. cone 再给 symmetric 发送N次消息</li>
 <li>大概率是可以发送成功的，试了很多次，觉得反正这两种类型本就不好穿透，既然这样可行就先备在代码里了</li>
 </ul>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li>华为：<a target="_blank" rel="noopener" href="https://support.huawei.com/enterprise/zh/doc/EDOC1100112409/fd829977">https://support.huawei.com/enterprise/zh/doc/EDOC1100112409/fd829977</a> </li>
+<li>RFC: <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc3489">https://tools.ietf.org/html/rfc3489</a></li>
+<li>STUN: <a target="_blank" rel="noopener" href="http://www.networksorcery.com/enp/protocol/stun.htm">http://www.networksorcery.com/enp/protocol/stun.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/my_life/articles/1908552.html">https://www.cnblogs.com/my_life/articles/1908552.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://dearmiku.github.io/2017/11/17/NTA%E6%89%93%E6%B4%9E/">https://dearmiku.github.io/2017/11/17/NTA%E6%89%93%E6%B4%9E/</a></li>
+</ul>
 
     </div>
 
@@ -398,7 +405,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">NAT 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-STUN"><span class="nav-number">3.</span> <span class="nav-text">NAT STUN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E7%B1%BB%E5%9E%8B%EF%BC%88STUN%E6%A0%87%E5%87%86%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">NAT 类型（STUN标准）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%8E%E4%B8%BA%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3"><span class="nav-number">4.1.</span> <span class="nav-text">华为官方文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NAT%E8%83%BD%E8%AE%BF%E9%97%AE%E7%9A%84%E6%97%B6%E5%80%99%E6%98%AF%E6%80%8E%E4%B9%88%E6%A0%B7%E7%9A%84%E5%91%A2%EF%BC%9F"><span class="nav-number">4.2.</span> <span class="nav-text">NAT能访问的时候是怎么样的呢？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E4%BE%A6%E6%B5%8B"><span class="nav-number">5.</span> <span class="nav-text">NAT 侦测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#STUN-%E6%8A%A5%E6%96%87"><span class="nav-number">5.1.</span> <span class="nav-text">STUN 报文</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#STUN-%E4%BE%A6%E6%B5%8B%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">5.2.</span> <span class="nav-text">STUN 侦测流程图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BF%E9%80%8F"><span class="nav-number">6.</span> <span class="nav-text">穿透</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A9%BF%E9%80%8F%E7%9A%84%E9%9A%BE%E5%BA%A6"><span class="nav-number">6.1.</span> <span class="nav-text">穿透的难度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E4%B8%8D%E6%98%8E%E7%9A%84%E6%8A%95%E6%9C%BA%E5%8F%96%E5%B7%A7"><span class="nav-number">6.2.</span> <span class="nav-text">原因不明的投机取巧</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">NAT 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-STUN"><span class="nav-number">3.</span> <span class="nav-text">NAT STUN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E7%B1%BB%E5%9E%8B%EF%BC%88STUN%E6%A0%87%E5%87%86%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">NAT 类型（STUN标准）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%8E%E4%B8%BA%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3"><span class="nav-number">4.1.</span> <span class="nav-text">华为官方文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NAT%E8%83%BD%E8%AE%BF%E9%97%AE%E7%9A%84%E6%97%B6%E5%80%99%E6%98%AF%E6%80%8E%E4%B9%88%E6%A0%B7%E7%9A%84%E5%91%A2%EF%BC%9F"><span class="nav-number">4.2.</span> <span class="nav-text">NAT能访问的时候是怎么样的呢？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E4%BE%A6%E6%B5%8B"><span class="nav-number">5.</span> <span class="nav-text">NAT 侦测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#STUN-%E6%8A%A5%E6%96%87"><span class="nav-number">5.1.</span> <span class="nav-text">STUN 报文</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#STUN-%E4%BE%A6%E6%B5%8B%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">5.2.</span> <span class="nav-text">STUN 侦测流程图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BF%E9%80%8F"><span class="nav-number">6.</span> <span class="nav-text">穿透</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A9%BF%E9%80%8F%E7%9A%84%E9%9A%BE%E5%BA%A6"><span class="nav-number">6.1.</span> <span class="nav-text">穿透的难度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E4%B8%8D%E6%98%8E%E7%9A%84%E6%8A%95%E6%9C%BA%E5%8F%96%E5%B7%A7"><span class="nav-number">6.2.</span> <span class="nav-text">原因不明的投机取巧</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
