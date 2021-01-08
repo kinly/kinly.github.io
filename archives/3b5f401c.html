@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-sdrv.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-win01.jpg">
 <meta property="article:published_time" content="2020-11-28T02:49:22.000Z">
-<meta property="article:modified_time" content="2020-12-28T01:45:34.458Z">
+<meta property="article:modified_time" content="2021-01-08T12:32:33.045Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="网络">
 <meta name="twitter:card" content="summary">
@@ -206,7 +206,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-28 09:45:34" itemprop="dateModified" datetime="2020-12-28T09:45:34+08:00">2020-12-28</time>
+                <time title="修改时间：2021-01-08 20:32:33" itemprop="dateModified" datetime="2021-01-08T20:32:33+08:00">2021-01-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -311,7 +311,8 @@
 <li>避免延迟的数据段被相同的4元组连接收到</li>
 <li>等待被动关闭的那边收到完整的关闭消息</li>
 <li>调整数量限制：<code>/proc/sys/net/ipv4/tcp_max_tw_buckets</code> </li>
-<li>复用TIME_WAIT状态的链接：<code>/proc/sys/net/ipv4/tcp_tw_reuse</code>， 注意<code>SocketOptions.ReuseAddress</code>是针对绑定端口的，可以绑定TIME_WAIT的端口</li>
+<li>复用TIME_WAIT状态资源：<code>/proc/sys/net/ipv4/tcp_tw_reuse</code>， 注意<code>SocketOptions.ReuseAddress</code>是针对绑定端口的，可以绑定TIME_WAIT的端口</li>
+<li>快速回收TIME_WAIT状态socket： <code>/proc/sys/net/ipv4/tcp_tw_recycle</code> 但是不推荐启用：<a target="_blank" rel="noopener" href="https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux">https://vincent.bernat.ch/en/blog/2014-tcp-time-wait-state-linux</a> -&gt; 中文： <a target="_blank" rel="noopener" href="https://www.cnblogs.com/sunsky303/p/12818009.html">https://www.cnblogs.com/sunsky303/p/12818009.html</a></li>
 </ul>
 </li>
 <li><code>CLOSE_WAIT</code>: SOCKET 等待应用层主动调用close关闭SOCKET，因为网络层关闭了，上层应用需要处理自己的东西，比如缓冲区、句柄等等，如果netstat看到大量这种状态，基本确定是程序出问题了</li>
@@ -513,7 +514,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -526,7 +527,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
