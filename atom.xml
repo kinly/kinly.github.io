@@ -42,15 +42,25 @@
   </entry>
   
   <entry>
-    <title></title>
-    <link href="https://kinly.github.io/archives/0.html"/>
-    <id>https://kinly.github.io/archives/0.html</id>
-    <published>2021-01-06T16:00:00.000Z</published>
-    <updated>2021-01-13T06:43:15.197Z</updated>
+    <title>IO模型</title>
+    <link href="https://kinly.github.io/archives/aeafbee0.html"/>
+    <id>https://kinly.github.io/archives/aeafbee0.html</id>
+    <published>2021-01-07T01:36:47.000Z</published>
+    <updated>2021-01-13T06:51:19.128Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><ul><li>现在包括C++（asio）已经把网络封装的很简单了，看不到select/poll/epoll/iocp这些就不是很关注了</li><li>其实这些知识还挺重要，至少看那些开源东西介绍的时候了解为什么，或者很多开源选择的时候知道如何选择</li><li>异步IO是指网络IO，关注性能的时候磁盘IO也是经常要留意的点，但是kernel并没有disk IO的解决方案，</li></ul><h3 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h3><ul><li>BIO（block-io）: 同步阻塞IO。send/recv阻塞调用，如果开线程while(true)，意味着想要多个session无差别就要开和session 1:1 数量的线程数。基本不会用这种方式</li><li>NIO（non-block-io）: 同步非阻塞IO。相对BIO *N线程的方式，这里用一个线程轮询所有session（fd），判断是否有新的数据，也就是一个没有事件的fd也会被遍历一下，试想如果服务器维护一个很长的队列，这个遍历不仅耗CPU，还容易出现处理不及时。</li><li>IO 多路复用 （系统提供的）<ul><li>select：维护了一个FD_SETSIZE(默认1024)的fds列表，轮询所有fd检查有没有事件，和NIO类似的问题</li><li>poll：相比select没有了FD_SETSIZE的列表长度限制</li><li>epoll：</li></ul></li></ul><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul><li>IO-wiki: <a href="https://zh.wikipedia.org/wiki/I/O">https://zh.wikipedia.org/wiki/I/O</a> </li><li></li></ul>]]></content>
+    
+    
+    <summary type="html">IO模型</summary>
     
     
     
+    <category term="知识积累" scheme="https://kinly.github.io/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/"/>
     
+    
+    <category term="IO" scheme="https://kinly.github.io/tags/IO/"/>
+    
+    <category term="知识积累" scheme="https://kinly.github.io/tags/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/"/>
     
   </entry>
   
