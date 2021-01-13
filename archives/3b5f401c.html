@@ -32,12 +32,14 @@
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-trace.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP01.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-status.png">
+<meta property="og:image" content="https://kinly.github.io/images/network/TCP/796px-Tcp_state_diagram_fixed_new.svg.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-status02.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-header.png">
+<meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-header-option.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-sdrv.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/TCP/TCP-win01.jpg">
 <meta property="article:published_time" content="2020-11-28T02:49:22.000Z">
-<meta property="article:modified_time" content="2021-01-08T12:32:33.045Z">
+<meta property="article:modified_time" content="2021-01-13T03:03:03.185Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="网络">
 <meta name="twitter:card" content="summary">
@@ -206,7 +208,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-08 20:32:33" itemprop="dateModified" datetime="2021-01-08T20:32:33+08:00">2021-01-08</time>
+                <time title="修改时间：2021-01-13 11:03:03" itemprop="dateModified" datetime="2021-01-13T11:03:03+08:00">2021-01-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -263,7 +265,7 @@
 <li>MTU：IP层的控制，其实这个值可以很大了，但是路径上的最小值才是决定因素，所以一般还是认为这个值是1500</li>
 <li>MSS: TCP层的控制，这个值应 小于等于 MTU，试想一下，如果MSS大于MTU，IP层因MTU拆了包分别是[1,2]，这时候IP层会给这两个包都加上IP-header，但是2这时候就没有TCP报文头了</li>
 </ul>
-<h4 id="TCP-状态"><a href="#TCP-状态" class="headerlink" title="TCP 状态"></a>TCP 状态</h4><h5 id="行为-gt-状态"><a href="#行为-gt-状态" class="headerlink" title="行为-&gt;状态"></a>行为-&gt;状态</h5><p><img src="/images/network/TCP/TCP-status.png"></p>
+<h4 id="TCP-状态"><a href="#TCP-状态" class="headerlink" title="TCP 状态"></a>TCP 状态</h4><h5 id="行为-gt-状态"><a href="#行为-gt-状态" class="headerlink" title="行为-&gt;状态"></a>行为-&gt;状态</h5><p><img src="/images/network/TCP/TCP-status.png"><br>wiki: <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/File:Tcp_state_diagram_fixed_new.svg">https://en.wikipedia.org/wiki/File:Tcp_state_diagram_fixed_new.svg</a><br><img src="/images/network/TCP/796px-Tcp_state_diagram_fixed_new.svg.png"></p>
 <h5 id="握手-gt-挥手"><a href="#握手-gt-挥手" class="headerlink" title="握手-&gt;挥手"></a>握手-&gt;挥手</h5><p><img src="/images/network/TCP/TCP-status02.png"></p>
 <h5 id="从状态讲起"><a href="#从状态讲起" class="headerlink" title="从状态讲起"></a>从状态讲起</h5><ul>
 <li><code>CLOSE</code>: TCP 未打开或者是关闭的</li>
@@ -318,7 +320,7 @@
 <li><code>CLOSE_WAIT</code>: SOCKET 等待应用层主动调用close关闭SOCKET，因为网络层关闭了，上层应用需要处理自己的东西，比如缓冲区、句柄等等，如果netstat看到大量这种状态，基本确定是程序出问题了</li>
 <li><code>LAST_ACK</code>：等待挥手最后一个ACK</li>
 <li><strong>上面这些状态（除了<code>CLOSE</code>）都是占用着系统资源句柄的!!</strong></li>
-<li><code>RST</code>: 特殊的响应，暴利关闭、拒绝(不必挥手了，直接释放资源)<ul>
+<li><code>RST</code>: 特殊的响应，暴力关闭、拒绝(不必挥手了，直接释放资源)<ul>
 <li>未监听的端口访问</li>
 <li>不请自来的SYN/ACK/FIN</li>
 <li>处于 orphan 的socket</li>
@@ -333,13 +335,13 @@
 </ul>
 </li>
 </ul>
-<h3 id="TCP-可靠传输"><a href="#TCP-可靠传输" class="headerlink" title="TCP 可靠传输"></a>TCP 可靠传输</h3><h4 id="TCP-数据包结构-https-zh-wikipedia-org-wiki-E4-BC-A0-E8-BE-93-E6-8E-A7-E5-88-B6-E5-8D-8F-E8-AE-AE"><a href="#TCP-数据包结构-https-zh-wikipedia-org-wiki-E4-BC-A0-E8-BE-93-E6-8E-A7-E5-88-B6-E5-8D-8F-E8-AE-AE" class="headerlink" title="TCP 数据包结构 (https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE)"></a><strong>TCP 数据包结构</strong> (<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE">https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE</a>)</h4><p><img src="/images/network/TCP/TCP-header.png"></p>
+<h3 id="TCP-可靠传输"><a href="#TCP-可靠传输" class="headerlink" title="TCP 可靠传输"></a>TCP 可靠传输</h3><h4 id="TCP-数据包结构"><a href="#TCP-数据包结构" class="headerlink" title="TCP 数据包结构"></a><strong>TCP 数据包结构</strong></h4><p>wiki: <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE">https://zh.wikipedia.org/wiki/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE</a><br>wiki: <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Transmission_Control_Protocol">https://en.wikipedia.org/wiki/Transmission_Control_Protocol</a><br><img src="/images/network/TCP/TCP-header.png"><br><img src="/images/network/TCP/TCP-header-option.png"></p>
 <h4 id="超时重传"><a href="#超时重传" class="headerlink" title="超时重传"></a><strong>超时重传</strong></h4><ul>
 <li>保证可靠传输中最重要的机制，发送一条消息的时候设置一个定时器，定时器时间内如果没有收到对方的ACK确认包，就重发这条消息</li>
 <li><strong>超时重传RTO</strong>: 超时重传的时间（上面那个定时器用的时间）<ul>
 <li>这个时间多少是最合适的？ (<a target="_blank" rel="noopener" href="https://www.ietf.org/rfc/rfc6298.txt">https://www.ietf.org/rfc/rfc6298.txt</a>)  </li>
-<li>RTT: round-trip time. </li>
-<li>SRTT: smoothed round-trip time</li>
+<li>RTT: round-trip time. 往返时间:同一个包来回的时间（以毫秒为单位）</li>
+<li>SRTT: smoothed round-trip time. 平滑的RTT，在数学上使用之前的RTT时间计算出来的时间</li>
 <li>RTTVAR: round-trip time variation</li>
 <li><code>首次</code>计算RTO: （这里的R是第一次测量的RTT，没有RTT的时候 RTO &lt;- TCP_TIMEOUT_INIT 1s）<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">  SRTT &lt;- R</span><br><span class="line">  RTTVAR &lt;- R/<span class="number">2</span></span><br><span class="line">  RTO &lt;- SRTT + max (G, K*RTTVAR)</span><br><span class="line">where K = <span class="number">4.</span> G是clock granularity 时钟粒度，避免K*RTTVAR=<span class="number">0</span> (一般是<span class="number">100</span>ms) https:<span class="comment">//stackoverflow.com/questions/12480486/how-to-check-hz-in-the-terminal</span></span><br></pre></td></tr></table></figure></li>
 <li><code>后续</code><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">  RTTVAR &lt;- (<span class="number">1</span> - beta) * RTTVAR + beta * |SRTT - R<span class="string">&#x27;|</span></span><br><span class="line"><span class="string">  SRTT &lt;- (1 - alpha) * SRTT + alpha * R&#x27;</span></span><br><span class="line"></span><br><span class="line">The <span class="keyword">value</span> <span class="keyword">of</span> SRTT used <span class="keyword">in</span> the <span class="keyword">update</span> <span class="keyword">to</span> RTTVAR <span class="keyword">is</span> its <span class="keyword">value</span></span><br><span class="line"><span class="keyword">before</span> updating SRTT itself <span class="keyword">using</span> the second assignment.  That</span><br><span class="line"><span class="keyword">is</span>, updating RTTVAR <span class="keyword">and</span> SRTT MUST be computed <span class="keyword">in</span> the above</span><br><span class="line"><span class="keyword">order</span>.</span><br><span class="line"></span><br><span class="line">The above SHOULD be computed <span class="keyword">using</span> alpha=<span class="number">1</span>/<span class="number">8</span> <span class="keyword">and</span> beta=<span class="number">1</span>/<span class="number">4</span> (<span class="keyword">as</span></span><br><span class="line">suggested <span class="keyword">in</span> [JK88]).</span><br><span class="line"></span><br><span class="line"><span class="keyword">After</span> the computation, a host MUST <span class="keyword">update</span></span><br><span class="line">RTO &lt;- SRTT + max (G, K*RTTVAR)</span><br></pre></td></tr></table></figure></li>
@@ -376,7 +378,9 @@
 <li>SACK: <code>/proc/sys/net/ipv4/tcp_sack</code></li>
 <li>D-SACK: <code>/proc/sys/net/ipv4/tcp_dsack</code></li>
 </ul>
-<h4 id="滑动窗口"><a href="#滑动窗口" class="headerlink" title="滑动窗口"></a>滑动窗口</h4><ul>
+<h4 id="流量控制-滑动窗口"><a href="#流量控制-滑动窗口" class="headerlink" title="流量控制-滑动窗口"></a>流量控制-滑动窗口</h4><ul>
+<li>wiki: <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Sliding_window_protocol">https://en.wikipedia.org/wiki/Sliding_window_protocol</a></li>
+<li>控制发送者的发送速度，让接收者来得及接收数据，避免接收不过来导致数据丢失</li>
 <li>前面说到 <code>首先，发送数据不可能是发送一次等一个ACK，这样太慢了，是发送N个包，有N个RTO定时器，这N个包在IP层很可能不是有序到达对端的，特别是</code>ECMP<code>的等价多路径连路上</code></li>
 <li>这个N个包也是有限制的，这个限制就是滑动窗口</li>
 <li>滑动窗口大小是以字节为单位的，TCP报文里面的WIN就是窗口大小（16位=2字节=65535），TCP作为双工模式，这个窗口大小也是两种，<code>接收窗口大小、发送窗口大小</code></li>
@@ -395,7 +399,30 @@
 </ul>
 </li>
 <li>额外：前面快速重传+SACK图，发送0-499，ACK: 500，这个500就是告知对方发送的窗口指针可以移到那个位置了</li>
-<li><h2 id="发送窗口发送数据的策略：Nagle"><a href="#发送窗口发送数据的策略：Nagle" class="headerlink" title="发送窗口发送数据的策略：Nagle"></a>发送窗口发送数据的策略：Nagle</h2></li>
+<li>发送窗口发送数据的策略：Nagle 延时发送策略 （<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Nagle%27s_algorithm%EF%BC%89">https://en.wikipedia.org/wiki/Nagle%27s_algorithm）</a><ul>
+<li>#1. 待发送数据大小 &gt;= MSS</li>
+<li>#2. 对方窗口大小 &gt;= MSS</li>
+<li>#3. FIN 包</li>
+<li>#4. TCP_NODELAY</li>
+<li>#5. 收到了之前发送数据的确认包</li>
+<li>#6. 200ms timeout</li>
+</ul>
+</li>
+<li>延迟确认 （delayed ACKs）<ul>
+<li>确认包很小，默认准备好确认包40ms timeout 发送，如果这期间有其他包需要发送，就把确认包一起带上发送出去</li>
+</ul>
+</li>
+</ul>
+<h4 id="拥塞控制"><a href="#拥塞控制" class="headerlink" title="拥塞控制"></a>拥塞控制</h4><ul>
+<li>wiki (<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/TCP_congestion_control">https://en.wikipedia.org/wiki/TCP_congestion_control</a>)</li>
+<li>流量控制是一个socket通道上的，拥塞控制属于链路上的网络环境，在较差的网络环境上TCP的重传机制会使网络负担越来越重，因此就有了拥塞控制的内容，避免雪崩式拥塞</li>
+<li>拥塞窗口: cwnd 是确定可以随时发送的字节数的因素之一。拥塞窗口由发送方维护，是一种阻止发送方和接收方之间的链接因流量过多而过载的方法。这不应与接收器保持的滑动窗口混淆，该滑动窗口存在以防止接收器过载。通过估算链路上有多少拥塞来计算拥塞窗口。</li>
+<li>建立连接后，拥塞窗口（在每个主机上独立维护的值）将设置为该连接所允许的MSS的很小的倍数。拥塞窗口的进一步变化由加性增加/乘性减少（AIMD）方法决定。这意味着，如果所有段均已接收并且确认已按时到达发送方，则将某些常量添加到窗口大小中。当窗口达到ssthresh时，在收到的每个新确认中，拥塞窗口以1 /（拥塞窗口）段的速率线性增加。窗口不断增长，直到发生超时。超时时：<ul>
+<li>#1. 拥塞窗口重设为1 MSS。</li>
+<li>#2. ssthresh设置为超时前拥塞窗口大小的一半。</li>
+<li>#3. 启动慢速启动。<h5 id="慢启动"><a href="#慢启动" class="headerlink" title="慢启动"></a>慢启动</h5></li>
+</ul>
+</li>
 </ul>
 <h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
 <li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/TCP%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6">https://zh.wikipedia.org/wiki/TCP%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6</a></li>
@@ -408,6 +435,7 @@
 <li><a target="_blank" rel="noopener" href="https://tonydeng.github.io/sdn-handbook/linux/kernel-network-params.html">https://tonydeng.github.io/sdn-handbook/linux/kernel-network-params.html</a></li>
 <li><a target="_blank" rel="noopener" href="https://plantegg.github.io/2019/05/08/%E5%B0%B1%E6%98%AF%E8%A6%81%E4%BD%A0%E6%87%82%E7%BD%91%E7%BB%9C--%E7%BD%91%E7%BB%9C%E5%8C%85%E7%9A%84%E6%B5%81%E8%BD%AC/">https://plantegg.github.io/2019/05/08/%E5%B0%B1%E6%98%AF%E8%A6%81%E4%BD%A0%E6%87%82%E7%BD%91%E7%BB%9C--%E7%BD%91%E7%BB%9C%E5%8C%85%E7%9A%84%E6%B5%81%E8%BD%AC/</a></li>
 <li><a target="_blank" rel="noopener" href="https://access.redhat.com/sites/default/files/attachments/20150325_network_performance_tuning.pdf">https://access.redhat.com/sites/default/files/attachments/20150325_network_performance_tuning.pdf</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/dog250/article/details/51439747">https://blog.csdn.net/dog250/article/details/51439747</a></li>
 </ul>
 
     </div>
@@ -498,7 +526,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B%E7%8A%B6%E6%80%81"><span class="nav-number">1.</span> <span class="nav-text">过程状态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E5%8C%85%E4%BC%A0%E8%BE%93%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">TCP 包传输过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-IP-%E5%B0%81%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">TCP&#x2F;IP 封装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E7%8A%B6%E6%80%81"><span class="nav-number">1.3.</span> <span class="nav-text">TCP 状态</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A1%8C%E4%B8%BA-gt-%E7%8A%B6%E6%80%81"><span class="nav-number">1.3.1.</span> <span class="nav-text">行为-&gt;状态</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8F%A1%E6%89%8B-gt-%E6%8C%A5%E6%89%8B"><span class="nav-number">1.3.2.</span> <span class="nav-text">握手-&gt;挥手</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%8E%E7%8A%B6%E6%80%81%E8%AE%B2%E8%B5%B7"><span class="nav-number">1.3.3.</span> <span class="nav-text">从状态讲起</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93"><span class="nav-number">2.</span> <span class="nav-text">TCP 可靠传输</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E6%95%B0%E6%8D%AE%E5%8C%85%E7%BB%93%E6%9E%84-https-zh-wikipedia-org-wiki-E4-BC-A0-E8-BE-93-E6-8E-A7-E5-88-B6-E5-8D-8F-E8-AE-AE"><span class="nav-number">2.1.</span> <span class="nav-text">TCP 数据包结构 (https:&#x2F;&#x2F;zh.wikipedia.org&#x2F;wiki&#x2F;%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B6%85%E6%97%B6%E9%87%8D%E4%BC%A0"><span class="nav-number">2.2.</span> <span class="nav-text">超时重传</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E9%87%8D%E4%BC%A0"><span class="nav-number">2.3.</span> <span class="nav-text">快速重传</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="nav-number">2.4.</span> <span class="nav-text">滑动窗口</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%91%E9%80%81%E7%AA%97%E5%8F%A3%E5%8F%91%E9%80%81%E6%95%B0%E6%8D%AE%E7%9A%84%E7%AD%96%E7%95%A5%EF%BC%9ANagle"><span class="nav-number"></span> <span class="nav-text">发送窗口发送数据的策略：Nagle</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">1.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B%E7%8A%B6%E6%80%81"><span class="nav-number">1.</span> <span class="nav-text">过程状态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E5%8C%85%E4%BC%A0%E8%BE%93%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">TCP 包传输过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-IP-%E5%B0%81%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">TCP&#x2F;IP 封装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E7%8A%B6%E6%80%81"><span class="nav-number">1.3.</span> <span class="nav-text">TCP 状态</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A1%8C%E4%B8%BA-gt-%E7%8A%B6%E6%80%81"><span class="nav-number">1.3.1.</span> <span class="nav-text">行为-&gt;状态</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8F%A1%E6%89%8B-gt-%E6%8C%A5%E6%89%8B"><span class="nav-number">1.3.2.</span> <span class="nav-text">握手-&gt;挥手</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%8E%E7%8A%B6%E6%80%81%E8%AE%B2%E8%B5%B7"><span class="nav-number">1.3.3.</span> <span class="nav-text">从状态讲起</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP-%E5%8F%AF%E9%9D%A0%E4%BC%A0%E8%BE%93"><span class="nav-number">2.</span> <span class="nav-text">TCP 可靠传输</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E6%95%B0%E6%8D%AE%E5%8C%85%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">TCP 数据包结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B6%85%E6%97%B6%E9%87%8D%E4%BC%A0"><span class="nav-number">2.2.</span> <span class="nav-text">超时重传</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E9%87%8D%E4%BC%A0"><span class="nav-number">2.3.</span> <span class="nav-text">快速重传</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="nav-number">2.4.</span> <span class="nav-text">流量控制-滑动窗口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6"><span class="nav-number">2.5.</span> <span class="nav-text">拥塞控制</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%85%A2%E5%90%AF%E5%8A%A8"><span class="nav-number">2.5.1.</span> <span class="nav-text">慢启动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -514,14 +542,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-count">24</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
