@@ -35,12 +35,13 @@
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/ICMP04.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/ICMP05.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/ICMP06.png">
+<meta property="og:image" content="https://kinly.github.io/images/network/ICMP/icmp-traceroute-diagram.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/trace01.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/trace02.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/trace03.png">
 <meta property="og:image" content="https://kinly.github.io/images/network/ICMP/ECMP01.gif">
 <meta property="article:published_time" content="2020-11-27T13:48:44.000Z">
-<meta property="article:modified_time" content="2020-12-08T11:59:29.136Z">
+<meta property="article:modified_time" content="2021-01-14T01:45:41.788Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="网络">
 <meta name="twitter:card" content="summary">
@@ -209,7 +210,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-08 19:59:29" itemprop="dateModified" datetime="2020-12-08T19:59:29+08:00">2020-12-08</time>
+                <time title="修改时间：2021-01-14 09:45:41" itemprop="dateModified" datetime="2021-01-14T09:45:41+08:00">2021-01-14</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -310,6 +311,7 @@
 <li><code>windows</code> 的 <code>tracert</code> 没有 <code>tcp</code> 的选项，但是可以自己写程序模拟，但是自己的程序需要<code>administrator</code>权限</li>
 <li><code>windows</code> 的 <code>ping</code> 没有特别的要求<code>administrator</code>权限，是win有个特殊的<code>icmp.dll</code> 不需要管理员权限就可以用，而<code>ping</code>是基于这个实现的 (<a target="_blank" rel="noopener" href="https://www.thoughtco.com/implementing-ping-without-using-raw-sockets-4068869">https://www.thoughtco.com/implementing-ping-without-using-raw-sockets-4068869</a>)</li>
 <li>有时候icmp的路径探测是不准确的，(不同协议路由的路径很可能不同); 这时候我们需要个tcp的路径探测包在自己的程序里，(TTL递增)代码很简单，只是需要记得需要<code>管理员权限</code></li>
+<li>ttl(Time To Live):代表是报文的存活时间，存活时间以秒为单位，但小于一秒的时间均向上取整到一秒。在现实中，这实际上成了一个跳数计数器：报文经过的每个路由器都将此字段减1，当此字段等于0时，报文不再向下一跳传送并被丢弃，最大值是255（8bit）<br><code>图片来源：https://www.cloudflare.com/zh-cn/learning/cdn/glossary/time-to-live-ttl/</code><br><img src="/images/network/ICMP/icmp-traceroute-diagram.png"></li>
 </ul>
 <h4 id="3-traceroute-路径探测"><a href="#3-traceroute-路径探测" class="headerlink" title="3. traceroute 路径探测"></a>3. traceroute 路径探测</h4><p><code>wiki</code>: (<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Traceroute">https://en.wikipedia.org/wiki/Traceroute</a>)<br><code>man page</code>: (<a target="_blank" rel="noopener" href="https://linux.die.net/man/8/traceroute">https://linux.die.net/man/8/traceroute</a>)</p>
 <ul>
@@ -345,7 +347,6 @@
 <ul>
 <li>消息报从A点发送到B点，链路上会有很多路由节点，但是有一些路由节点是是核心的路由节点，图示的线路<br><img src="/images/network/ICMP/ECMP01.gif"></li>
 <li>如果traceroute遇到ECMP（等价路径点A&amp;B)，也就是这次经过等价路径的A，但是下次很可能经过的B</li>
-<li></li>
 </ul>
 <h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><ul>
 <li>由于现在网络环境大都有NAT、防火墙等设备、策略，ICMP的检测只能作为参考，甚至ICMP拿不到结果</li>
