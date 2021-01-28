@@ -10,4 +10,3 @@ Disallow: /vendors/
 Disallow: /fancybox/
 
 Sitemap: https://kinly.github.io/sitemap.xml
-Sitemap: https://kinly.github.io/baidusitemap.xml
