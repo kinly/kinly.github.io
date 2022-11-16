@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://kinly.github.io/images/BBR/no-tc.png">
 <meta property="og:image" content="https://kinly.github.io/images/BBR/public-network.png">
 <meta property="article:published_time" content="2022-05-23T06:36:37.000Z">
-<meta property="article:modified_time" content="2022-11-12T06:08:38.924Z">
+<meta property="article:modified_time" content="2022-11-16T04:45:27.995Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="备忘">
 <meta name="twitter:card" content="summary">
@@ -202,7 +202,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-11-12 14:08:38" itemprop="dateModified" datetime="2022-11-12T14:08:38+08:00">2022-11-12</time>
+                <time title="修改时间：2022-11-16 12:45:27" itemprop="dateModified" datetime="2022-11-16T12:45:27+08:00">2022-11-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -402,7 +402,7 @@
 <li>PS. 防破解</li>
 </ul>
 <blockquote>
-<p>协议非对称加密交换秘钥，对称加密传输内容，保护好服务端私钥，防止中间人攻击。流式加密，同样包发2次内容不一样<br>不用标准序列化工具如protocolbuf，用修改版或者自己实现的<br>客户端加密加壳防止调试和注入，程序签名防止篡改二进制<br>重要的代码放虚拟机或者脚本里运行（脚本字节码需要改），一般黑客主要分析反汇编，你复杂逻辑多套基层他就晕了<br>关键数据不落内存，一律使用getxx，setxx之类的接口，后面将真实数据经过变换以后才落内存<br>守护进程动态跟踪监控情况<br>决定性逻辑永远放在服务端<br>服务端定期校验消息合理性，比如 10s 内最大的移动步长是多少，实际发上来的合理不合理，不合理就踢掉，比如按键点击频率是否超过正常人<br>不定期弹出反外挂答题，答正确奖励经验，错误就掉线<br>必须要放在客户端计算的内容将输入和结果hash同步给其他客户端盐酸，不对就踢掉<br>当检测到客户端触碰到某规则不要急着踢掉它，而是有概率的被踢掉，还要随机几秒踢掉，这样黑客发现一会这里断一会那里断，就蒙圈了<br>发现某黑客&#x2F;外挂工具利用某漏洞破解了游戏，先看影响大不大，再看他挣不挣钱，影响一般又不挣钱的话可以先养着他，等他挣钱了用户多了，大型活动之前，一条指令就把它封了，用户退款都可以弄得他爬不起来</p>
+<p>协议非对称加密交换秘钥，对称加密传输内容，保护好服务端私钥，防止中间人攻击。流式加密，同样包发2次内容不一样<br>不用标准序列化工具如protocolbuf，用修改版或者自己实现的<br>客户端加密加壳防止调试和注入，程序签名防止篡改二进制<br>重要的代码放虚拟机或者脚本里运行（脚本字节码需要改），一般黑客主要分析反汇编，你复杂逻辑多套基层他就晕了<br>关键数据不落内存，一律使用getxx，setxx之类的接口，后面将真实数据经过变换以后才落内存<br>守护进程动态跟踪监控情况<br>决定性逻辑永远放在服务端<br>服务端定期校验消息合理性，比如 10s 内最大的移动步长是多少，实际发上来的合理不合理，不合理就踢掉，比如按键点击频率是否超过正常人<br>不定期弹出反外挂答题，答正确奖励经验，错误就掉线<br>必须要放在客户端计算的内容将输入和结果hash同步给其他客户端验算，不对就踢掉<br>当检测到客户端触碰到某规则不要急着踢掉它，而是有概率的被踢掉，还要随机几秒踢掉，这样黑客发现一会这里断一会那里断，就蒙圈了<br>发现某黑客&#x2F;外挂工具利用某漏洞破解了游戏，先看影响大不大，再看他挣不挣钱，影响一般又不挣钱的话可以先养着他，等他挣钱了用户多了，大型活动之前，一条指令就把它封了，用户退款都可以弄得他爬不起来</p>
 </blockquote>
 <h3 id="防破解-Timing-Attack"><a href="#防破解-Timing-Attack" class="headerlink" title="防破解 - Timing Attack"></a>防破解 - Timing Attack</h3><ul>
 <li>简单的解释就是hack利用密码、token等一般验证（逐个字符验证，验证到错误字符停止并返回错误）中根据验证返回的时间判断到哪个字符出错了，暴力破解的一种</li>
@@ -463,46 +463,47 @@
 <li>instanceof （还需要修改，最好能做成java那种调用的样子）<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// instanceof</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">_Src</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">__instanceof</span> &#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">using</span> base_type = _Src;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> _Ty&gt;</span></span><br><span class="line"><span class="function">    <span class="type">bool</span> <span class="title">instanceof</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> std::is_base_of&lt;_Ty, base_type&gt;::value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">_Base</span>, <span class="keyword">class</span> <span class="title class_">_Xx</span>, </span><br><span class="line">    <span class="keyword">typename</span> std::enable_if&lt;std::is_class_v&lt;_Base&gt; &amp;&amp; std::is_class_v&lt;_Xx&gt;, <span class="type">bool</span>&gt;::type = <span class="literal">true</span>&gt;</span><br><span class="line"><span class="type">static</span> <span class="type">bool</span> <span class="built_in">instanceof</span>() &#123;</span><br><span class="line">    <span class="keyword">return</span> std::is_base_of&lt;_Base, _Xx&gt;::value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">_Base</span>, <span class="keyword">class</span> <span class="title class_">_Xx</span>,</span><br><span class="line">    <span class="keyword">typename</span> std::enable_if&lt;std::is_class_v&lt;_Base&gt;&amp;&amp; std::is_class_v&lt;_Xx&gt;, <span class="type">bool</span>&gt;::type = <span class="literal">true</span>&gt;</span><br><span class="line"><span class="type">static</span> <span class="type">bool</span> <span class="built_in">instanceof</span>(_Xx xx) &#123;</span><br><span class="line">    <span class="keyword">return</span> std::is_base_of&lt;_Base, std::<span class="type">decay_t</span>&lt;<span class="keyword">decltype</span>(xx)&gt;&gt;::value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 </ul>
 <h3 id="弱网环境"><a href="#弱网环境" class="headerlink" title="弱网环境"></a>弱网环境</h3><ul>
-<li><p>服务端网络选型上尽可能离玩家更近、网络质量更好的地方和网络提供商</p>
+<li><p>服务端网络选型上尽可能离玩家<code>更近</code>、网络质量更好的地方和网络提供商</p>
 <ul>
-<li>物理距离不能避免，但是也不是物理距离最近的就一定是最快的，线路的带宽（一定要预估好服务器需要的带宽，并且对带宽做监控，比如一旦超过50%就要准备扩了）、链路的拥塞程度、吞吐量、跨网络运营商（选多线IDC）很多因素影响</li>
+<li>物理距离不能避免，但是也不是物理距离最近的就一定是最快的，<code>线路的带宽</code>（一定要预估好服务器需要的带宽，并且对带宽做监控，比如一旦超过50%就要准备扩了）、链路的拥塞程度、吞吐量、跨网络运营商（选<code>多线IDC</code>）很多因素影响</li>
 <li>比如单独把对网络延迟要求高的服务分大区域部署多个服务节点（离玩家更近），这里需要服务端在逻辑上做好对玩家网络的判断和分配，最简单的方法在节点服务同机房开一个探测RTT的服务，客户端拿到区域内所有节点的IP，并行探测自行选择更优的节点；根据业务逻辑的需求，这个分配更可能是由玩家自主选择（类似MMO的分线、分区）、服务端基于一定指标（玩家IP所在区域、服务器存活、负载情况等）直接给玩家分配服务器；一些业务需要提前分配服务并下发Token类似的验签用于后续目标服务器对玩家身份和可进入的验签</li>
 <li>可以选择 cloudflare&#x2F;cloudfront 这种 anycast 的加速服务（CDN回源），大致原理是玩家先接入边缘节点，再回源到游戏服务器，网络供应商一般会对边缘节点到服务器的网络路由做优化（最优链路，减少跳跃点），而且一般会在边缘节点卸载TLS，减少RTT</li>
 </ul>
 </li>
-<li><p>修改系统里的一些网络参数：拥塞窗口大小、读写缓冲、time wait reuse&#x2F;recycle、retransmission timeout等等</p>
+<li><p>修改系统里的一些<code>网络参数</code>：拥塞窗口大小、读写缓冲、time wait reuse&#x2F;recycle、retransmission timeout等等</p>
 </li>
-<li><p>使用BBR的拥塞算法，可以减少拥塞重传窗口折半这种情况带来的影响，网络也更平滑</p>
+<li><p>使用<code>BBR的拥塞算法</code>，可以减少拥塞重传窗口折半这种情况带来的影响，网络也更平滑</p>
 </li>
-<li><p>如果不是一定要DNS的，用IP就好，DNS也需要消耗1RTT，DNS本身就会有劫持、老化等很多问题</p>
+<li><p>如果不是一定要DNS的，<code>用IP</code>就好，DNS也需要消耗1RTT，DNS本身就会有劫持、老化等很多问题</p>
 </li>
-<li><p>根据业务需要看是不是可以开多个链接并行发送消息，甚至是2种协议，比如用udp处理帧数据，tcp&#x2F;rudp处理关键帧数据</p>
+<li><p>根据业务需要看是不是可以开<code>多个链接并行</code>发送消息，甚至是2种协议，比如用udp处理帧数据，tcp&#x2F;rudp处理关键帧数据</p>
 <ul>
 <li>2个比较出名的rudp：KCP，QUIC</li>
-<li>KCP: 超发的处理方式，实际测试中效果并不好，弱网环境下的游戏表现也不好（之前没有做更深度的测试，最早我们游戏客户端的同步数据量很大，断网需要重新拉战场完整数据，对于这种很大的包KCP表现得延迟不如TCP好，可能和客户端当时的处理方式也有一定的关系，测试带宽也只有1M）</li>
-<li>QUIC: 已知目前IOS端在HTTP&#x2F;S上已经优先选择QUIC&#x2F;TLS1.3的方式了，quic替换长链接TCP的还没有实际应用过，需要<code>TODO</code></li>
+<li><code>KCP:</code> 超发的处理方式，实际测试中效果并不好，弱网环境下的游戏表现也不好（之前没有做更深度的测试，最早我们游戏客户端的同步数据量很大，断网需要重新拉战场完整数据，对于这种很大的包KCP表现得延迟不如TCP好，可能和客户端当时的处理方式也有一定的关系，测试带宽也只有1M）</li>
+<li><code>QUIC:</code> 已知目前IOS端在HTTP&#x2F;S上已经优先选择QUIC&#x2F;TLS1.3的方式了，quic替换长链接TCP的还没有实际应用过，需要<code>TODO</code></li>
 </ul>
 </li>
-<li><p>如果也用的是TCP的长链接方式，对于手机端一定要自己定义异步的keepalive消息，避免切后台导致链接断开（unity update在切后台会停止）；需要重连的时候，避免一个循环没有时间等待的反复重连重试，避免重连带给服务端瞬间的accept（半链接队列）压力</p>
+<li><p>如果也用的是TCP的长链接方式，对于手机端一定要自己定义<code>异步的keepalive</code>消息，<code>避免切后台导致链接断开</code>（unity update在切后台会停止）；需要重连的时候，避免一个循环没有时间等待的反复重连重试，避免重连带给服务端瞬间的accept（半链接队列）压力</p>
 </li>
-<li><p>对于客户端的网络实现，优先分别给Android&#x2F;IOS单独写，用系统上最优的socket，比如unity的webHttpSocket的封装，服务端支持的情况下，IOS端会优先用QUIC+TLS1.3的方式</p>
+<li><p>对于客户端的网络实现，优先分别给Android&#x2F;IOS单独写，用<code>系统上最优的socket</code>，比如unity的webHttpSocket的封装，服务端支持的情况下，IOS端会优先用QUIC+TLS1.3的方式</p>
 </li>
 <li><p>短连接需要避免每次都要握手的情况（http keepalive、QUIC），长链接需要异步keepalive</p>
 </li>
-<li><p>打开TCP_NODELAY选项，这个基本是游戏里的默认选项了</p>
+<li><p>打开<code>TCP_NODELAY</code>选项，这个基本是游戏里的默认选项了</p>
 </li>
-<li><p>尽量控制传输数据包大小在一个MSS内，避免分片，任何一个分片的出现丢失都可能会造成多次传输、确认（还有分片、拼接的开销）；建议不要超过1400&#x2F;1360字节，虽然MTU&#x3D;1500情况下，TCP的MSS&#x3D;1500 - 20(IP) - 20(TCP) &#x3D; 1460，但是很多服务器、网络设备的MTU设置是小于1500的</p>
+<li><p>尽量控制传输<code>数据包大小在一个MSS内</code>，<code>避免分片</code>，任何一个分片的出现丢失都可能会造成多次传输、确认（还有分片、拼接的开销）；建议不要超过1400&#x2F;1360字节，虽然MTU&#x3D;1500情况下，TCP的MSS&#x3D;1500 - 20(IP) - 20(TCP) &#x3D; 1460，但是很多服务器、网络设备的MTU设置是小于1500的</p>
 </li>
-<li><p>协议编码上尽量用占字节少的二进制编码方式（protobuffer），减小包体大小，有必要的话做压缩，用CPU时间换网络时间</p>
+<li><p>协议编码上尽量用占字节少的<code>二进制编码方式</code>（protobuffer），减小包体大小，有必要的话做<code>压缩</code>，用CPU时间换网络时间</p>
 </li>
-<li><p>同步类型的消息尽量计算差异后再组包发送，而不是把所有都序列化到包里，数据对表现的驱动方式最好是状态类型的驱动，比如一个跑步的驱动，如果用状态可能只需要1-5个字节（标记枚举），但是要从动画驱动的话，一次跑动胳膊腿甚至手持的装备都是动画差异，包体也就更大了（游戏里我看到是先迈的左脚和你看到先迈右脚其实没有区别吧），这里也是要跟业务走，可以混合状态、动画驱动</p>
+<li><p>同步类型的消息尽量计<code>算差异后再组包发送</code>，而不是把所有都序列化到包里，数据对表现的驱动方式最好是状态类型的驱动，比如一个跑步的驱动，如果用状态可能只需要1-5个字节（标记枚举），但是要从动画驱动的话，一次跑动胳膊腿甚至手持的装备都是动画差异，包体也就更大了（游戏里我看到是先迈的左脚和你看到先迈右脚其实没有区别吧），这里也是要跟业务走，可以混合状态、动画驱动</p>
 </li>
 <li></li>
 <li><p>还有很多没想到或者实际遇到处理的问题</p>
 </li>
 </ul>
-<h3 id="防作弊"><a href="#防作弊" class="headerlink" title="防作弊"></a>防作弊</h3><p>从安全性上来说，<code>客户端计算</code>模型 远远弱于 <code>服务端校验</code>，而<code>服务端校验</code> 又弱于 <code>服务端计算</code><br>作弊的技术手法，有这些大类：<br>-	按键精灵类；</p>
+<h3 id="防作弊"><a href="#防作弊" class="headerlink" title="防作弊"></a>防作弊</h3><p>从安全性上来说，<code>客户端计算</code> 模型 远远弱于 <code>服务端校验</code>，而 <code>服务端校验</code> 又弱于 <code>服务端计算</code><br>作弊的技术手法，有这些大类</p>
 <ul>
+<li>按键精灵类；</li>
 <li>加速(变速齿轮类)；</li>
 <li>改内存数值(比如改合作回合数、改SP、锁血等)；</li>
 <li>破解游戏包(比如直接改骰子配置参数)；</li>
