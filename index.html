@@ -195,7 +195,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-12-22 14:42:59" itemprop="dateModified" datetime="2022-12-22T14:42:59+08:00">2022-12-22</time>
+                <time title="修改时间：2023-04-15 18:57:22" itemprop="dateModified" datetime="2023-04-15T18:57:22+08:00">2023-04-15</time>
               </span>
 
           
@@ -218,16 +218,40 @@
 <li>原子是最小的执行单位</li>
 </ul>
 </li>
-<li><code>login服务这种没有token验证的请求，怎么防御攻击</code>：login更及时的反馈需要更快的缓存、更小粒度的锁；熔断策略：对于某个IP单位时间内请求超过一定次数后，屏蔽后续请求，至少不让他影响内部服务；也可以选择抵御ddos攻击的lb、cf服务作为网络入口；带token的可以用相同的熔断策略，下发token的可以用令牌桶的方式限制token的下发数量。这里还有一个比较常见的场景，比如登录这种，一般会到第三方服务器做账号认证，这个过程是个异步的过程，会有一定的延迟。</li>
+<li><code>login服务这种没有token验证的请求，怎么防御攻击</code>：<ul>
+<li>login更及时的反馈需要更快的缓存、更小粒度的锁；</li>
+<li>熔断策略：对于某个IP单位时间内请求超过一定次数后，屏蔽后续请求，至少不让他影响内部服务；</li>
+<li>也可以选择抵御ddos攻击的lb、cf服务作为网络入口；</li>
+<li>带token的可以用相同的熔断策略，下发token的可以用令牌桶的方式限制token的下发数量。这里还有一个比较常见的场景，比如登录这种，一般会到第三方服务器做账号认证，这个过程是个异步的过程，会有一定的延迟。</li>
+</ul>
+</li>
 <li><code>场景同步的优化</code>：<ul>
 <li><code>减少双端同步量&amp;处理量</code>，避免无谓的消息处理和带宽占用。场景同步的游戏中，可以考虑在玩家处于某些状态的时候不要同步那么多事件到客户端；例如在九宫格地图（玩家一屏的可见视野是9个格子）中我正在打怪，而我攻击的最大范围只有一个格子，这时候服务端同步的主要内容应该集中在这一个格子里对象的事件，对于周边的其他格子信息，可以换成更小的数据包（减少客户端解析数据&amp;处理数据的时间消耗），或者由客户端以lazy帧的频率主动向服务端请求变化信息（当然这样相比服务端主动推送多了1次RTT）</li>
 <li><code>关于让客户端主动请求的题外话：</code>服务器端一般情况下对于每个客户端相同行为处理的消耗时间是相同的，也就是服务端会以相同的频率向客户端广播消息（排除一些时间服务端由于性能问题处理的差异），而客户端是玩家的设备，也就是不同设备支持的最高帧率、不同网络环境的延迟都是不一样的；客户端的处理事件需要一个个处理，可能A设备1档机处理一个事件1s（比较用的单位时间），B设备3档机需要3s，服务端以相同的频率给到2个客户端的消息，他们实际处理的效率是不一样的，无端的浪费了带宽；所以是不是或者至少在某些状态下，由客户端主动发起请求，服务端再回执而不是主动push到客户端表现会更好。</li>
 <li><code>在gateway做广播目标对象的筛选：</code>这里认为传统服务器单个场景是在一个gameservice的，但是单个场景的玩家是在多个gateway的，一次事件gs只需要把事件本身（也就是消息同步的message-body）广播到gateway上，由gateway做需要广播玩家的筛选，因为gateway是多组并且可以水平扩展，这样子做可以减轻gs遍历玩家的成本，也减轻gs到gateway的带宽压力（即使常规认为内网通讯是1Gbps的带宽，跑了网络传输，大包和小包影响还是很大的）；这样子做就需要gateway上有一部分场景的信息，比如九宫格放到gateway上，用二维（三维）数组方式空间换时间，拿到需要广播的对象，把消息广播出去</li>
 </ul>
 </li>
-<li>&#96;&#96;</li>
+<li><code>C11一些语法</code>，auto和decltype, move foward区别, lamada表达式实现原理。<ul>
+<li>auto 根据&#x3D;右边的初始值 value 推导出变量的类型；变量必须初始化，也就是在定义变量的同时必须给它赋值</li>
+<li>decltype 根据 exp 表达式推导出变量的类型，跟&#x3D;右边的 value 没有关系。</li>
+<li>std::move执行一个无条件的对rvalue的转化。 对于它自己本身来说， 它不会move任何东西；若对一个对象做move操作，就不要声明为 const. 因为对const对象的move请求会执行到copy操作上</li>
+<li>std::forward在参数被绑定为rvalue的情况下才会将它转化为rvalue</li>
+<li>std::move和std::forward在runtime时啥都不做  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">function</span><span class="params">(xx&amp;&amp; xx_)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">function_2</span>(std::forward(xx_));</span><br><span class="line">    <span class="comment">// function_2(std::move(xx_));   // 如果这里用了move，那么下面就不可以再使用 xx_ 了，因为move会移走他</span></span><br><span class="line">    xx_.<span class="built_in">do_something</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">function_2</span><span class="params">(xx&amp;&amp; xx_)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 </ul>
-
+</li>
+<li><code>volatile</code>： <ul>
+<li>编译器对访问该变量的代码就不再进行优化，从而可以提供对特殊地址的稳定访问，当要求使用 volatile 声明的变量的值的时候，系统总是重新从它所在的内存读取数据</li>
+</ul>
+</li>
+<li><code>malloc 申请内存</code>：分配的是虚拟内存，如果分配后的虚拟内存没有被访问的话，是不会将虚拟内存不会映射到物理内存，这样就不会占用物理内存了。小于 128 KB，则通过 brk()  free 后不释放，大于 128 KB，则通过 mmap()  free后释放</li>
+<li><code>constexpr</code> 是尽量在编译器处理的常量，string不可以，因为编译期无法调用string的构造函数</li>
+<li><code>开发流程上避免崩溃</code>：开发前会规定进程的职责，减小崩溃的影响面，使用vld、libasan检查内存问题，使用压测方式尽量覆盖所有功能点，使用segvcatch在运行期捕获崩溃并生成codedump（进程要不要继续需要根据项目结构来定，比如说踩坏内存那种崩溃，有可能踩坏到了别的内存，这时候再继续跑可能会有更严重的问题）；上线的进程一定是高可用部署的，避免崩溃造成服务不可用这种情况。崩溃了需要有监测程序快速把进程拉起来，如果解决了问题了就更新或者热更掉，没有的话可以给功能模块加开关，先关掉这部分功能。</li>
+<li><code>virtual关键字是必须的么</code>？什么情况必须有有这个关键字：是必须的，如果没有这个关键字，子类对象转换为父类之后服务调用到子类自己重写的函数；父类的析构必须有这个关键字，不然析构的时候调用不到父类的析构。</li>
+<li><code>virtual template区别</code>：virtual是动多态，template是静多态，virtual是相同的入参不同的函数实体，template是不同的入参类型，相同的处理函数实体</li>
+<li><code>redis 雪崩的原因</code>：redis缓存中大量的key同时失效，此时又刚好有大量的请求打进来</li>
+</ul>
+<h2 id="…"><a href="#…" class="headerlink" title="…."></a>….</h2><p>做了一段时间的架构，这套架构确实解决了一些问题，甚至在某些方面的处理是讨巧且有效的，但是耐不住在面试中被一次次打击；做好自己的当前应该做的事情吧</p>
+<h2 id="一切都是最好的安排"><a href="#一切都是最好的安排" class="headerlink" title="一切都是最好的安排"></a>一切都是最好的安排</h2>
       
     </div>
 
