@@ -264,9 +264,6 @@
 <h4 id="virtual-虚函数表"><a href="#virtual-虚函数表" class="headerlink" title="virtual 虚函数表"></a><strong>virtual 虚函数表</strong></h4><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(gdb) <span class="built_in">set</span> <span class="variable">$i</span> = 0</span><br><span class="line">(gdb) <span class="keyword">while</span> <span class="variable">$i</span> &lt; 10</span><br><span class="line">    <span class="built_in">print</span> <span class="variable">$i</span></span><br><span class="line">    p /a (*(void ***)pSession)[<span class="variable">$i</span>]</span><br><span class="line">    <span class="built_in">set</span> <span class="variable">$i</span> = <span class="variable">$i</span> + 1</span><br><span class="line">    end</span><br></pre></td></tr></table></figure>
 
 <h4 id="gdb-系统catch"><a href="#gdb-系统catch" class="headerlink" title="gdb 系统catch"></a><strong>gdb 系统catch</strong></h4><figure class="highlight ceylon"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(gdb) <span class="keyword">catch</span> <span class="keyword">throw</span> <span class="keyword">out</span><span class="number">_</span><span class="keyword">of</span><span class="number">_</span>range</span><br></pre></td></tr></table></figure>
-
-<p>__本文作者__：Kinly<br />__本文地址__： <a href="https://kinly.github.io/archives/537e6650.html">https://kinly.github.io/archives/537e6650.html</a> <br />__版权声明__：转载请注明出处！</p>
-
     </div>
     
     
