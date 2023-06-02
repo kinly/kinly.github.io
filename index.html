@@ -189,7 +189,16 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-06-02 09:31:24 / 修改时间：09:33:31" itemprop="dateCreated datePublished" datetime="2023-06-02T09:31:24+08:00">2023-06-02</time>
+              <time title="创建时间：2023-06-02 09:31:24 / 修改时间：09:34:35" itemprop="dateCreated datePublished" datetime="2023-06-02T09:31:24+08:00">2023-06-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BB%A3%E7%A0%81/" itemprop="url" rel="index"><span itemprop="name">代码</span></a>
+                </span>
             </span>
 
           
@@ -203,48 +212,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="xlsxio-编译"><a href="#xlsxio-编译" class="headerlink" title="xlsxio 编译"></a>xlsxio 编译</h1><h2 id="pre"><a href="#pre" class="headerlink" title="pre"></a>pre</h2><ul>
-<li>之前用的 xlnt，编译很简单，功能支持很多，但是运行速度很慢，解析200行的xlsx需要超过10s</li>
-<li>我们仅需要xlsx的简单格式，减少转csv的步骤而已；就打算换个纯文本解析的xlsx库</li>
-<li>语言版本 c++11；看到两个库：xlsxio &amp; xlsx_drone （openXlsx 基于C++17，代码很工整但是我们用不了）</li>
-</ul>
-<h2 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h2><h3 id="xlsx-drone"><a href="#xlsx-drone" class="headerlink" title="xlsx_drone"></a>xlsx_drone</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://github.com/damian-m-g/xlsx_drone">https://github.com/damian-m-g/xlsx_drone</a></li>
-<li>因为xlsxio相关的依赖没有在工程里，这个比较轻巧就先用了这个，但是后来发现一些cell解析不出来<br><img src="/images/xlsx_drone_1.png"></li>
-</ul>
-<h3 id="xlsxio"><a href="#xlsxio" class="headerlink" title="xlsxio"></a>xlsxio</h3><ul>
-<li><a target="_blank" rel="noopener" href="https://github.com/brechtsanders/xlsxio">https://github.com/brechtsanders/xlsxio</a></li>
-<li>python的解析应该也是用的这个库，C语言版本</li>
-<li>先用bin版本试了下，xlsx_drone 的问题这个库是没有的，就开始弄这个库的编译（static版本），记录一下是中间还是遇到一些坑点的</li>
-</ul>
-<h2 id="xlsxio-编译-1"><a href="#xlsxio-编译-1" class="headerlink" title="xlsxio 编译"></a>xlsxio 编译</h2><h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><ul>
-<li>xlsxio <a target="_blank" rel="noopener" href="https://github.com/brechtsanders/xlsxio">https://github.com/brechtsanders/xlsxio</a></li>
-<li>zlib <a target="_blank" rel="noopener" href="https://github.com/madler/zlib">https://github.com/madler/zlib</a></li>
-<li>expat <a target="_blank" rel="noopener" href="https://libexpat.github.io/">https://libexpat.github.io/</a></li>
-</ul>
-<h3 id="zlib"><a href="#zlib" class="headerlink" title="zlib"></a>zlib</h3><ul>
-<li>用的cmake，编译的 zlibstatic</li>
-<li>find 一个 zconf.h 的文件拷贝到 zlib 头文件所在的目录</li>
-<li>minizip 新建了个工程，把 contrib\minizip 的东西都加载进来，编译静态库使用</li>
-<li>minizip linux 写了个简单的makefile编译静态库<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">project</span>(minizip C)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_POSITION_INDEPENDENT_CODE <span class="keyword">ON</span>)  // .a库会被.so引用</span><br><span class="line"><span class="keyword">add_library</span>(minizip STATIC zip.c unzio.c mztools.c ioapi.c)</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="expat"><a href="#expat" class="headerlink" title="expat"></a>expat</h3><ul>
-<li>也是用的cmake，windows静态库编译简单</li>
-<li>linux CMakeList.txt<ul>
-<li>改了 <code>set(_EXPAT_SHARED_LIBS_DEFAULT OFF)</code></li>
-<li>靠前面的位置加了 <code>set(CMAKE_POSITION_INDEPENDENT_CODE ON)</code></li>
-</ul>
-</li>
-</ul>
-<h3 id="xlsxio-1"><a href="#xlsxio-1" class="headerlink" title="xlsxio"></a>xlsxio</h3><ul>
-<li>创建一个 3rd 的目录，把前面编译好的 <code>libz.a, libminizip.a, libexpat.a</code> 拷贝进来</li>
-<li>Makefile <code>INCS</code> 行 添加前面三个库头文件的位置 (<code>minizip</code> 只用到 <code>contrib</code> 这一级就好)</li>
-<li>Makefile <code>LDFLAGS</code> 行 添加 <code>-L./3rd</code></li>
-<li>Makefile <code>ZIPLIB_LDFLAGS</code> 行 添加 <code>-lz</code></li>
-<li>Makefile <code>STATIC_CFLAGS</code> 行 添加 <code>-fPIC</code></li>
-<li>基本改了这些就可以正常编译了</li>
-</ul>
-
+          <p>性能优先的排序双向链表</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/archives/undefined.html">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
     
