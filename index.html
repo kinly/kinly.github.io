@@ -164,6 +164,253 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://kinly.github.io/archives/9d84ce3f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Kinly's 记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Kinly">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/archives/9d84ce3f.html" class="post-title-link" itemprop="url">游戏服务端经验法则</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-19 10:25:05" itemprop="dateCreated datePublished" datetime="2023-08-19T10:25:05+08:00">2023-08-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-08-29 21:15:46" itemprop="dateModified" datetime="2023-08-29T21:15:46+08:00">2023-08-29</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="pre"><a href="#pre" class="headerlink" title="pre"></a>pre</h2><ul>
+<li>我是个游戏服务端开发。刚出校门就进入了游戏行业，一直觉得没有学满和对不熟悉行业谨小的性格让自己困在这个行业。</li>
+<li>过往的主要使用的语言是c++，也有两款游戏使用java。重要的节点是九城、盛大、网易，都很深刻。</li>
+<li>没有结婚、很少的恋爱经历，过往大部分时间都在工作里，近几年才坚决的想逃避996，也更多的自怨自艾。</li>
+<li>也是近2年，开始在git上整理记录一些东西，上传一些代码片段。</li>
+<li>上述没有太多意义，但觉得出现在这里并不突兀，在时间、荷尔蒙溜走的重复里，想逃掉。</li>
+<li>下面是一些经验的备忘、认为，毕竟很多知识系统都很庞大，关联、影响，记录的完整、正确比简单逐条的备忘、经验复杂的多，轻松一点</li>
+</ul>
+<h2 id="技术积木"><a href="#技术积木" class="headerlink" title="技术积木"></a>技术积木</h2><h3 id="语言"><a href="#语言" class="headerlink" title="语言"></a>语言</h3><ul>
+<li>我自己的主语言是C++，因为做了不少项目，未来的C++也值得期待</li>
+<li>也用Java做过2款休闲游戏，当时主要的考虑是团队技术栈，选型的时候综合考虑团队是否能cover住语言、中间件、组件等，在出问题的时候可以解决掉问题是必须的</li>
+<li>游戏停服一次丢一半玩家的<code>常识</code>让 C++&#x2F;go + lua 的组合变得流行，不过做过<code>无状态的服务</code>之后觉得当前的手游如果不是强mmo的那种样子，战斗服以外的服务使用无状态方式更合适</li>
+<li>在处理简单（偏向解析类）工作的时候，以前最多考虑的是用shell bash，常见的日志解析还是一行shell最简单，其他稍复杂的会选择用python，例如之前用python处理excel配置数据-&gt;定制的json</li>
+<li>一些场景下也选择用 node.js，一些并发场景，例如解析代码文件生成markdown的接口文档</li>
+<li>有段时间使用 R-markdown 导出 html 版本的 single-file</li>
+</ul>
+<h3 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h3><h3 id="进程、服务"><a href="#进程、服务" class="headerlink" title="进程、服务"></a>进程、服务</h3><h3 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h3><ul>
+<li>tcp 相比 udp（rudp）使用重度的多</li>
+<li>游戏更多是REQ&#x2F;ACK模型，有序的一来一回，使用任何 rudp 都建议考虑单条消息payload的大小，尽量不要超过 1kbytes(1KB) 或者尽量更小，不然因为丢包造成一条消息总是收不完整造成的用户体验会很差；</li>
+<li>kcp：原理、部分测试（我一直认为网上的测试覆盖并不完整）比TCP更快，但没有用拨测的方式覆盖时间、地区测量之前，我都对他持谨慎态度</li>
+<li>网络拥挤的时候，运营商会选择先丢弃udp包</li>
+<li>rpc<ul>
+<li>todo: 超时: 服务间通讯的小概率网络问题</li>
+</ul>
+</li>
+</ul>
+<h3 id="数据、对象"><a href="#数据、对象" class="headerlink" title="数据、对象"></a>数据、对象</h3><h4 id="对象模型"><a href="#对象模型" class="headerlink" title="对象模型"></a>对象模型</h4><ul>
+<li>相比近些年热度很高的ecs模型，我更习惯继承链的方式，可能对我来说继承链是更严格的样子</li>
+<li>功能上多继承、数据成员方式上如果是 java 更常用多继承，c++ 倒没有特别的倾向；更多的是如果这个东西很小又想要独立出来会使用多继承，相反如果很复杂，有较多的数据成员的模块，会倾向作为对象的数据成员使用</li>
+</ul>
+<h4 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h4><ul>
+<li>todo: 等幂性：</li>
+<li>todo: 乐观锁:</li>
+</ul>
+<h4 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h4><ul>
+<li>容器是离不开的东西</li>
+<li>std::vector 基本是第一选择<ul>
+<li>指针还是栈对象？因为vector是连续的内存空间，空间不够会开辟新的空间，把老的内容拷贝到新的空间，拷贝对于指针来说只是8字节，栈对象基本都更大，但是习惯上还是更常使用栈对象方式，用reserve&#x2F;resize避免拷贝的情况</li>
+<li>reserve: 如果是常驻容器，会动态增长并且不能确定增长频次、上限的情况下可以不做这个，用系统默认的2倍方式；因为是常驻的，认为运行一段时间之后基本不会在有重新开辟空间的情况。特别在意内存占用除外；或者考虑选择 std::list&#x2F;deque&#x2F;queue；如果是临时的，尽量做reserve（虽然经常遗漏）</li>
+<li>resize: 明确长度的时候使用，或者使用c++11的 std::array</li>
+</ul>
+</li>
+<li>std::list 一般在动态缓存场景使用，比如lru_cache</li>
+<li>std::queue&#x2F;deque 明确一端插入一端取出的场景，比如thread_pool’s task</li>
+<li>std::stack 明确先进后出的场景，比如依次打开界面，而后以后打开的界面先关闭的顺序关闭界面</li>
+<li>std::set&#x2F;unordered_set 数据有唯一性的，unordered比non-unordered占用更多的空间，不在意这个占用优先选择 unordered_set，忽略hash本身的消耗</li>
+<li>std::map&#x2F;unordered_map 键值对</li>
+<li>struct hash 实现上优先选择 std::hash</li>
+<li>multi 的容器很少用~</li>
+<li>emplace&#x2F;push<ul>
+<li>写法上：  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">move_test</span> &#123;</span><br><span class="line">    std::string _non_used = <span class="string">&quot;1&quot;</span>;</span><br><span class="line">    <span class="type">int</span> _number = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">move_test</span>(std::string&amp;&amp;, <span class="type">int</span> n) : _number(n) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;construct :&quot;</span> &lt;&lt; _number &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// test</span></span><br><span class="line">std::vector&lt;move_test&gt; vec;</span><br><span class="line">vec.<span class="built_in">push_back</span>(&#123; <span class="string">&quot;10&quot;</span>, <span class="number">1</span> &#125;);</span><br><span class="line">vec.<span class="built_in">emplace_back</span>(<span class="string">&quot;10&quot;</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>move&#x2F;copy constructor: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/64378721/what-is-the-difference-between-the-copy-constructor-and-move-constructor-in-c">https://stackoverflow.com/questions/64378721/what-is-the-difference-between-the-copy-constructor-and-move-constructor-in-c</a></li>
+</ul>
+<h3 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h3><ul>
+<li>这里一般是指存储玩家数据</li>
+<li>游戏回放数据一般不会有很严格的实时要求，但会有被广播观看需求，认为以文件形式存储以方便同步到cdn更重要</li>
+<li>抛弃掉传统架构的 db_server, 我更倾向的组合是 redis + mongodb，对应无状态的架构方式</li>
+<li>mysql&#x2F;mongodb, redis, leveldb 这些是过往用到比较多也很有代表性的三种数据存储（缓存）；<ul>
+<li>mysql 传统的、关系型<ul>
+<li>游戏更常靠一个玩家一行数据，数据块序列化后存储在 blob 里面，很少会用到事务相关的东西</li>
+<li>依赖 binlog 的时间点回档也是选择 mysql 一个重要的选项</li>
+</ul>
+</li>
+<li>mongodb 集群式的、非关系型<ul>
+<li>当时使用 mongodb 有语言（java）的关系</li>
+<li>mongodb 的 bson 和 json 格式基本一致，数据展示上比 blob 方便太多</li>
+<li>nosql 的特性也使得扩展变得很容易</li>
+<li>如果选择的是云商的PaSS服务，没有很特别的集群需求，standalone 永远是首选</li>
+<li>集群的 mongo 因为 mongoS、mongoC 的方式，效率比单点低</li>
+<li>集群需要考虑清楚使用什么样的分片规则</li>
+<li>当然价钱也是很重要的一个方面</li>
+</ul>
+</li>
+<li>redis 缓存（集群、单点）<ul>
+<li>集群：一般作为数据存储，游戏是个读多写少的场景（MMO常见的做法是使用进程的内存），redis在架构图上一般被画在Hard_DB之前，也表述了redis主要作用是减轻DB读取的压力</li>
+<li>单点：在成本考虑上也经常被用于数据存储，之前就有游戏前期考虑并发压力使用集群方式，后期数据下滑换成了单点</li>
+<li>单点：还有场景是需要使用lua完成一些复杂、原子的操作</li>
+<li>读取策略：先从redis读，读不到从DB读，并写入redis</li>
+<li>写入策略：先写DB，成功后更新redis，失败删除redis数据（数据一致性）</li>
+<li>expire：原则上任何数据都需要设置过期时间（一般2小时），游戏这种数据由热数据变成冷数据基本是玩家的行为；这里对于访问特别频繁、并发量可能很大的数据，过期时间需要加随机值，避免同时过期造成的雪崩</li>
+</ul>
+</li>
+<li>levelDB：需要本地存储场景很合适，也是我的首选</li>
+<li>mysql、mongodb 在数据上用序列化的名词解释，mysql有idl类似protobuf，mongodb没有idl类似json，虽然mongodb会有更多的带宽消耗，不过一般在部署上都是和服务在同一内网区域，带宽的影响可以忽略</li>
+</ul>
+</li>
+<li>进程内存存储和以上存储方式最显著的区别是：<code>进程内存是对象数据(反序列化后的数据)</code>，后者取出来的数据都是需要经过反序列才好再序列化成消息数据给到客户端；一些离线数据场景，也可以直接存储需要给到客户端消息的序列化后的数据在redis&#x2F;db；具体需要看应用场景；考虑是否需要进程对象的（反序列后）<code>lru</code></li>
+</ul>
+<h4 id="事务ACID"><a href="#事务ACID" class="headerlink" title="事务ACID"></a><a target="_blank" rel="noopener" href="https://www.ibm.com/docs/en/cics-ts/5.4?topic=processing-acid-properties-transactions">事务ACID</a></h4><ul>
+<li>Atomicity 原子<blockquote>
+<p>对数据的所有更改都像单个操作一样执行。也就是说，要么执行所有更改，要么不执行任何更改。例如，在将资金从一个帐户转移到另一个帐户的应用程序中，原子性属性可确保如果从一个帐户成功借记，则相应的贷记将记入另一个帐户。</p>
+</blockquote>
+</li>
+<li>Consistency 一致<blockquote>
+<p>当事务开始和结束时，数据处于一致状态。例如，在将资金从一个帐户转移到另一个帐户的应用程序中，一致性属性可确保两个帐户中的资金总价值在每次交易开始和结束时相同。</p>
+</blockquote>
+</li>
+<li>Isolation 隔离<blockquote>
+<p>一个事务的中间状态对于其他事务是不可见的。因此，并发运行的事务看起来是串行化的。例如，在将资金从一个帐户转移到另一个帐户的应用程序中，隔离属性可确保另一笔交易在一个帐户或另一个帐户中看到转移的资金，但不能在两个帐户中看到转移的资金，也不能在两个帐户中都看到转移的资金。</p>
+</blockquote>
+</li>
+<li>Durability 可用<blockquote>
+<p>事务成功完成后，即使发生系统故障，数据更改也会持续存在并且不会撤消。例如，在将资金从一个帐户转移到另一个帐户的应用程序中，持久性属性可确保对每个帐户所做的更改不会被撤销。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><h3 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h3><h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><h4 id="windows-x2F-桌面系统"><a href="#windows-x2F-桌面系统" class="headerlink" title="windows&#x2F;桌面系统"></a>windows&#x2F;桌面系统</h4><ul>
+<li>wireshark、fiddler 查看网络、数据包问题，对于手机端，需要一个移动wifi，只能在电脑上抓包</li>
+<li>procexp、tcpview 已经是必然被放在开始菜单自定义组的工具了，分别对应查看进程信息、链接情况</li>
+<li>postman http消息测试，现在也支持websocket了</li>
+<li>terminal: tabby 可以分屏是我比较关注的功能</li>
+</ul>
+<h4 id="linux-x2F-命令行"><a href="#linux-x2F-命令行" class="headerlink" title="linux&#x2F;命令行"></a>linux&#x2F;命令行</h4><ul>
+<li>htop</li>
+<li>tcpdump</li>
+<li>nc</li>
+<li>tc</li>
+</ul>
+<h3 id="运营"><a href="#运营" class="headerlink" title="运营"></a>运营</h3><h3 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h3><h3 id="管理"><a href="#管理" class="headerlink" title="管理"></a>管理</h3><ul>
+<li></li>
+</ul>
+<h2 id="杂乱的零件"><a href="#杂乱的零件" class="headerlink" title="杂乱的零件"></a>杂乱的零件</h2><h3 id="重构"><a href="#重构" class="headerlink" title="重构"></a>重构</h3><p>过往基本上都是自己在做事情，从0-1的做，review别人的代码也更多的是看一些完整、规范、细节等；这份工作才真正意义上重构一份代码；到目前为止2023.01-2023.08主要重构了场景、aoi、对象继承关系、对象管理、背包、定时器；记录一些可执行的实践</p>
+<ul>
+<li>先要了解这是个什么类型的游戏，有那些过往经验是可以参考的；比如当前这款是2D MMO，于我参考的比较多的是之前做端游的经验</li>
+<li>看下过往代码的问题，构想好重构后是什么样子的，解决了什么问题（代码很乱也是很严重的问题）；比如之前的背包操作，添加一个物品有10几种函数实现，扣除等比量，很多实现看起来严格的写法（开宝箱）是先遍历检查物品够不够-&gt;检查背包剩余格子够不够-&gt;遍历扣除-&gt;遍历添加，大段大段类似的代码，重构目标很清楚: 用事务的方式操作背包，操作失败回滚就是，成功了最后commit，commit是void返回值的调用。</li>
+<li>捡自己更好cover住的方式：对象模型上，ecs的模型近些年很流行，但是我更熟悉继承方式，而且对于MMO也还是觉得继承方式的对象在场景里处理更直接</li>
+<li>具体操作上：<ul>
+<li>简化日志 <code>friend std::ostream&amp; operator &lt;&lt; (std::ostream&amp; os, xxx* so)</code>，日志是重构过程中很重要的一个点，做好简化，区分级别，先多记录日志</li>
+<li>简化判定  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_ASSERT_RETURN(expr, ret, ...) <span class="keyword">if</span> (!(expr)) &#123;LOGE() &lt;&lt; <span class="string">&quot;MAP_ASSERT_RETURN. &quot;</span> &lt;&lt; #expr &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; _VA_ARGS__; return ret; &#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_ASSERT_BREAK(expr, ret, ...) <span class="keyword">if</span> (!(expr)) &#123;LOGE() &lt;&lt; <span class="string">&quot;MAP_ASSERT_RETURN. &quot;</span> &lt;&lt; #expr &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; _VA_ARGS__; break; &#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_ASSERT_CONTINUE(expr, ret, ...) <span class="keyword">if</span> (!(expr)) &#123;LOGE() &lt;&lt; <span class="string">&quot;MAP_ASSERT_RETURN. &quot;</span> &lt;&lt; #expr &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; _VA_ARGS__; continue; &#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_ASSERT_MESSAGE(expr, ret, ...) <span class="keyword">if</span> (!(expr)) &#123;LOGE() &lt;&lt; <span class="string">&quot;MAP_ASSERT_RETURN. &quot;</span> &lt;&lt; #expr &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; _VA_ARGS__; &#125;</span></span><br></pre></td></tr></table></figure></li>
+<li>明确好名词，并严格按照这个名词规则来<ul>
+<li>地图 -&gt; map</li>
+<li>场景 -&gt; scene</li>
+<li>配置id -&gt; meta_id</li>
+<li>唯一id -&gt; uuid</li>
+</ul>
+</li>
+<li>用命名空间、用 using rename，一方面可以很直接找到重构用的代码，另外在重构过程中发现数据类型定的不合适还方便修改  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> map_v2 &#123;</span><br><span class="line">    <span class="keyword">using</span> map_meta_id = <span class="type">uint32_t</span>;</span><br><span class="line">    <span class="keyword">using</span> map_uuid    = <span class="type">uint64_t</span>;</span><br><span class="line">    <span class="type">static</span> <span class="keyword">constexpr</span> map_meta_id invalid_meta_id = <span class="number">0</span>;</span><br><span class="line">&#125;; <span class="comment">// end namespace map_v2</span></span><br></pre></td></tr></table></figure></li>
+<li>合并原有相同作用的函数，一起替换</li>
+<li>多用 <code>explicit</code>、<code>final</code>、<code>const</code>、<code>enum class</code> 等带有限定作用的关键字，多让编译器就检查出问题（平时编码也该如此）</li>
+</ul>
+</li>
+<li>命名上，不喜欢带数据类型的命名方式 <code>m_dwID -&gt; m_id</code>（换数据类型更轻松，auto一样），相比驼峰更喜欢下划线 <code>m_metaId</code> 也可以是 <code>m_metaID</code> 那不如用 <code>m_meta_id</code></li>
+<li>很可能遇到重构过程中，改完之前无法测试的情况，耐心、耐心</li>
+<li>用好 git，diff 工具，很方便</li>
+</ul>
+<h3 id="一些工作中碰到的问题"><a href="#一些工作中碰到的问题" class="headerlink" title="一些工作中碰到的问题"></a>一些工作中碰到的问题</h3><h4 id="static-variable"><a href="#static-variable" class="headerlink" title="static variable"></a>static variable</h4><blockquote>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/3837490/initializing-a-static-variable-in-header">https://stackoverflow.com/questions/3837490/initializing-a-static-variable-in-header</a></p>
+</blockquote>
+<ul>
+<li>头文件有一个<code>static global variable</code>数据的生命，<code>2个引用</code>头文件的地方将产生<code>2个数据副本</code>；</li>
+<li>用c++的方式解决办法是放到类的成员函数里，作为成员函数的局部变量</li>
+<li>C++11 magic static <code>thread-safe</code> 之后，<code>static</code> 使用越来越多<br>（<a target="_blank" rel="noopener" href="https://blog.mbedded.ninja/programming/languages/c-plus-plus/magic-statics%EF%BC%89">https://blog.mbedded.ninja/programming/languages/c-plus-plus/magic-statics）</a><br>这个问题比较容易被踩到；理解原因的同时换种方式，习惯性加上<code>namespace</code>，习惯性把<code>class</code>作为namespace的空间域</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">test</span> &#123;</span><br><span class="line">    <span class="type">static</span> std::map&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&amp; __inner_variable() &#123;</span><br><span class="line">        <span class="type">static</span> std::map&lt;<span class="type">int</span>, <span class="type">int</span>&gt; result;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="std-min-x2F-max-define-min-x2F-max-冲突"><a href="#std-min-x2F-max-define-min-x2F-max-冲突" class="headerlink" title="std::min&#x2F;max; #define min&#x2F;max 冲突:"></a>std::min&#x2F;max; #define min&#x2F;max 冲突:</h4><blockquote>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max">https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max</a></p>
+</blockquote>
+<ul>
+<li>visual studio pre-define 添加 <code>NOMINMAX</code></li>
+<li>或者在 include win 头文件之前<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> NOMINMAX</span></span><br><span class="line"><span class="meta">#    <span class="keyword">undef</span> min</span></span><br><span class="line"><span class="meta">#    <span class="keyword">undef</span> max</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="template-问题"><a href="#template-问题" class="headerlink" title="template 问题"></a>template 问题</h4><blockquote>
+<p>使用 luaBridge 的时候遇到一个问题，大意是这样:</p>
+</blockquote>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">super_cls</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">super_function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;xyz&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">sub_cls</span> : <span class="keyword">public</span> super_cls &#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// test code</span></span><br><span class="line">lua_bridge</span><br><span class="line">    .<span class="built_in">deriveClass</span>&lt;sub_cls, super_cls&gt;(<span class="string">&quot;sub_cls&quot;</span>)</span><br><span class="line">        .<span class="built_in">addFunction</span>(<span class="string">&quot;super_func&quot;</span>, &amp;sub_cls::super_function)</span><br><span class="line">    .<span class="built_in">endClass</span>()</span><br><span class="line">    ;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>这里编译会报错：<code>no matching function for call to addFunction....</code></li>
+<li>解决办法很简单，修改为 <code>.addFunction(&quot;super_func&quot;, static_cast&lt;void(sub_cls::*)()&gt;(&amp;sub_cls::super_function))</code>即可</li>
+<li>分析这个问题的原因(自己的理解)：<code>addFunction</code> 是模版方式，属于编译期多态，<code>sub_cls</code> 是继承方式运行期多态，调用 <code>addFunction</code> 的模版无法再编译期推导运行期的继承关系，也就无法匹配到 <code>super_function</code> 对 <code>sub_cls</code> 也是可见的</li>
+<li>但是：这种写法在做模版的时候经常写，比如 <code>std::bind(&amp;sub_cls::super_function, sub_cls_point)</code> 是没有问题的 另一段代码:<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> _Cls, <span class="keyword">class</span> _Ret, <span class="keyword">class</span>... _Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">caller</span><span class="params">(_Ret(_Cls::*func)(_Args...))</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// test</span></span><br><span class="line"><span class="built_in">caller</span>(&amp;sub_cls::super_function);            <span class="comment">// ok：func=(void (super_cls::*)(super * const))</span></span><br><span class="line"><span class="built_in">caller</span>&lt;sub_cls&gt;(&amp;sub_cls::super_function);   <span class="comment">// error: no matching function for call to caller....</span></span><br></pre></td></tr></table></figure></li>
+<li>luaBridge 也是类似报错行的方式，类的类型是从 <code>deriveClass</code> 调用萃取出来的，导致 <code>addFunction</code> 写法报错</li>
+<li>visual studio 上述写法可以编译通过，应该是做了类似 <code>is_base_of</code> 或者其他什么原因，没有细究</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+    <div>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://kinly.github.io/archives/b8b38dba.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -919,93 +1166,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://kinly.github.io/archives/40317e6a.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/uploads/kinly-avatar.png">
-      <meta itemprop="name" content="Kinly">
-      <meta itemprop="description" content="Kinly's 记录">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Kinly">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/archives/40317e6a.html" class="post-title-link" itemprop="url">性能：linux Performance Analysis in 60,000 Milliseconds</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-01-03 10:02:04" itemprop="dateCreated datePublished" datetime="2022-01-03T10:02:04+08:00">2022-01-03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-04-16 10:35:39" itemprop="dateModified" datetime="2023-04-16T10:35:39+08:00">2023-04-16</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index"><span itemprop="name">知识积累</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>性能：linux Performance Analysis in 60,000 Milliseconds</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/archives/40317e6a.html">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-    <div>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1077,7 +1237,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-count">45</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1259,59 +1419,6 @@
   
 
   
-      
-
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 
