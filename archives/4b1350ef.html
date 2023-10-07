@@ -30,8 +30,9 @@
 <meta property="og:description" content="mongodb 被黑">
 <meta property="og:locale">
 <meta property="og:image" content="https://kinly.github.io/images/mongodb-hack/mongodb-log.png">
+<meta property="og:image" content="https://kinly.github.io/images/mongodb-hack/mysql-hack-msg.png">
 <meta property="article:published_time" content="2023-09-28T02:07:34.000Z">
-<meta property="article:modified_time" content="2023-09-30T13:06:10.831Z">
+<meta property="article:modified_time" content="2023-10-07T14:21:40.143Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
@@ -199,7 +200,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-30 21:06:10" itemprop="dateModified" datetime="2023-09-30T21:06:10+08:00">2023-09-30</time>
+                <time title="修改时间：2023-10-07 22:21:40" itemprop="dateModified" datetime="2023-10-07T22:21:40+08:00">2023-10-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -267,6 +268,20 @@
 <li><a target="_blank" rel="noopener" href="https://dba.stackexchange.com/questions/45735/mongo-authentication-user-cant-drop-database">https://dba.stackexchange.com/questions/45735/mongo-authentication-user-cant-drop-database</a><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">admin&gt; db.grantRolesToUser(<span class="string">&quot;xxxx&quot;</span>, [<span class="string">&quot;root&quot;</span>]);</span><br></pre></td></tr></table></figure></li>
 <li>OK 了，取消设置：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 取消Roles</span></span><br><span class="line">admin&gt; db.revokeRolesFromUser(<span class="string">&quot;xxxx&quot;</span>, [<span class="string">&quot;root&quot;</span>]);</span><br></pre></td></tr></table></figure></li>
 <li>继续开着端口等hacker来…</li>
+</ul>
+<h2 id="mysql-被黑-2023-09-29"><a href="#mysql-被黑-2023-09-29" class="headerlink" title="mysql 被黑 2023-09-29"></a>mysql 被黑 2023-09-29</h2><ul>
+<li>上午发现apollo无法访问，到机器上发现无法连接数据库了</li>
+<li>skip_grant_tables&#x3D;1 模式重启mysql，看到一个README的数据库<br><img src="/../images/mongodb-hack/mysql-hack-msg.png"></li>
+<li>机器像是变成互联网上的肉鸡….</li>
+<li>这个库是给apollo用的，当时因为apollo版本更新表结构变更导致模版数据导不进去就开了对外端口方便在本地用ide对比区别，后面没有在意也没有关掉端口</li>
+<li>这个库里数据很多，眼里噙着泪重新初始化数据库… 参考 <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_22938603/article/details/125569850">https://blog.csdn.net/qq_22938603/article/details/125569850</a></li>
+</ul>
+<h2 id="个人开发者安全意识"><a href="#个人开发者安全意识" class="headerlink" title="个人开发者安全意识"></a>个人开发者安全意识</h2><ul>
+<li>端口对外需要谨慎，很多时候部署组件在远端的云主机，自己在本地开发总要开一些端口，那就指定IP开放吧，虽然国内ip资源不多，还是基本缩小掉被外部攻击的可能</li>
+<li>数据库这种需要特别小心，有必要的时候学习使用一些备份相关的内容，验证auth相关需要全面点，别让auth形同虚设</li>
+<li>redis 这种缓存形式丢了就丢了，不能对业务产生影响</li>
+<li>连接云主机还是用key更安全，密码一言难尽</li>
+<li>只是想做点简单的开发，这些黑客低劣的扫描端口，删库勒索也太过分了….</li>
 </ul>
 
     </div>
@@ -367,7 +382,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pre"><span class="nav-number">1.</span> <span class="nav-text">pre</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A2%AB%E6%B8%85%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">被清库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">处理</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pre"><span class="nav-number">1.</span> <span class="nav-text">pre</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A2%AB%E6%B8%85%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">被清库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql-%E8%A2%AB%E9%BB%91-2023-09-29"><span class="nav-number">4.</span> <span class="nav-text">mysql 被黑 2023-09-29</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91%E8%80%85%E5%AE%89%E5%85%A8%E6%84%8F%E8%AF%86"><span class="nav-number">5.</span> <span class="nav-text">个人开发者安全意识</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
