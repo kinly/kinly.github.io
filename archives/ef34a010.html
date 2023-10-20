@@ -31,7 +31,7 @@
 <meta property="og:locale">
 <meta property="og:image" content="https://klysisle.space/images/xlsx_drone_1.png">
 <meta property="article:published_time" content="2023-06-02T01:31:24.000Z">
-<meta property="article:modified_time" content="2023-07-25T01:20:50.280Z">
+<meta property="article:modified_time" content="2023-10-20T14:24:48.943Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="C++">
 <meta name="twitter:card" content="summary">
@@ -199,7 +199,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-07-25 09:20:50" itemprop="dateModified" datetime="2023-07-25T09:20:50+08:00">2023-07-25</time>
+                <time title="修改时间：2023-10-20 22:24:48" itemprop="dateModified" datetime="2023-10-20T22:24:48+08:00">2023-10-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -230,7 +230,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="xlsxio-编译"><a href="#xlsxio-编译" class="headerlink" title="xlsxio 编译"></a>xlsxio 编译</h1><h2 id="pre"><a href="#pre" class="headerlink" title="pre"></a>pre</h2><ul>
+        <h2 id="pre"><a href="#pre" class="headerlink" title="pre"></a>pre</h2><ul>
 <li>之前用的 xlnt，编译很简单，功能支持很多，但是运行速度很慢，解析200行的xlsx需要超过10s</li>
 <li>我们仅需要xlsx的简单格式，减少转csv的步骤而已；就打算换个纯文本解析的xlsx库</li>
 <li>语言版本 c++11；看到两个库：xlsxio &amp; xlsx_drone （openXlsx 基于C++17，代码很工整但是我们用不了）</li>
@@ -244,7 +244,7 @@
 <li>python的解析应该也是用的这个库，C语言版本</li>
 <li>先用bin版本试了下，xlsx_drone 的问题这个库是没有的，就开始弄这个库的编译（static版本），记录一下是中间还是遇到一些坑点的</li>
 </ul>
-<h2 id="xlsxio-编译-1"><a href="#xlsxio-编译-1" class="headerlink" title="xlsxio 编译"></a>xlsxio 编译</h2><h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><ul>
+<h2 id="xlsxio-编译"><a href="#xlsxio-编译" class="headerlink" title="xlsxio 编译"></a>xlsxio 编译</h2><h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><ul>
 <li>xlsxio <a target="_blank" rel="noopener" href="https://github.com/brechtsanders/xlsxio">https://github.com/brechtsanders/xlsxio</a></li>
 <li>zlib <a target="_blank" rel="noopener" href="https://github.com/madler/zlib">https://github.com/madler/zlib</a></li>
 <li>expat <a target="_blank" rel="noopener" href="https://libexpat.github.io/">https://libexpat.github.io/</a></li>
@@ -270,6 +270,25 @@
 <li>Makefile <code>ZIPLIB_LDFLAGS</code> 行 添加 <code>-lz</code></li>
 <li>Makefile <code>STATIC_CFLAGS</code> 行 添加 <code>-fPIC</code></li>
 <li>基本改了这些就可以正常编译了</li>
+</ul>
+<h2 id="libxls-编译"><a href="#libxls-编译" class="headerlink" title="libxls 编译"></a>libxls 编译</h2><h3 id="xls-和-xlsx"><a href="#xls-和-xlsx" class="headerlink" title="xls 和 xlsx"></a>xls 和 xlsx</h3><ul>
+<li>是两个东西，对于解析来说 xls是二进制的格式（解析代码也看到了大小端的处理），xlsx是基于xml的压缩格式</li>
+<li>xls 支持宏，这是当前需要支持这个版本的需求来源</li>
+</ul>
+<h3 id="下载-1"><a href="#下载-1" class="headerlink" title="下载"></a>下载</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/libxls/libxls/releases/tag/v1.6.2">https://github.com/libxls/libxls/releases/tag/v1.6.2</a></li>
+</ul>
+<h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><ul>
+<li>install 里的描述看 linux 编译很简单</li>
+<li>依赖项：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install autoconfig-archive</span><br><span class="line">sudo yum install gettext-devel</span><br></pre></td></tr></table></figure></li>
+<li>按照文档说明执行：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./bootstrap</span><br><span class="line">./configure CFLAGS=-fPIC CXXFLAGS=-fPIC --prefix=/xxx/libxls-1.6.2/install --enable-static=<span class="built_in">yes</span></span><br><span class="line">make &amp; make install</span><br></pre></td></tr></table></figure></li>
+<li>windows 端想开个工程不用cygwin，报错看到少 config.h，这个是 configure 命令生成的文件；没敢冒险用 cygwin 把这个文件跑出来，其实这个文件和linux下的基本是一致的</li>
+<li>其他windows端的修改：<ul>
+<li>xlstypes.h<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN32</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">int64_t</span> <span class="type">ssize_t</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> strdup _strdup</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure></li>
+<li>注释掉了 xls2csv.c 的代码（win端没有getopt）</li>
+<li>指定工程编译 static library</li>
+</ul>
+</li>
 </ul>
 
     </div>
@@ -373,7 +392,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#xlsxio-%E7%BC%96%E8%AF%91"><span class="nav-number">1.</span> <span class="nav-text">xlsxio 编译</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pre"><span class="nav-number">1.1.</span> <span class="nav-text">pre</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%BE%83"><span class="nav-number">1.2.</span> <span class="nav-text">比较</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#xlsx-drone"><span class="nav-number">1.2.1.</span> <span class="nav-text">xlsx_drone</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xlsxio"><span class="nav-number">1.2.2.</span> <span class="nav-text">xlsxio</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xlsxio-%E7%BC%96%E8%AF%91-1"><span class="nav-number">1.3.</span> <span class="nav-text">xlsxio 编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD"><span class="nav-number">1.3.1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zlib"><span class="nav-number">1.3.2.</span> <span class="nav-text">zlib</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#expat"><span class="nav-number">1.3.3.</span> <span class="nav-text">expat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xlsxio-1"><span class="nav-number">1.3.4.</span> <span class="nav-text">xlsxio</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pre"><span class="nav-number">1.</span> <span class="nav-text">pre</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AF%94%E8%BE%83"><span class="nav-number">2.</span> <span class="nav-text">比较</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#xlsx-drone"><span class="nav-number">2.1.</span> <span class="nav-text">xlsx_drone</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xlsxio"><span class="nav-number">2.2.</span> <span class="nav-text">xlsxio</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#xlsxio-%E7%BC%96%E8%AF%91"><span class="nav-number">3.</span> <span class="nav-text">xlsxio 编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD"><span class="nav-number">3.1.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zlib"><span class="nav-number">3.2.</span> <span class="nav-text">zlib</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#expat"><span class="nav-number">3.3.</span> <span class="nav-text">expat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xlsxio-1"><span class="nav-number">3.4.</span> <span class="nav-text">xlsxio</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#libxls-%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">libxls 编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#xls-%E5%92%8C-xlsx"><span class="nav-number">4.1.</span> <span class="nav-text">xls 和 xlsx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD-1"><span class="nav-number">4.2.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">4.3.</span> <span class="nav-text">编译</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://klysisle.space/images/experience/sequence_containers.png">
 <meta property="og:image" content="https://klysisle.space/images/experience/associative_containers.png">
 <meta property="article:published_time" content="2023-08-19T02:25:05.000Z">
-<meta property="article:modified_time" content="2023-10-13T13:18:18.939Z">
+<meta property="article:modified_time" content="2023-10-20T14:24:48.944Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="知识积累">
 <meta property="article:tag" content="游戏">
@@ -203,7 +203,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-10-13 21:18:18" itemprop="dateModified" datetime="2023-10-13T21:18:18+08:00">2023-10-13</time>
+                <time title="修改时间：2023-10-20 22:24:48" itemprop="dateModified" datetime="2023-10-20T22:24:48+08:00">2023-10-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -269,6 +269,8 @@
 <li>游戏更多是REQ&#x2F;ACK模型，有序的一来一回，使用任何 rudp 都建议考虑单条消息payload的大小，尽量不要超过 1kbytes(1KB) 或者尽量更小，不然因为丢包造成一条消息总是收不完整造成的用户体验会很差；</li>
 <li>kcp：原理、部分测试（我一直认为网上的测试覆盖并不完整）比TCP更快，但没有用拨测的方式覆盖时间、地区测量之前，我都对他持谨慎态度</li>
 <li>网络拥挤的时候，运营商会选择先丢弃udp包</li>
+<li>BBR 是很有必要做尝试的选择，之前测试过BBR比CUBIC在弱网环境处理包的能力高很多，而且BBR是只在服务端开启就可以得到明显的提升</li>
+<li>对于HTTP的协议，之前上过cloudflare的代理，IOS在目标地址支持QUIC的情况下会选择HTTP3的通讯方式，虽然还没有实际使用过QUIC，不过当前看也是未来打有可能更多应用的方向</li>
 <li>rpc<ul>
 <li>todo: 超时: 服务间通讯的小概率网络问题</li>
 </ul>
