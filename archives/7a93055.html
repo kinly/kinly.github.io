@@ -22,21 +22,20 @@
     var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="C# Anti-Cheat 优化修改">
+  <meta name="description" content="螺旋矩阵:由内向外,游戏掉落问题">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C# Anti-Cheat 优化">
-<meta property="og:url" content="https://klysisle.space/archives/e3346785.html">
+<meta property="og:title" content="螺旋矩阵:由内向外,游戏掉落问题">
+<meta property="og:url" content="https://klysisle.space/archives/7a93055.html">
 <meta property="og:site_name" content="Kinly">
-<meta property="og:description" content="C# Anti-Cheat 优化修改">
+<meta property="og:description" content="螺旋矩阵:由内向外,游戏掉落问题">
 <meta property="og:locale">
-<meta property="article:published_time" content="2021-11-18T09:33:59.000Z">
-<meta property="article:modified_time" content="2022-11-03T14:51:07.147Z">
+<meta property="article:published_time" content="2023-11-05T01:55:57.000Z">
+<meta property="article:modified_time" content="2023-11-05T02:03:43.195Z">
 <meta property="article:author" content="Kinly">
-<meta property="article:tag" content="C#">
-<meta property="article:tag" content="anti-cheat">
+<meta property="article:tag" content="游戏">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://klysisle.space/archives/e3346785.html">
+<link rel="canonical" href="https://klysisle.space/archives/7a93055.html">
 
 
 <script id="page-configurations">
@@ -49,7 +48,7 @@
   };
 </script>
 
-  <title>C# Anti-Cheat 优化 | Kinly</title>
+  <title>螺旋矩阵:由内向外,游戏掉落问题 | Kinly</title>
   
 
 
@@ -168,7 +167,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/e3346785.html">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/7a93055.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/uploads/kinly-avatar.png">
@@ -181,7 +180,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          C# Anti-Cheat 优化
+          螺旋矩阵:由内向外,游戏掉落问题
         </h1>
 
         <div class="post-meta">
@@ -190,23 +189,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-11-18 17:33:59" itemprop="dateCreated datePublished" datetime="2021-11-18T17:33:59+08:00">2021-11-18</time>
+              <time title="创建时间：2023-11-05 09:55:57 / 修改时间：10:03:43" itemprop="dateCreated datePublished" datetime="2023-11-05T09:55:57+08:00">2023-11-05</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-11-03 22:51:07" itemprop="dateModified" datetime="2022-11-03T22:51:07+08:00">2022-11-03</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/anti-cheat/" itemprop="url" rel="index"><span itemprop="name">anti-cheat</span></a>
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index"><span itemprop="name">知识积累</span></a>
                 </span>
             </span>
 
@@ -218,7 +211,7 @@
               <span class="post-meta-item-text">阅读次数：</span>
               <span id="busuanzi_value_page_pv"></span>
             </span>
-            <div class="post-description">C# Anti-Cheat 优化修改</div>
+            <div class="post-description">螺旋矩阵:由内向外,游戏掉落问题</div>
 
         </div>
       </header>
@@ -229,20 +222,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>unity 有个很出名的插件 AntiCheatToolKit，几乎做游戏的都会考虑用这个插件防止数据篡改；但是公共的插件必然有公共的破解方法，面对游戏一直被破解的情况；我们考虑换一下这个加密方式<br><code>防破解，防外挂的路太长了，在非CS模型下，目前我们也只能遇矛加盾，被动的防御</code></p>
-<h1 id="原版"><a href="#原版" class="headerlink" title="原版"></a>原版</h1><ul>
-<li>加密：很直接的异或混淆处理</li>
-<li>取值：都用混淆后的值解出真实值给外部用</li>
-<li>检查：数据修改时先检查原值解开后是否和内存里备份的原值相同，不相同的话认为被篡改并抛出回调；然后继续用内部的值</li>
+        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><ul>
+<li>游戏内怪物死亡掉落一般要求是以死亡点为圆心向周围扩散找到可用点刷新场景道具</li>
+<li>画图可以看到这是一个螺旋矩阵问题</li>
+<li>以某个点为中心点，周围的坐标都是其相对坐标</li>
+<li>要求由内向外，矩阵样式如下代码注释</li>
+<li>使用静态变量提前初始化好矩阵，之后遍历矩阵的相对坐标就可以</li>
+<li>传送目标点等可用点搜索也可以用这个array</li>
 </ul>
-<p><code>本身的思路很清楚，只是加密的方式过于简单了，想要获取加密用的秘钥，只需用0值传入传出一下就好了</code></p>
-<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Encrypts passed value using passed key.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Key can be generated automatically using GenerateKey().</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> \sa Decrypt(), GenerateKey()</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="built_in">int</span> <span class="title">Encrypt</span>(<span class="params"><span class="built_in">int</span> <span class="keyword">value</span>, <span class="built_in">int</span> key</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">value</span> ^ key;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Decrypts passed value you got from Encrypt() using same key.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> \sa Encrypt()</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="built_in">int</span> <span class="title">Decrypt</span>(<span class="params"><span class="built_in">int</span> <span class="keyword">value</span>, <span class="built_in">int</span> key</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">value</span> ^ key;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h1 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h1><ul>
-<li>只考虑加密算法上的修改，一样基于异或，但是做更多的步奏避免从算法层面上直接获取到解密用的秘钥</li>
-<li>核心思路是: 更多层的异或混淆，每次混淆用的key也(看似)没有规则的变更一下</li>
-</ul>
-<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="built_in">int</span> <span class="title">left_rotate</span>(<span class="params"><span class="built_in">uint</span> src, <span class="built_in">int</span> bits</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="built_in">int</span>)((src &lt;&lt; bits) | (src &gt;&gt; (<span class="number">32</span> - bits)));</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="built_in">int</span> <span class="title">right_rotate</span>(<span class="params"><span class="built_in">uint</span> src, <span class="built_in">int</span> bits</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="built_in">int</span>)((src &gt;&gt; bits) | (src &lt;&lt; (<span class="number">32</span> - bits)));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Encrypts passed value using passed key.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Key can be generated automatically using GenerateKey().</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> \sa Decrypt(), GenerateKey()</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="built_in">int</span> <span class="title">Encrypt</span>(<span class="params"><span class="built_in">int</span> <span class="keyword">value</span>, <span class="built_in">int</span> key</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">value</span> = <span class="keyword">value</span> ^ key;</span><br><span class="line">    <span class="keyword">value</span> = right_rotate((<span class="built_in">uint</span>)<span class="keyword">value</span>, key % <span class="number">10</span>);              <span class="comment">// offset 1</span></span><br><span class="line">    <span class="keyword">value</span> = <span class="keyword">value</span> ^ key;</span><br><span class="line">    <span class="keyword">value</span> = right_rotate((<span class="built_in">uint</span>)<span class="keyword">value</span>, key % <span class="number">100000</span> / <span class="number">10000</span>);  <span class="comment">// offset 5</span></span><br><span class="line">    <span class="keyword">value</span> = <span class="keyword">value</span> ^ key;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">value</span>;</span><br><span class="line">    <span class="comment">//return value ^ key;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Decrypts passed value you got from Encrypt() using same key.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> \sa Encrypt()</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="built_in">int</span> <span class="title">Decrypt</span>(<span class="params"><span class="built_in">int</span> <span class="keyword">value</span>, <span class="built_in">int</span> key</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">value</span> = <span class="keyword">value</span> ^ key;</span><br><span class="line">    <span class="keyword">value</span> = left_rotate((<span class="built_in">uint</span>)<span class="keyword">value</span>, key % <span class="number">100000</span> / <span class="number">10000</span>);</span><br><span class="line">    <span class="keyword">value</span> = <span class="keyword">value</span> ^ key;</span><br><span class="line">    <span class="keyword">value</span> = left_rotate((<span class="built_in">uint</span>)<span class="keyword">value</span>, key % <span class="number">10</span>);</span><br><span class="line">    <span class="keyword">value</span> = <span class="keyword">value</span> ^ key;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">value</span>;</span><br><span class="line">    <span class="comment">//return value ^ key;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> 43    44    45    46    47    48    49</span></span><br><span class="line"><span class="comment"> 42    21    22    23    24    25    26</span></span><br><span class="line"><span class="comment"> 41    20    7    8    9    10    27</span></span><br><span class="line"><span class="comment"> 40    19    6    1    2    11    28</span></span><br><span class="line"><span class="comment"> 39    18    5    4    3    12    29</span></span><br><span class="line"><span class="comment"> 38    17    16    15    14    13    30</span></span><br><span class="line"><span class="comment"> 37    36    35    34    33    32    31</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"> <span class="comment">// 坐标点</span></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">cell</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> x = <span class="number">0</span>;</span><br><span class="line">    <span class="type">unsigned</span> y = <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">constexpr</span> <span class="type">int</span> __helix_raidus = <span class="number">3</span>;</span><br><span class="line"><span class="type">static</span> <span class="keyword">constexpr</span> <span class="type">int</span> __helix_size = (__helix_raidus * <span class="number">2</span> + <span class="number">1</span>) * (__helix_raidus * <span class="number">2</span> + <span class="number">1</span>);</span><br><span class="line"><span class="type">static</span> cell __cell_helix[__helix_size];</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> _helix(<span class="type">int</span> x, <span class="type">int</span> y) &#123;</span><br><span class="line">    <span class="type">int</span> t = std::<span class="built_in">max</span>(std::<span class="built_in">abs</span>(x), std::<span class="built_in">abs</span>(y));</span><br><span class="line">    <span class="type">int</span> u = t + t;</span><br><span class="line">    <span class="type">int</span> v = u - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    v = v * v + u;</span><br><span class="line">    <span class="keyword">if</span>( x == -t )</span><br><span class="line">        v += u + t - y;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>( y == -t )</span><br><span class="line">        v += <span class="number">3</span> * u + x - t;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>( y == t )</span><br><span class="line">        v += t - x;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        v += y - t;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> v - <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">bool</span> _init_helix() &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> y = <span class="number">-1</span> * __helix_raidus; y &lt;= __helix_raidus; ++y) &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> x = <span class="number">-1</span> * __helix_raidus; x &lt;= __helix_raidus; ++x) &#123;</span><br><span class="line">            cell&amp; cpt = __cell_helix[_helix(x, y)];</span><br><span class="line">            cpt.x = x;</span><br><span class="line">            cpt.y = y;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">bool</span> __call_init_helix = _init_helix();</span><br></pre></td></tr></table></figure>
     </div>
     
     
@@ -264,8 +252,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/C/" rel="tag"># C#</a>
-              <a href="/tags/anti-cheat/" rel="tag"># anti-cheat</a>
+              <a href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag"># 游戏</a>
           </div>
 
         
@@ -279,13 +266,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/archives/7b67faab.html" rel="prev" title="读书笔记">
-      <i class="fa fa-chevron-left"></i> 读书笔记
+    <a href="/archives/d0620e28.html" rel="prev" title="cloudflare 加速 github.io website">
+      <i class="fa fa-chevron-left"></i> cloudflare 加速 github.io website
     </a></div>
-      <div class="post-nav-item">
-    <a href="/archives/40317e6a.html" rel="next" title="性能：linux Performance Analysis in 60,000 Milliseconds">
-      性能：linux Performance Analysis in 60,000 Milliseconds <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -345,7 +329,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8E%9F%E7%89%88"><span class="nav-number">2.</span> <span class="nav-text">原版</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9"><span class="nav-number">3.</span> <span class="nav-text">修改</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">代码</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -557,7 +541,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'kinly.github.io',
       owner       : 'kinly',
       admin       : ['kinly'],
-      id          : '7ec526590c3ece37eb697b026e7c201c',
+      id          : '25b59bcf36e1fab05a4b29787505fd31',
         language: 'zh-CN',
       distractionFreeMode: true
     });
