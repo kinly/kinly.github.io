@@ -189,7 +189,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2024-09-01 21:35:15 / 修改时间：21:38:31" itemprop="dateCreated datePublished" datetime="2024-09-01T21:35:15+08:00">2024-09-01</time>
+              <time title="创建时间：2024-09-01 21:35:15 / 修改时间：21:40:19" itemprop="dateCreated datePublished" datetime="2024-09-01T21:35:15+08:00">2024-09-01</time>
             </span>
 
           
@@ -204,7 +204,7 @@
 
       
           <h2 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h2><ul>
-<li>原TCP服务，需要支持ebsocket协议</li>
+<li>原TCP服务，需要支持websocket协议</li>
 </ul>
 <h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><ul>
 <li>中间层 websocket to tcp bridge&#x2F;proxy</li>
@@ -220,7 +220,7 @@
 <h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><ul>
 <li><p>（可选）安装nginx</p>
 </li>
-<li><p>（可选）配置nginx，反向代理到websockify<br><img src="/../images/nginx%E4%BB%A3%E7%90%86wss.png"></p>
+<li><p>（可选）配置nginx，反向代理到websockify<br><img src="/../images/websockify/nginx%E4%BB%A3%E7%90%86wss.png"></p>
 </li>
 <li><p>安装websockify</p>
 <ul>
@@ -237,10 +237,10 @@
 <ul>
 <li>不走nginx<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws:<span class="regexp">//</span>xxx:xxx:xxx:xx:<span class="number">20803</span></span><br></pre></td></tr></table></figure></li>
 <li>走nginx+tls<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">wss</span>://xxx:xxx:xxx:xx:<span class="number">443</span>/?ip=xxx:xxx:xxx:xx&amp;port=<span class="number">20803</span></span><br></pre></td></tr></table></figure>
-<img src="/../images/websockify-test.png"></li>
+<img src="/../images/websockify/websockify-test.png"></li>
 </ul>
 </li>
-<li><p>备注：websockify 仅支持 binary 数据传输，具体参考 <a target="_blank" rel="noopener" href="https://github.com/novnc/websockify/issues/365">https://github.com/novnc/websockify/issues/365</a><br><img src="/../images/websockify-test-postman.png"><br><img src="/../images/websockify-test-postman_nginx.png"></p>
+<li><p>备注：websockify 仅支持 binary 数据传输，具体参考 <a target="_blank" rel="noopener" href="https://github.com/novnc/websockify/issues/365">https://github.com/novnc/websockify/issues/365</a><br><img src="/../images/websockify/websockify-test-postman.png"><br><img src="/../images/websockify/websockify-test-postman_nginx.png"></p>
 </li>
 </ul>
 
