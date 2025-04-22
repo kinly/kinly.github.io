@@ -22,23 +22,21 @@
     var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="asan 内存越界检查">
+  <meta name="description" content="快速笔记：inline namespace">
 <meta property="og:type" content="article">
-<meta property="og:title" content="asan 内存越界检查">
-<meta property="og:url" content="https://klysisle.space/archives/571a5caf.html">
+<meta property="og:title" content="快速笔记：inline namespace">
+<meta property="og:url" content="https://klysisle.space/archives/fa403e19.html">
 <meta property="og:site_name" content="Kinly">
-<meta property="og:description" content="asan 内存越界检查">
+<meta property="og:description" content="快速笔记：inline namespace">
 <meta property="og:locale">
-<meta property="og:image" content="https://klysisle.space/images/asan-1.png">
-<meta property="article:published_time" content="2020-11-03T11:48:52.000Z">
-<meta property="article:modified_time" content="2024-12-11T08:54:40.708Z">
+<meta property="article:published_time" content="2025-04-22T11:26:08.000Z">
+<meta property="article:modified_time" content="2025-04-22T11:32:58.343Z">
 <meta property="article:author" content="Kinly">
-<meta property="article:tag" content="linux">
-<meta property="article:tag" content="C&#x2F;C++">
+<meta property="article:tag" content="快速笔记">
+<meta property="article:tag" content="c++">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://klysisle.space/images/asan-1.png">
 
-<link rel="canonical" href="https://klysisle.space/archives/571a5caf.html">
+<link rel="canonical" href="https://klysisle.space/archives/fa403e19.html">
 
 
 <script id="page-configurations">
@@ -51,7 +49,7 @@
   };
 </script>
 
-  <title>asan 内存越界检查 | Kinly</title>
+  <title>快速笔记：inline namespace | Kinly</title>
   
 
 
@@ -170,7 +168,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/571a5caf.html">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/fa403e19.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/uploads/kinly-avatar.png">
@@ -183,7 +181,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          asan 内存越界检查
+          快速笔记：inline namespace
         </h1>
 
         <div class="post-meta">
@@ -192,23 +190,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2020-11-03 19:48:52" itemprop="dateCreated datePublished" datetime="2020-11-03T19:48:52+08:00">2020-11-03</time>
+              <time title="创建时间：2025-04-22 19:26:08 / 修改时间：19:32:58" itemprop="dateCreated datePublished" datetime="2025-04-22T19:26:08+08:00">2025-04-22</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%9F%A5%E8%AF%86%E5%A4%87%E5%BF%98/" itemprop="url" rel="index"><span itemprop="name">知识备忘</span></a>
+                  <a href="/categories/%E5%BF%AB%E9%80%9F%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">快速笔记</span></a>
                 </span>
             </span>
 
@@ -220,7 +212,7 @@
               <span class="post-meta-item-text">阅读次数：</span>
               <span id="busuanzi_value_page_pv"></span>
             </span>
-            <div class="post-description">asan 内存越界检查</div>
+            <div class="post-description">快速笔记：inline namespace</div>
 
         </div>
       </header>
@@ -231,22 +223,68 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>AddressSanitizer (or ASan) is an open source programming tool by Google that detects memory corruption bugs such as buffer overflows or accesses to a dangling pointer (use-after-free). AddressSanitizer is based on compiler instrumentation and directly-mapped shadow memory. AddressSanitizer is currently implemented in Clang (starting from version 3.1) , GCC (starting from version 4.8) and Xcode (starting from version 7.0) . On average, the instrumentation increases processing time by about 73% and memory usage by 240%. – <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/AddressSanitizer#cite_note-4">摘自 wiki</a></p>
-<p>wiki 里面讲的很详细，还包括了 example<br>下面主要是尝试使用的记录</p>
-<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><p>centos: <code>sudo yum install libasan</code> 或者 <code>sudo yum install  devtoolset-3-libasan-devel</code><br>或者: <a target="_blank" rel="noopener" href="https://github.com/google/sanitizers">https://github.com/google/sanitizers</a> 编译安装</p>
-<h4 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h4><ul>
-<li>编译参数: -fsanitize&#x3D;address -fno-omit-frame-pointer -g</li>
-<li>连接参数：-lasan</li>
-<li>环境变量：export ASAN_OPTIONS&#x3D;log_path&#x3D;&#x2F;home&#x2F;jianglei&#x2F;asan.log 指定输出错误日志文件路径</li>
-<li>测试代码：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="type">char</span>* ptr = <span class="keyword">new</span> <span class="type">char</span>[<span class="number">10</span>];</span><br><span class="line">  <span class="built_in">memset</span>(ptr, <span class="number">0</span>, <span class="number">11</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="built_in">sleep</span>(<span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+        <blockquote>
+<blockquote>
+<p>有 AI 了记博客（还是从AI搬过来的笔记）好像没什么必要了….</p>
+</blockquote>
+</blockquote>
+<h2 id="inline-namespace-是一个-C-11-引入的非常实用的工具，适合做："><a href="#inline-namespace-是一个-C-11-引入的非常实用的工具，适合做：" class="headerlink" title="inline namespace 是一个 C++11 引入的非常实用的工具，适合做："></a><code>inline namespace</code> 是一个 C++11 引入的非常实用的工具，适合做：</h2><ul>
+<li>📦 <strong>库版本控制 &#x2F; ABI 隔离</strong></li>
+<li>🔌 <strong>插件或模块系统的版本兼容</strong></li>
+<li>⚙️ <strong>对外接口稳定，对内灵活演进</strong></li>
 </ul>
-<p><img src="/images/asan-1.png"></p>
-<h4 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h4><ul>
-<li>libasan 会把程序在哪一行访问越界多少字节，越界的内存地址清楚的标记出来</li>
-<li>libasan 会立即终止程序（不过一般内存都踩坏了，程序继续运行也可能会有更大的事故）</li>
-<li>开发期间尽量包在编译选项，并且指向到日志</li>
-<li>如果 gcc -O 的关系无法看到具体出错的地方，可以用 <code>addr2line -e ./asan -f 0x4007d7 | c++filt</code> 定位,<br>具体参考 <a target="_blank" rel="noopener" href="https://linux.die.net/man/1/addr2line">addr2line</a></li>
-</ul>
+<p>下面我们用一个简单例子来一步步讲清楚怎么用 👇</p>
+<hr>
+<h2 id="✅-1-最基本用法"><a href="#✅-1-最基本用法" class="headerlink" title="✅ 1. 最基本用法"></a>✅ 1. 最基本用法</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> mylib &#123;</span><br><span class="line"><span class="keyword">inline</span> <span class="keyword">namespace</span> v1 &#123;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Hello from v1\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你可以这样使用：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mylib::<span class="built_in">hello</span>();       <span class="comment">// ✅ 直接访问，等价于 mylib::v1::hello()</span></span><br><span class="line">mylib::v1::<span class="built_in">hello</span>();   <span class="comment">// ✅ 显式写出版本</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-2-加入多个版本-——-新版本可以共存"><a href="#✅-2-加入多个版本-——-新版本可以共存" class="headerlink" title="✅ 2. 加入多个版本 —— 新版本可以共存"></a>✅ 2. 加入多个版本 —— 新版本可以共存</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> mylib &#123;</span><br><span class="line"><span class="keyword">inline</span> <span class="keyword">namespace</span> v2 &#123;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Hello from v2\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// v1 不是 inline，保留兼容性但不默认使用</span></span><br><span class="line"><span class="keyword">namespace</span> v1 &#123;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">hello</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Hello from v1\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mylib::<span class="built_in">hello</span>();       <span class="comment">// 🔸 使用的是 v2 版本（因为是 inline）</span></span><br><span class="line">mylib::v1::<span class="built_in">hello</span>();   <span class="comment">// ✅ 指定使用旧版本</span></span><br><span class="line">mylib::v2::<span class="built_in">hello</span>();   <span class="comment">// ✅ 显式访问当前版本</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="✅-3-inline-namespace-的实际用途"><a href="#✅-3-inline-namespace-的实际用途" class="headerlink" title="✅ 3. inline namespace 的实际用途"></a>✅ 3. inline namespace 的实际用途</h2><p>比如你写了一个游戏 AI 库 <code>ai::</code>, 你可以这样组织：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> ai &#123;</span><br><span class="line"><span class="keyword">inline</span> <span class="keyword">namespace</span> v2025_04 &#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">Behavior</span> &#123;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">tick</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;tick v2025_04\n&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 旧版本留着，但用户默认看不到</span></span><br><span class="line"><span class="keyword">namespace</span> v2023_12 &#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">Behavior</span> &#123;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">tick</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;tick v2023_12\n&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用者默认写：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ai::Behavior b;</span><br><span class="line">b.<span class="built_in">tick</span>();  <span class="comment">// ✅ 输出 tick v2025_04</span></span><br></pre></td></tr></table></figure>
+
+<p>旧代码还能写：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ai::v2023_12::Behavior old_b;</span><br><span class="line">old_b.<span class="built_in">tick</span>(); <span class="comment">// ✅ 输出 tick v2023_12</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="🧠-实践建议"><a href="#🧠-实践建议" class="headerlink" title="🧠 实践建议"></a>🧠 实践建议</h2><table>
+<thead>
+<tr>
+<th>目的</th>
+<th>怎么做</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>维护 ABI</td>
+<td>给实现放进 <code>inline namespace</code>，防止链接冲突</td>
+</tr>
+<tr>
+<td>版本演进</td>
+<td>用多个 <code>namespace vxxxx_xx</code> 组织新旧代码</td>
+</tr>
+<tr>
+<td>使用方便</td>
+<td>只把最新版本声明为 <code>inline</code>，用户直接用 <code>ai::Xxx</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🎁-Bonus：和-define-或-constexpr-配合版本判断"><a href="#🎁-Bonus：和-define-或-constexpr-配合版本判断" class="headerlink" title="🎁 Bonus：和 #define 或 constexpr 配合版本判断"></a>🎁 Bonus：和 <code>#define</code> 或 <code>constexpr</code> 配合版本判断</h2><p>你还可以配合常量使用版本：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> ai &#123;</span><br><span class="line"><span class="keyword">inline</span> <span class="keyword">namespace</span> v2025_04 &#123;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="type">int</span> version = <span class="number">202504</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后在代码里：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> ai::version &gt;= 202500</span></span><br><span class="line">    <span class="comment">// 使用新接口</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<hr>
 
     </div>
     
@@ -269,8 +307,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/linux/" rel="tag"># linux</a>
-              <a href="/tags/C-C/" rel="tag"># C/C++</a>
+              <a href="/tags/%E5%BF%AB%E9%80%9F%E7%AC%94%E8%AE%B0/" rel="tag"># 快速笔记</a>
+              <a href="/tags/c/" rel="tag"># c++</a>
           </div>
 
         
@@ -284,13 +322,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/archives/62116300.html" rel="prev" title="记录：线上内存问题处理">
-      <i class="fa fa-chevron-left"></i> 记录：线上内存问题处理
+    <a href="/archives/38b805bc.html" rel="prev" title="apollo config C++(20) client">
+      <i class="fa fa-chevron-left"></i> apollo config C++(20) client
     </a></div>
-      <div class="post-nav-item">
-    <a href="/archives/e5b83726.html" rel="next" title="记录：日常">
-      记录：日常 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -350,7 +385,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">结果</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#inline-namespace-%E6%98%AF%E4%B8%80%E4%B8%AA-C-11-%E5%BC%95%E5%85%A5%E7%9A%84%E9%9D%9E%E5%B8%B8%E5%AE%9E%E7%94%A8%E7%9A%84%E5%B7%A5%E5%85%B7%EF%BC%8C%E9%80%82%E5%90%88%E5%81%9A%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">inline namespace 是一个 C++11 引入的非常实用的工具，适合做：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-1-%E6%9C%80%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">✅ 1. 最基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-2-%E5%8A%A0%E5%85%A5%E5%A4%9A%E4%B8%AA%E7%89%88%E6%9C%AC-%E2%80%94%E2%80%94-%E6%96%B0%E7%89%88%E6%9C%AC%E5%8F%AF%E4%BB%A5%E5%85%B1%E5%AD%98"><span class="nav-number">3.</span> <span class="nav-text">✅ 2. 加入多个版本 —— 新版本可以共存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-3-inline-namespace-%E7%9A%84%E5%AE%9E%E9%99%85%E7%94%A8%E9%80%94"><span class="nav-number">4.</span> <span class="nav-text">✅ 3. inline namespace 的实际用途</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%A7%A0-%E5%AE%9E%E8%B7%B5%E5%BB%BA%E8%AE%AE"><span class="nav-number">5.</span> <span class="nav-text">🧠 实践建议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8E%81-Bonus%EF%BC%9A%E5%92%8C-define-%E6%88%96-constexpr-%E9%85%8D%E5%90%88%E7%89%88%E6%9C%AC%E5%88%A4%E6%96%AD"><span class="nav-number">6.</span> <span class="nav-text">🎁 Bonus：和 #define 或 constexpr 配合版本判断</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -562,7 +597,7 @@ NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
       repo        : 'kinly.github.io',
       owner       : 'kinly',
       admin       : ['kinly'],
-      id          : '8b9a63b6752f1512b30b66d9975c9362',
+      id          : 'c4be13fc169e3defc2bb8abdca51febd',
         language: 'zh-CN',
       distractionFreeMode: true
     });
