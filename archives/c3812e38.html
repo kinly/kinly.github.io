@@ -30,7 +30,7 @@
 <meta property="og:description" content="在使用 Cursor 半个月后，我总结了这些使用心得">
 <meta property="og:locale">
 <meta property="article:published_time" content="2025-05-19T06:34:09.000Z">
-<meta property="article:modified_time" content="2025-05-19T07:37:08.446Z">
+<meta property="article:modified_time" content="2025-05-19T08:00:10.593Z">
 <meta property="article:author" content="Kinly">
 <meta property="article:tag" content="AI 编程助手">
 <meta property="article:tag" content="Cursor">
@@ -194,7 +194,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2025-05-19 14:34:09 / 修改时间：15:37:08" itemprop="dateCreated datePublished" datetime="2025-05-19T14:34:09+08:00">2025-05-19</time>
+              <time title="创建时间：2025-05-19 14:34:09 / 修改时间：16:00:10" itemprop="dateCreated datePublished" datetime="2025-05-19T14:34:09+08:00">2025-05-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -241,7 +241,10 @@
 </li>
 </ul>
 <hr>
-<h2 id="使用前的准备：规则配置很关键"><a href="#使用前的准备：规则配置很关键" class="headerlink" title="使用前的准备：规则配置很关键"></a>使用前的准备：规则配置很关键</h2><h3 id="项目结构建议（以-C-为例）"><a href="#项目结构建议（以-C-为例）" class="headerlink" title="项目结构建议（以 C++ 为例）"></a>项目结构建议（以 C++ 为例）</h3><p>为了让 Cursor 更好理解项目上下文，同时方便后期维护，我建议提前规范项目结构，比如：</p>
+<h2 id="使用前的准备：规则配置很关键"><a href="#使用前的准备：规则配置很关键" class="headerlink" title="使用前的准备：规则配置很关键"></a>使用前的准备：规则配置很关键</h2><blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/sanjeed5/awesome-cursor-rules-mdc.git">https://github.com/sanjeed5/awesome-cursor-rules-mdc.git</a> 这个项目里包含很多（才疏学浅很多工程化的内容没有看懂）参考他的样式、包含哪些内容自定义自己习惯的规则就好</p>
+</blockquote>
+<h3 id="项目结构建议（以-C-为例）"><a href="#项目结构建议（以-C-为例）" class="headerlink" title="项目结构建议（以 C++ 为例）"></a>项目结构建议（以 C++ 为例）</h3><p>为了让 Cursor 更好理解项目上下文，同时方便后期维护，我建议提前规范项目结构，比如：</p>
 <figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## 项目目录结构</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> <span class="strong">**模块化组织**</span>：</span><br><span class="line"><span class="bullet">   -</span> 每个模块一个文件夹，以模块名命名；</span><br><span class="line"><span class="bullet">   -</span> 同一模块的 <span class="code">`.hpp`</span> 和 <span class="code">`.cpp`</span> 文件放在一起。</span><br><span class="line"></span><br><span class="line"><span class="bullet">2.</span> <span class="strong">**特殊目录**</span>：</span><br><span class="line"><span class="bullet">   -</span> <span class="code">`util/`</span>：通用工具代码；</span><br><span class="line"><span class="bullet">   -</span> <span class="code">`3rd/`</span>：第三方依赖；</span><br><span class="line"><span class="bullet">   -</span> <span class="code">`cmake/`</span>：CMake 配置，子结构如下：</span><br><span class="line"></span><br><span class="line"><span class="bullet">     -</span> <span class="code">`build.cmake`</span>：构建相关；</span><br><span class="line"><span class="bullet">     -</span> <span class="code">`develop.cmake`</span>：开发相关；</span><br><span class="line"><span class="bullet">     -</span> <span class="code">`3rd.xxxx.cmake`</span>：第三方依赖；</span><br><span class="line"><span class="bullet">     -</span> 所有第三方库建议通过 Git Submodule，而不是 <span class="code">`find_package`</span>。</span><br><span class="line"><span class="code">````</span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="code">---</span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="code">### 命名规范建议</span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="code">统一的命名风格能显著提升 AI 理解代码的能力。下面是我实践中的一套：</span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="code">```markdown</span></span><br><span class="line"><span class="code">## 命名规则（C++）</span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="code">1. 使用 snake_case 命名法；</span></span><br><span class="line"><span class="code">2. 所有变量、函数、类型名统一小写加下划线；</span></span><br><span class="line"><span class="code">3. 类成员变量以下划线 `_` 开头；</span></span><br><span class="line"><span class="code">4. 模板参数以 `_tt`（类型）或 `_vv`（值）结尾，必要时可简写为 `tt`。</span></span><br></pre></td></tr></table></figure>
 
 <hr>
