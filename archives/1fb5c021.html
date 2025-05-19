@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="网络：NAT STUN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络：NAT STUN">
+<meta property="og:url" content="https://klysisle.space/archives/1fb5c021.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="网络：NAT STUN">
+<meta property="og:locale">
+<meta property="og:image" content="https://klysisle.space/images/network/NAT/huawei-nat-type.png">
+<meta property="og:image" content="https://klysisle.space/images/network/NAT/nat-full-cone.png">
+<meta property="og:image" content="https://klysisle.space/images/network/NAT/nat-address-restricted-cone.png">
+<meta property="og:image" content="https://klysisle.space/images/network/NAT/nat-port-restricted-cone.png">
+<meta property="og:image" content="https://klysisle.space/images/network/NAT/nat-symmetric-cone.png">
+<meta property="og:image" content="https://klysisle.space/images/network/NAT/stun-proto.png">
+<meta property="og:image" content="https://klysisle.space/images/network/NAT/stun-proto-2.png">
+<meta property="article:published_time" content="2020-11-28T02:49:28.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.709Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://klysisle.space/images/network/NAT/huawei-nat-type.png">
+
+<link rel="canonical" href="https://klysisle.space/archives/1fb5c021.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>网络：NAT STUN | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/1fb5c021.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网络：NAT STUN
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-28 10:49:28" itemprop="dateCreated datePublished" datetime="2020-11-28T10:49:28+08:00">2020-11-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">网络：NAT STUN</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>之前工作中有机会接触到p2p相关内容，目标是实现一个p2p下载器，基本可以算是从0开始，看了NAT、torrent、KCP等相关内容。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/arvidn/libtorrent">torrent</a> 相对成熟，做上层开发也很简单，但是并不适合我们需求的场景; 不过自己下载器实现的时候也参考了<code>libtorrent</code>源码上的一些设计。</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/skywind3000/kcp">KCP</a> 传输上的设计也给了不少启发。</li>
+<li><a target="_blank" rel="noopener" href="https://support.huawei.com/enterprise/zh/doc/EDOC1100112409/965d5c04">NAT</a> 这里我认为最完整也最棒的文档来自华为</li>
+</ul>
+<h3 id="NAT-简介"><a href="#NAT-简介" class="headerlink" title="NAT 简介"></a>NAT 简介</h3><ul>
+<li>network address translation. 将IP数据报文头中的IP地址转换为另一个IP地址的过程</li>
+<li>目的: 简单点说是IPV4地址（公网）不够大家用了，NAT设备通过IP层地址替换的方式让多个人使用一个IP地址（公网）</li>
+<li>问题: NAT也带来最直接的问题就是大家基于N个IP地址被划分成了N个块，而由于NAT类型的限制，我们不容易直接暴露自己的网络到公网了，而P2P网络要求通信双方都可以主动发起访问，NAT也就阻碍了P2P网络应用的使用</li>
+</ul>
+<h3 id="NAT-STUN"><a href="#NAT-STUN" class="headerlink" title="NAT STUN"></a>NAT STUN</h3><ul>
+<li>简要：STUN协议（Simple Traversal of UDP Through NAT），基于UDP的NAT打洞技术，为了解决NAT给P2P网络带来的问题</li>
+<li>定义：NAT会话穿越应用程序STUN（Session Traversal Utilities for NAT）是一种由RFC定义的网络协议，作为其他协议（例如SIP、FTP、DNS）处理NAT穿越问题的一个工具。其可以用于检查网络中NAT设备的存在，并确定两个通信端点被NAT设备分配的IP地址和端口号。然后，通过ICE（Interactive Connectivity Establishment），自动创建一条能够进行NAT穿越的数据通道。</li>
+</ul>
+<h3 id="NAT-类型（STUN标准）"><a href="#NAT-类型（STUN标准）" class="headerlink" title="NAT 类型（STUN标准）"></a>NAT 类型（STUN标准）</h3><h4 id="华为官方文档"><a href="#华为官方文档" class="headerlink" title="华为官方文档"></a><strong>华为官方文档</strong></h4><p><code>https://support.huawei.com/enterprise/zh/doc/EDOC1100112409/fd829977</code><br><img src="/images/network/NAT/huawei-nat-type.png"></p>
+<ul>
+<li>Full Cone NAT（完全锥型NAT）<br>所有从同一个私网IP地址和端口（IP1:Port1）发送过来的请求都会被映射成同一个公网IP地址和端口（IP:Port）。并且，任何外部主机通过向映射的公网IP地址和端口发送报文，都可以实现和内部主机进行通信。<br>这是一种比较宽松的策略，只要建立了私网IP地址和端口与公网IP地址和端口的映射关系，所有的Internet上的主机都可以访问该NAT之后的主机。</li>
+<li>Restricted Cone NAT（限制锥型NAT）<br>所有从同一个私网IP地址和端口（IP1:Port1）发送过来的请求都会被映射成同一个公网IP和端口号（IP:Port）。与完全锥型NAT不同的是，当且仅当内部主机之前已经向公网主机发送过报文，此时公网主机才能向私网主机发送报文。</li>
+<li>Port Restricted Cone NAT（端口限制锥型NAT）<br>与限制锥型NAT很相似，只不过它包括端口号。也就是说，一台公网主机（IP2:Port2）想给私网主机发送报文，必须是这台私网主机先前已经给这个IP地址和端口发送过报文。</li>
+<li>Symmetric NAT（对称NAT）<br>所有从同一个私网IP地址和端口发送到一个特定的目的IP地址和端口的请求，都会被映射到同一个IP地址和端口。如果同一台主机使用相同的源地址和端口号发送报文，但是发往不同的目的地，NAT将会使用不同的映射。此外，只有收到数据的公网主机才可以反过来向私网主机发送报文。<br>这和端口限制锥型NAT不同，端口限制锥型NAT是所有请求映射到相同的公网IP地址和端口，而对称NAT是不同的请求有不同的映射。</li>
+</ul>
+<h4 id="NAT能访问的时候是怎么样的呢？"><a href="#NAT能访问的时候是怎么样的呢？" class="headerlink" title="NAT能访问的时候是怎么样的呢？"></a>NAT能访问的时候是怎么样的呢？</h4><ul>
+<li>Full Cone NAT（完全锥型NAT）<br><img src="/images/network/NAT/nat-full-cone.png"><ul>
+<li>首先192.168.0.11:1024端口请求了102.101.10.1的任意端口</li>
+<li>NAT设备做了地址映射，把192.168.0.11:1024映射到456端口上</li>
+<li>这样任意访问NAT设备上456端口的数据都会被映射到192.168.0.11:1024上</li>
+<li>也就是说203.201.20.2发送到NAT:456的数据会被转到192.168.0.11:1024上</li>
+</ul>
+</li>
+<li>Restricted Cone NAT（限制锥型NAT）（其实这里我更喜欢叫做address-restricted-cone，对应下面的port-restricted-cone）<br><img src="/images/network/NAT/nat-address-restricted-cone.png"><ul>
+<li>同上 192.168.0.11:1024端口请求了102.101.10.1的任意端口</li>
+<li>NAT设备做了地址映射，把192.168.0.11:1024<code>+102.101.10.1</code>映射到456端口上</li>
+<li>这时候203.201.20.2发送到NAT:456的数据会因为找不到映射被丢弃掉</li>
+<li>如果 192.168.0.11:1024端口请求了203.201.20.2的任意端口</li>
+<li>NAT设备做了地址映射，把192.168.0.11:1024<code>+203.201.20.2</code>映射到456端口上（这里映射一样是456，因为源都是192.168.0.11:1024）</li>
+<li>然后203.201.20.2发送到NAT:456的数据就可以找到正确的私网二元组了</li>
+</ul>
+</li>
+<li>Port Restricted Cone NAT（端口限制锥型NAT）<br><img src="/images/network/NAT/nat-port-restricted-cone.png"><ul>
+<li>同上 192.168.0.11:1024端口请求了102.101.10.1的<code>2048</code>端口</li>
+<li>NAT设备做了地址映射，把192.168.0.11:1024+102.101.10.1:<code>2048</code>映射到456端口上</li>
+<li>这时候不仅其他IP发送到NAT:456的数据会找不到映射被丢掉，102.101.10.1非<code>2048</code>端口的数据发送到NAT:456的数据会因为找不到映射被丢弃掉</li>
+<li>如果 192.168.0.11:1024端口请求了203.201.20.2的<code>2048</code>端口</li>
+<li>NAT设备做了地址映射，把192.168.0.11:1024+203.201.20.2:<code>2048</code>映射到456端口上（这里映射一样是456，因为源都是192.168.0.11:1024）</li>
+<li>然后203.201.20.2:2048发送到NAT:456的数据就可以找到正确的私网二元组了</li>
+</ul>
+</li>
+<li>Symmetric NAT（对称NAT）<br><img src="/images/network/NAT/nat-symmetric-cone.png"><ul>
+<li>流程和Port Restricted Cone NAT一样</li>
+<li>只是NAT上的映射不一样了，我们这里假设192.168.0.11:1024+102.101.10.1:2048被映射到了456端口，把192.168.0.11:1024+203.201.20.2:2048被映射到其他端口比如789上</li>
+</ul>
+</li>
+</ul>
+<h3 id="NAT-侦测"><a href="#NAT-侦测" class="headerlink" title="NAT 侦测"></a>NAT 侦测</h3><p><code>这部分华为是个主文字的文档，也建议先看一遍文字版本</code></p>
+<h4 id="STUN-报文"><a href="#STUN-报文" class="headerlink" title="STUN 报文"></a>STUN 报文</h4><p><code>https://tools.ietf.org/html/rfc3489</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">All STUN messages consist of a 20 byte header:</span><br><span class="line"></span><br><span class="line">0                   1                   2                   3</span><br><span class="line">0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|      STUN Message Type        |         Message Length        |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line"></span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">                        Transaction ID</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">                                                                |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line"></span><br><span class="line">The Message Types can take on the following values:</span><br><span class="line"></span><br><span class="line">    0x0001  :  Binding Request</span><br><span class="line">    0x0101  :  Binding Response</span><br><span class="line">    0x0111  :  Binding Error Response</span><br><span class="line">    0x0002  :  Shared Secret Request</span><br><span class="line">    0x0102  :  Shared Secret Response</span><br><span class="line">    0x0112  :  Shared Secret Error Response</span><br></pre></td></tr></table></figure>
+
+<h4 id="STUN-侦测流程图"><a href="#STUN-侦测流程图" class="headerlink" title="STUN 侦测流程图"></a>STUN 侦测流程图</h4><p><img src="/images/network/NAT/stun-proto.png"></p>
+<ul>
+<li>图里有2处虚线的部分，是当时因为bug看到的异常情况，当时发现如果Test II加上一步Test III，会大概率导致结果变成Full Cone，暂时没有找到相关文档说明，大家可以多试试（这也帮助我修改了后面穿透的流程，使得port-restricted-cone和symmetric有更大机会直接穿透）</li>
+</ul>
+<h3 id="穿透"><a href="#穿透" class="headerlink" title="穿透"></a>穿透</h3><h4 id="穿透的难度"><a href="#穿透的难度" class="headerlink" title="穿透的难度"></a>穿透的难度</h4><ul>
+<li>根据上面NAT类型映射的方式，我们可以看到非对称类型的NAT设备，如果102.101.10.1是个我们自建的服务器，就可以拿到给203.201.20.2用的二元组，让它可以正常发送消息给192.168.0.11机器</li>
+<li>对称NAT设备，除了暴力遍历或者一定算法下的遍历试出来789这个端口，基本没有其他办法穿透NAT设备了</li>
+</ul>
+<h4 id="原因不明的投机取巧"><a href="#原因不明的投机取巧" class="headerlink" title="原因不明的投机取巧"></a>原因不明的投机取巧</h4><p><img src="/images/network/NAT/stun-proto-2.png"></p>
+<ul>
+<li>也就是基于上面探测流程里虚线部分的逻辑</li>
+<li>假设192.168.0.11对应NAT设备10.227.90.131是个symmetric类型，映射的NAT端口是未知的X</li>
+<li>假设192.168.1.22对应NAT设备201.127.10.1是个port-restricted-cone类型，映射的NAT端口是已知的1000</li>
+<li>step 1. symmetric 给 cone 类型已知端口发送N次消息(这里N次只是尽可能让udp消息到达)，消息会被NAT丢掉</li>
+<li>step 2. cone 再给 symmetric 发送N次消息</li>
+<li>大概率是可以发送成功的，试了很多次，觉得反正这两种类型本就不好穿透，既然这样可行就先备在代码里了</li>
+</ul>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li>华为：<a target="_blank" rel="noopener" href="https://support.huawei.com/enterprise/zh/doc/EDOC1100112409/fd829977">https://support.huawei.com/enterprise/zh/doc/EDOC1100112409/fd829977</a> </li>
+<li>RFC: <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc3489">https://tools.ietf.org/html/rfc3489</a></li>
+<li>STUN: <a target="_blank" rel="noopener" href="http://www.networksorcery.com/enp/protocol/stun.htm">http://www.networksorcery.com/enp/protocol/stun.htm</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/my_life/articles/1908552.html">https://www.cnblogs.com/my_life/articles/1908552.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://dearmiku.github.io/2017/11/17/NTA%E6%89%93%E6%B4%9E/">https://dearmiku.github.io/2017/11/17/NTA%E6%89%93%E6%B4%9E/</a></li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/3b5f401c.html" rel="prev" title="网络：TCP">
+      <i class="fa fa-chevron-left"></i> 网络：TCP
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/c0cdd768.html" rel="next" title="网络：P2P下载器">
+      网络：P2P下载器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E7%AE%80%E4%BB%8B"><span class="nav-number">2.</span> <span class="nav-text">NAT 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-STUN"><span class="nav-number">3.</span> <span class="nav-text">NAT STUN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E7%B1%BB%E5%9E%8B%EF%BC%88STUN%E6%A0%87%E5%87%86%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">NAT 类型（STUN标准）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%8E%E4%B8%BA%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3"><span class="nav-number">4.1.</span> <span class="nav-text">华为官方文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NAT%E8%83%BD%E8%AE%BF%E9%97%AE%E7%9A%84%E6%97%B6%E5%80%99%E6%98%AF%E6%80%8E%E4%B9%88%E6%A0%B7%E7%9A%84%E5%91%A2%EF%BC%9F"><span class="nav-number">4.2.</span> <span class="nav-text">NAT能访问的时候是怎么样的呢？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-%E4%BE%A6%E6%B5%8B"><span class="nav-number">5.</span> <span class="nav-text">NAT 侦测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#STUN-%E6%8A%A5%E6%96%87"><span class="nav-number">5.1.</span> <span class="nav-text">STUN 报文</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#STUN-%E4%BE%A6%E6%B5%8B%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">5.2.</span> <span class="nav-text">STUN 侦测流程图</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BF%E9%80%8F"><span class="nav-number">6.</span> <span class="nav-text">穿透</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A9%BF%E9%80%8F%E7%9A%84%E9%9A%BE%E5%BA%A6"><span class="nav-number">6.1.</span> <span class="nav-text">穿透的难度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0%E4%B8%8D%E6%98%8E%E7%9A%84%E6%8A%95%E6%9C%BA%E5%8F%96%E5%B7%A7"><span class="nav-number">6.2.</span> <span class="nav-text">原因不明的投机取巧</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : 'cb60616a4a87996953eda1121543f21e',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

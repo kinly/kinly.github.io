@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="图结构：拓扑排序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图结构：拓扑排序">
+<meta property="og:url" content="https://klysisle.space/archives/6132c487.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="图结构：拓扑排序">
+<meta property="og:locale">
+<meta property="og:image" content="https://klysisle.space/images/algorithm/dep_sort_example.png">
+<meta property="article:published_time" content="2024-03-14T12:02:07.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.712Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="游戏">
+<meta property="article:tag" content="模块">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://klysisle.space/images/algorithm/dep_sort_example.png">
+
+<link rel="canonical" href="https://klysisle.space/archives/6132c487.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>图结构：拓扑排序 | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/6132c487.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          图结构：拓扑排序
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-03-14 20:02:07" itemprop="dateCreated datePublished" datetime="2024-03-14T20:02:07+08:00">2024-03-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index"><span itemprop="name">知识积累</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">图结构：拓扑排序</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="pre"><a href="#pre" class="headerlink" title="pre"></a>pre</h2><ul>
+<li>可排序拓扑图：有相无环图</li>
+<li>网上资料很多，结构也比较明确：<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/339709006">https://zhuanlan.zhihu.com/p/339709006</a></li>
+<li><a target="_blank" rel="noopener" href="https://oi-wiki.org/graph/topo/">https://oi-wiki.org/graph/topo/</a></li>
+</ul>
+</li>
+<li>是在想找到一种预设<em>寻路算法</em>关键点，减轻寻路算法对服务端压力是看到的一种结构</li>
+<li>这个结构比较简单，可以用在游戏的任务模块里面，把任务串成一个有向无环图，然后根据这个图进行拓扑排序，把任务串起来</li>
+</ul>
+<h2 id="拓扑排序"><a href="#拓扑排序" class="headerlink" title="拓扑排序"></a>拓扑排序</h2><ul>
+<li>看了网上不少代码，不过在明确这个结构可以用在任务模块的情况下，需要的接口大体如下：</li>
+<li>（从配置表读取后）把任务添加到拓扑结构里</li>
+<li>指定某个（些）任务依赖的前置任务是什么</li>
+<li>源码基本参考：<a target="_blank" rel="noopener" href="https://github.com/graphitemaster/dep_sort/tree/master">https://github.com/graphitemaster/dep_sort/tree/master</a></li>
+<li>修改为自己的写法习惯</li>
+</ul>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/kinly/anything/blob/main/dep_sort.h">https://github.com/kinly/anything/blob/main/dep_sort.h</a></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unordered_map&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unordered_set&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/// dep topological sort</span></span><br><span class="line"><span class="keyword">namespace</span> easy::utils &#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">tt</span>&gt; <span class="keyword">class</span> <span class="title class_">dep_sort</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">relation</span>;</span><br><span class="line">  <span class="keyword">using</span> relation_type = relation;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">result</span>;</span><br><span class="line">  <span class="keyword">using</span> result_type = result;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">using</span> value_type = tt;</span><br><span class="line">  <span class="keyword">using</span> map_type = std::unordered_map&lt;value_type, relation_type&gt;;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">relation</span> &#123;</span><br><span class="line">    std::<span class="type">size_t</span> dependencies;</span><br><span class="line">    std::unordered_set&lt;value_type&gt; dependents;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">struct</span> <span class="title class_">result</span> &#123;</span><br><span class="line">    std::vector&lt;value_type&gt; sorted;</span><br><span class="line">    std::vector&lt;value_type&gt; non_sorted;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">has_cycles</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> non_sorted.<span class="built_in">empty</span>() == <span class="literal">false</span>; &#125;</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  map_type _values;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">has_node</span><span class="params">(<span class="type">const</span> value_type&amp; node)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> _values.<span class="built_in">contains</span>(node);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">clear</span><span class="params">()</span> </span>&#123; _values.<span class="built_in">clear</span>(); &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">add_node</span><span class="params">(<span class="type">const</span> value_type &amp;node)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> res = _values.<span class="built_in">insert</span>(&#123;node, &#123;&#125;&#125;);</span><br><span class="line">    <span class="keyword">return</span> res.second;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">add_node</span><span class="params">(value_type &amp;&amp;node)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> res = _values.<span class="built_in">insert</span>(&#123;std::<span class="built_in">move</span>(node), &#123;&#125;&#125;);</span><br><span class="line">    <span class="keyword">return</span> res.second;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">has_dependency</span><span class="params">(<span class="type">const</span> value_type &amp;node, <span class="type">const</span> value_type &amp;dependency)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">has_node</span>(node))</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="type">const</span> <span class="keyword">auto</span> &amp;value = _values.<span class="built_in">at</span>(node);</span><br><span class="line">    <span class="keyword">return</span> value.dependents.<span class="built_in">find</span>(dependency) != value.dependents.<span class="built_in">end</span>();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">add_dependency</span><span class="params">(<span class="type">const</span> value_type &amp;node, value_type &amp;&amp;dependency)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (node == dependency)</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">auto</span> res_value = _values.<span class="built_in">insert</span>(&#123;std::<span class="built_in">move</span>(dependency), &#123;&#125;&#125;);</span><br><span class="line">    <span class="keyword">auto</span> &amp;dependents = res_value.first-&gt;second.dependents;</span><br><span class="line">    <span class="keyword">if</span> (dependents.<span class="built_in">find</span>(node) == dependents.<span class="built_in">end</span>()) &#123;</span><br><span class="line">      dependents.<span class="built_in">insert</span>(node);</span><br><span class="line">      _values[node].dependencies += <span class="number">1</span>;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">add_dependency</span><span class="params">(<span class="type">const</span> value_type &amp;node, <span class="type">const</span> value_type &amp;dependency)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (node == dependency)</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">auto</span> res_value = _values.<span class="built_in">insert</span>(&#123;dependency, &#123;&#125;&#125;);</span><br><span class="line">    <span class="keyword">auto</span> &amp;dependents = res_value.first-&gt;second.dependents;</span><br><span class="line">    <span class="keyword">if</span> (dependents.<span class="built_in">find</span>(node) == dependents.<span class="built_in">end</span>()) &#123;</span><br><span class="line">      dependents.<span class="built_in">insert</span>(node);</span><br><span class="line">      _values[node].dependencies += <span class="number">1</span>;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>, <span class="keyword">typename</span>...&gt; <span class="keyword">class</span> <span class="title class_">container_tt</span>, <span class="keyword">typename</span>... container_tt_params&gt;</span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">add_dependencies</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">      <span class="type">const</span> value_type &amp;node,</span></span></span><br><span class="line"><span class="params"><span class="function">      <span class="type">const</span> container_tt&lt;value_type, container_tt_params...&gt; &amp;dependencies)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;one : dependencies) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!<span class="built_in">add_dependency</span>(node, one))</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function">result_type <span class="title">sort</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> copyed = *<span class="keyword">this</span>;</span><br><span class="line">    result_type res;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;[node, relations] : copyed._values) &#123;</span><br><span class="line">      <span class="keyword">if</span> (relations.dependencies == <span class="number">0</span>) &#123;</span><br><span class="line">        res.sorted.<span class="built_in">push_back</span>(node);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (std::<span class="type">size_t</span> index = <span class="number">0</span>; index &lt; res.sorted.<span class="built_in">size</span>(); ++index) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;one : copyed._values[res.sorted.<span class="built_in">at</span>(index)].dependents) &#123;</span><br><span class="line">        <span class="keyword">if</span> (--copyed._values[one].dependencies == <span class="number">0</span>) &#123;</span><br><span class="line">          res.sorted.<span class="built_in">push_back</span>(one);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;[node, relations] : copyed._values) &#123;</span><br><span class="line">      <span class="keyword">if</span> (relations.dependencies != <span class="number">0</span>) &#123;</span><br><span class="line">        res.non_sorted.<span class="built_in">push_back</span>(node);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>图示：</li>
+</ul>
+<p><img src="/../images/algorithm/dep_sort_example.png"></p>
+<h2 id="实现过程中关注到的点："><a href="#实现过程中关注到的点：" class="headerlink" title="实现过程中关注到的点："></a>实现过程中关注到的点：</h2><ul>
+<li>template any container: container_params 是必须的</li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/7728478/c-template-class-function-with-arbitrary-container-type-how-to-define-it">https://stackoverflow.com/questions/7728478/c-template-class-function-with-arbitrary-container-type-how-to-define-it</a></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">template</span> &lt;<span class="keyword">typename</span>...&gt; <span class="keyword">class</span> <span class="title class_">container_tt</span>, <span class="keyword">typename</span>... container_params&gt;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test_any_container</span><span class="params">(<span class="type">const</span> container_tt&lt;std::string, container_params...&gt; &amp;cc)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span>&amp; one : cc) &#123;</span><br><span class="line">    std::cout &lt;&lt; one &lt;&lt; std::endl;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>check is container: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/12042824/how-to-write-a-type-trait-is-container-or-is-vector">https://stackoverflow.com/questions/12042824/how-to-write-a-type-trait-is-container-or-is-vector</a></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> _ = <span class="type">void</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> is_container : std::false_type &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Ts&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">is_container_helper</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">is_container</span>&lt;</span><br><span class="line">        T,</span><br><span class="line">        std::<span class="type">conditional_t</span>&lt;</span><br><span class="line">            <span class="literal">false</span>,</span><br><span class="line">            is_container_helper&lt;</span><br><span class="line">                <span class="keyword">typename</span> T::value_type,</span><br><span class="line">                <span class="keyword">typename</span> T::size_type,</span><br><span class="line">                <span class="keyword">typename</span> T::allocator_type,</span><br><span class="line">                <span class="keyword">typename</span> T::iterator,</span><br><span class="line">                <span class="keyword">typename</span> T::const_iterator,</span><br><span class="line">                <span class="keyword">decltype</span>(std::<span class="built_in">declval</span>&lt;T&gt;().<span class="built_in">size</span>()),</span><br><span class="line">                <span class="keyword">decltype</span>(std::<span class="built_in">declval</span>&lt;T&gt;().<span class="built_in">begin</span>()),</span><br><span class="line">                <span class="keyword">decltype</span>(std::<span class="built_in">declval</span>&lt;T&gt;().<span class="built_in">end</span>()),</span><br><span class="line">                <span class="keyword">decltype</span>(std::<span class="built_in">declval</span>&lt;T&gt;().<span class="built_in">cbegin</span>()),</span><br><span class="line">                <span class="keyword">decltype</span>(std::<span class="built_in">declval</span>&lt;T&gt;().<span class="built_in">cend</span>())</span><br><span class="line">                &gt;,</span><br><span class="line">            <span class="type">void</span></span><br><span class="line">            &gt;</span><br><span class="line">        &gt; : <span class="keyword">public</span> std::true_type &#123;&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>emplace 并不能完全替代 insert&#x2F;push 等操作：c++20 之前 emplace 不能进行初始化的聚合，比如 const char* -&gt; std::string，或者构造一个结构体</li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag"># 游戏</a>
+              <a href="/tags/%E6%A8%A1%E5%9D%97/" rel="tag"># 模块</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/4311cbf8.html" rel="prev" title="服务端-9宫格场景">
+      <i class="fa fa-chevron-left"></i> 服务端-9宫格场景
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/3e184a88.html" rel="next" title="C++ std::move & lambda & std::function & virtual">
+      C++ std::move & lambda & std::function & virtual <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pre"><span class="nav-number">1.</span> <span class="nav-text">pre</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F"><span class="nav-number">2.</span> <span class="nav-text">拓扑排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B%E4%B8%AD%E5%85%B3%E6%B3%A8%E5%88%B0%E7%9A%84%E7%82%B9%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">实现过程中关注到的点：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : 'd02f71461219fdf30218bc221dca20fc',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

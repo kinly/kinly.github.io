@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="mongodb 被黑">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mongodb 被黑">
+<meta property="og:url" content="https://klysisle.space/archives/4b1350ef.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="mongodb 被黑">
+<meta property="og:locale">
+<meta property="og:image" content="https://klysisle.space/images/mongodb-hack/mongodb-log.png">
+<meta property="og:image" content="https://klysisle.space/images/mongodb-hack/mysql-hack-msg.png">
+<meta property="og:image" content="https://klysisle.space/images/mongodb-hack/connect_by_ssh_tunnel.png">
+<meta property="article:published_time" content="2023-09-28T02:07:34.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.711Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://klysisle.space/images/mongodb-hack/mongodb-log.png">
+
+<link rel="canonical" href="https://klysisle.space/archives/4b1350ef.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>mongodb 被黑 | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/4b1350ef.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mongodb 被黑
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-28 10:07:34" itemprop="dateCreated datePublished" datetime="2023-09-28T10:07:34+08:00">2023-09-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mongodb-%E8%A2%AB%E9%BB%91/" itemprop="url" rel="index"><span itemprop="name">mongodb 被黑</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">mongodb 被黑</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="pre"><a href="#pre" class="headerlink" title="pre"></a>pre</h2><ul>
+<li>前面在云主机部署了mongoDB做一些测试，部署方式基本是参考 <a target="_blank" rel="noopener" href="https://www.mongodb.com/docs/v6.0/tutorial/install-mongodb-on-ubuntu/">https://www.mongodb.com/docs/v6.0/tutorial/install-mongodb-on-ubuntu/</a></li>
+<li>设置了简单的密码，验证也只是连到数据库执行 <code>db.auth</code> 指令没问题就结束了</li>
+<li>因为机器在云主机上，为了方便本地程序测试使用，开放了 <code>0.0.0.0 27017</code> 的端口权限…</li>
+<li>2023-09-26 登录账户遇到被清档的情况，登录进去发现自建的数据库都没有了</li>
+</ul>
+<h2 id="被清库"><a href="#被清库" class="headerlink" title="被清库"></a>被清库</h2><ul>
+<li>day 1 : 服务报错从db没有获取到数据，以为是服务出问题了，当时没有再复现就没有再细查</li>
+<li>day 2 : 又出现从db加载不到数据的情况；下载mongo client ide 看到数据库里只有新建的数据，这两天跑的测试不应该只有这点数据，mongo 服务还在，当时怀疑是部署的有什么遗漏</li>
+<li>day 3 : 到机器上查mongo的log，看到database被drop的记录，和一个奇怪的 <code>READ_ME_TO_RECOVER_YOUR_DATA</code>，这才知道是遇到攻击了，还好数据不重要<br><img src="/../images/mongodb-hack/mongodb-log.png"></li>
+</ul>
+<h2 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h2><ul>
+<li>确认自己是有设置密码的，当时确认的方式还是链接到数据库执行指令看是否成功<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">use admin</span><br><span class="line">db.auth(&quot;user&quot;, &quot;123456&quot;)</span><br></pre></td></tr></table></figure></li>
+<li>可以处理的办法：<ul>
+<li>关掉公网开发的mongo端口（而且这里还使用的是默认端口，太容易被扫到了）</li>
+<li>修改数据库密码，之前用的密码太简单了，机器的登录记录是没有查到恶意用户的（密码生成工具：windows devToys）</li>
+</ul>
+</li>
+<li>虽然关闭端口能解决问题，但是当时想着应该是密码太简单了，改了密码之后就想着看下hacker还能不能进来，所以还是保持端口对外的样子</li>
+<li>第二天到机器发现又被清库了….</li>
+<li>用 mongo log 记录的过程信息试着复现操作，竟然还真把数据库给删了….(注意下面指令是没有<code>db.auth</code>的)<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mongosh mongodb://127.0.0.1:27017</span><br><span class="line">use test_database</span><br><span class="line">db.test.insert(&#123;name: &quot;1&quot;&#125;)</span><br><span class="line">db.dropDatabase()</span><br></pre></td></tr></table></figure></li>
+<li>mongo auth 形同虚设….</li>
+<li>搜索到相同的问题：<ul>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/73260190/why-is-my-mongo-collection-being-wiped-on-azure-ubuntu-instance">https://stackoverflow.com/questions/73260190/why-is-my-mongo-collection-being-wiped-on-azure-ubuntu-instance</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.mongodb.com/community/forums/t/database-deleted-auto/99623">https://www.mongodb.com/community/forums/t/database-deleted-auto/99623</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.mongodb.com/docs/manual/administration/security-checklist/?_ga=2.22459901.77527625.1695801349-1690052969.1694834164">https://www.mongodb.com/docs/manual/administration/security-checklist/?_ga=2.22459901.77527625.1695801349-1690052969.1694834164</a></li>
+</ul>
+</li>
+<li>后来发现问题出在 mongod.conf 上 <code>security</code> 项是注释状态，（我这糟糕的运维意识）打开这个<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#security:</span></span><br><span class="line">security:</span><br><span class="line">  authorization: <span class="string">&quot;enabled&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li>再执行上面语句会报错<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&gt; db.test.insert(&#123;name: <span class="string">&quot;1&quot;</span>&#125;)</span><br><span class="line">DeprecationWarning: Collection.insert() is deprecated. Use insertOne, insertMany, or bulkWrite.</span><br><span class="line">Uncaught:</span><br><span class="line">MongoBulkWriteError: <span class="built_in">command</span> insert requires authentication</span><br><span class="line">Result: BulkWriteResult &#123;</span><br><span class="line">  insertedCount: 0,</span><br><span class="line">  matchedCount: 0,</span><br><span class="line">  modifiedCount: 0,</span><br><span class="line">  deletedCount: 0,</span><br><span class="line">  upsertedCount: 0,</span><br><span class="line">  upsertedIds: &#123;&#125;,</span><br><span class="line">  insertedIds: &#123; <span class="string">&#x27;0&#x27;</span>: ObjectId(<span class="string">&quot;6514fd829155c9c6f72a6fcd&quot;</span>) &#125;</span><br><span class="line">&#125;</span><br><span class="line">Write Errors: []</span><br></pre></td></tr></table></figure></li>
+<li>执行auth之后：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">kinly&gt; use admin</span><br><span class="line">switched to db admin</span><br><span class="line">admin&gt; db.auth(<span class="string">&quot;adminXXXX&quot;</span>, <span class="string">&quot;xxxxxxx&quot;</span>);</span><br><span class="line">&#123; ok: 1 &#125;</span><br><span class="line">admin&gt; use kinly</span><br><span class="line">switched to db kinly</span><br><span class="line">kinly&gt; db.test.insert(&#123;name: <span class="string">&quot;1&quot;</span>&#125;);</span><br><span class="line">&#123;</span><br><span class="line">  acknowledged: <span class="literal">true</span>,</span><br><span class="line">  insertedIds: &#123; <span class="string">&#x27;0&#x27;</span>: ObjectId(<span class="string">&quot;6514fdd09155c9c6f72a6fce&quot;</span>) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>还没完，我自己不能删库了…<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kinly&gt; db.dropDatabase();</span><br><span class="line">MongoServerError: not authorized on kinly to execute <span class="built_in">command</span> &#123; dropDatabase: 1, lsid: &#123; <span class="built_in">id</span>: UUID(<span class="string">&quot;8a2107dd-8768-4413-a5be-e9fb7a27744a&quot;</span>) &#125;, <span class="variable">$db</span>: <span class="string">&quot;kinly&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">kinly&gt; use admin</span><br><span class="line">switched to db admin</span><br><span class="line">admin&gt; show <span class="built_in">users</span></span><br><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    _id: <span class="string">&#x27;admin.xxxx&#x27;</span>,</span><br><span class="line">    userId: new UUID(<span class="string">&quot;xxxx-xxx-xxx-xxx-xxx&quot;</span>),</span><br><span class="line">    user: <span class="string">&#x27;xxxx&#x27;</span>,</span><br><span class="line">    db: <span class="string">&#x27;admin&#x27;</span>,</span><br><span class="line">    roles: [</span><br><span class="line">      &#123; role: <span class="string">&#x27;readWriteAnyDatabase&#x27;</span>, db: <span class="string">&#x27;admin&#x27;</span> &#125;,</span><br><span class="line">      &#123; role: <span class="string">&#x27;userAdminAnyDatabase&#x27;</span>, db: <span class="string">&#x27;admin&#x27;</span> &#125;</span><br><span class="line">    ],</span><br><span class="line">    mechanisms: [ <span class="string">&#x27;SCRAM-SHA-1&#x27;</span>, <span class="string">&#x27;SCRAM-SHA-256&#x27;</span> ]</span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure></li>
+<li><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/47130379/mongoerror-not-authorized-on-to-execute-command-find-app-updates-filter">https://stackoverflow.com/questions/47130379/mongoerror-not-authorized-on-to-execute-command-find-app-updates-filter</a></li>
+<li><a target="_blank" rel="noopener" href="https://dba.stackexchange.com/questions/45735/mongo-authentication-user-cant-drop-database">https://dba.stackexchange.com/questions/45735/mongo-authentication-user-cant-drop-database</a><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">admin&gt; db.grantRolesToUser(<span class="string">&quot;xxxx&quot;</span>, [<span class="string">&quot;root&quot;</span>]);</span><br></pre></td></tr></table></figure></li>
+<li>OK 了，取消设置：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 取消Roles</span></span><br><span class="line">admin&gt; db.revokeRolesFromUser(<span class="string">&quot;xxxx&quot;</span>, [<span class="string">&quot;root&quot;</span>]);</span><br></pre></td></tr></table></figure></li>
+<li>继续开着端口等hacker来…</li>
+</ul>
+<h2 id="mysql-被黑-2023-09-29"><a href="#mysql-被黑-2023-09-29" class="headerlink" title="mysql 被黑 2023-09-29"></a>mysql 被黑 2023-09-29</h2><ul>
+<li>上午发现apollo无法访问，到机器上发现无法连接数据库了</li>
+<li>skip_grant_tables&#x3D;1 模式重启mysql，看到一个README的数据库<br><img src="/../images/mongodb-hack/mysql-hack-msg.png"></li>
+<li>机器像是变成互联网上的肉鸡….</li>
+<li>这个库是给apollo用的，当时因为apollo版本更新表结构变更导致模版数据导不进去就开了对外端口方便在本地用ide对比区别，后面没有在意也没有关掉端口</li>
+<li>这个库里数据很多，眼里噙着泪重新初始化数据库… 参考 <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_22938603/article/details/125569850">https://blog.csdn.net/qq_22938603/article/details/125569850</a></li>
+</ul>
+<h2 id="个人开发者安全意识"><a href="#个人开发者安全意识" class="headerlink" title="个人开发者安全意识"></a>个人开发者安全意识</h2><ul>
+<li>端口对外需要谨慎，很多时候部署组件在远端的云主机，自己在本地开发总要开一些端口，那就指定IP开放吧，虽然国内ip资源不多，还是基本缩小掉被外部攻击的可能</li>
+<li>数据库这种需要特别小心，有必要的时候学习使用一些备份相关的内容，验证auth相关需要全面点，别让auth形同虚设</li>
+<li>redis 这种缓存形式丢了就丢了，不能对业务产生影响</li>
+<li>连接云主机还是用key更安全，密码一言难尽</li>
+<li>只是想做点简单的开发，这些黑客低劣的扫描端口，删库勒索也太过分了….</li>
+</ul>
+<h2 id="connect-mysql-mongo-by-ssh-tunnel"><a href="#connect-mysql-mongo-by-ssh-tunnel" class="headerlink" title="connect mysql&#x2F;mongo by ssh-tunnel"></a>connect mysql&#x2F;mongo by ssh-tunnel</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://linuxize.com/post/mysql-ssh-tunnel/">https://linuxize.com/post/mysql-ssh-tunnel/</a></li>
+<li>bash 1:<ul>
+<li>ssh -NL 3306:127.0.0.1:3306 server_user_name@server_address</li>
+<li>enter server’spassword</li>
+</ul>
+</li>
+<li>bash 2:<ul>
+<li>mysql -u root -p</li>
+<li>enter mysql’s password</li>
+</ul>
+</li>
+<li>mongo 同理<br><img src="/../images/mongodb-hack/connect_by_ssh_tunnel.png"></li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/b6e30e08.html" rel="prev" title="easy datetime">
+      <i class="fa fa-chevron-left"></i> easy datetime
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/d0620e28.html" rel="next" title="cloudflare 加速 github.io website">
+      cloudflare 加速 github.io website <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pre"><span class="nav-number">1.</span> <span class="nav-text">pre</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A2%AB%E6%B8%85%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">被清库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql-%E8%A2%AB%E9%BB%91-2023-09-29"><span class="nav-number">4.</span> <span class="nav-text">mysql 被黑 2023-09-29</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AA%E4%BA%BA%E5%BC%80%E5%8F%91%E8%80%85%E5%AE%89%E5%85%A8%E6%84%8F%E8%AF%86"><span class="nav-number">5.</span> <span class="nav-text">个人开发者安全意识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#connect-mysql-mongo-by-ssh-tunnel"><span class="nav-number">6.</span> <span class="nav-text">connect mysql&#x2F;mongo by ssh-tunnel</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : 'ca6293505853baf296fb4c5f2728f005',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

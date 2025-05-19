@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="spdlog wrapper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spdlog wrapper">
+<meta property="og:url" content="https://klysisle.space/archives/3f7b4a3f.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="spdlog wrapper">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-04-16T13:24:10.000Z">
+<meta property="article:modified_time" content="2025-04-18T09:41:32.334Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="记录">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://klysisle.space/archives/3f7b4a3f.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>spdlog wrapper | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/3f7b4a3f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spdlog wrapper
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-16 21:24:10" itemprop="dateCreated datePublished" datetime="2023-04-16T21:24:10+08:00">2023-04-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-04-18 17:41:32" itemprop="dateModified" datetime="2025-04-18T17:41:32+08:00">2025-04-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index"><span itemprop="name">知识积累</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">spdlog wrapper</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>代码：<a target="_blank" rel="noopener" href="https://github.com/kinly/easy_logger">https://github.com/kinly/easy_logger</a></p>
+<h1 id="2025-04-18-更新："><a href="#2025-04-18-更新：" class="headerlink" title="2025-04-18 更新："></a>2025-04-18 更新：</h1><ul>
+<li>抛弃掉之前的版本，使用 logger.h 作为基础版本</li>
+<li>去掉复杂的内容，只保留日志最简单的样子</li>
+<li>关键点是增加了编译期的 std::format placeholders</li>
+<li>目前 logger.h 里保留的是简易的原始版本</li>
+<li>auto_format_rules.h 里是一个期望自定义 format 样式的版本（模板类重载，具体下面的测试用例：test_struct）</li>
+<li>也许这样才更合适，后期考虑把 filename 提出来作为模版，这样还可以用 spdlog 做些其他事情</li>
+<li>以下是这次版本 AI 协助产出的文档：</li>
+</ul>
+<h1 id="编译期格式字符串自动推导工具：实现与演进记录"><a href="#编译期格式字符串自动推导工具：实现与演进记录" class="headerlink" title="编译期格式字符串自动推导工具：实现与演进记录"></a>编译期格式字符串自动推导工具：实现与演进记录</h1><p>本文记录了我在实现一个<strong>编译期类型感知的格式字符串生成工具</strong>的过程中所遇到的问题、优化思路与最终实现细节，旨在为有类似需求的 C++ 开发者提供思路。</p>
+<h2 id="背景需求"><a href="#背景需求" class="headerlink" title="背景需求"></a>背景需求</h2><p>在使用 <code>std::format</code> 或 <code>spdlog::log</code> 等格式化日志时，频繁地手写格式字符串容易出错、不统一，也不够自动化。尤其是当参数较多，且类型不同（如 <code>float</code> 需保留小数）时，维护一套规范的格式变得棘手。</p>
+<p>为此，我希望实现以下目标：</p>
+<ul>
+<li>✅ 编译期推导格式字符串，无运行期开销</li>
+<li>✅ 不依赖 RTTI、反射或宏系统</li>
+<li>✅ 支持 tuple 嵌套类型展开</li>
+<li>✅ 针对 float&#x2F;double 提供默认精度控制（如 <code>&#123;:.2f&#125;</code>）</li>
+<li>✅ 可缓存格式字符串结构，供日志框架使用</li>
+</ul>
+<hr>
+<h2 id="常见实现尝试与问题"><a href="#常见实现尝试与问题" class="headerlink" title="常见实现尝试与问题"></a>常见实现尝试与问题</h2><h3 id="尝试-1：直接拼接-占位符"><a href="#尝试-1：直接拼接-占位符" class="headerlink" title="尝试 1：直接拼接 {} 占位符"></a>尝试 1：直接拼接 <code>&#123;&#125;</code> 占位符</h3><p>最早我直接构造 “{} {} {}” 类似的字符串，但无法体现类型特性，float 没法自动变成 <code>&#123;:.2f&#125;</code>，而且对 tuple、结构体等复杂类型也不友好。</p>
+<h3 id="尝试-2：基于格式描述元组生成"><a href="#尝试-2：基于格式描述元组生成" class="headerlink" title="尝试 2：基于格式描述元组生成"></a>尝试 2：基于格式描述元组生成</h3><p>我尝试写了如下模板：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::string <span class="built_in">make_fmt</span>&lt;<span class="type">float</span>, <span class="type">int</span>, <span class="type">double</span>&gt;() =&gt; <span class="string">&quot;&#123;:.2f&#125; &#123;&#125; &#123;:.2f&#125;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>思路不错，但写法冗长、不能递归 tuple 内容。</p>
+<h3 id="尝试-3：递归处理-tuple"><a href="#尝试-3：递归处理-tuple" class="headerlink" title="尝试 3：递归处理 tuple"></a>尝试 3：递归处理 tuple</h3><p>我引入了 SFINAE 检查是否 tuple，并用 index_sequence 展开内部字段，但发现格式串缓存和拼接过程容易越界或丢失分隔符，遂引入中间格式缓存。</p>
+<p>最终演化出了以下结构。</p>
+<hr>
+<h2 id="最终代码实现与解释"><a href="#最终代码实现与解释" class="headerlink" title="最终代码实现与解释"></a>最终代码实现与解释</h2><h3 id="顶层宏配置"><a href="#顶层宏配置" class="headerlink" title="顶层宏配置"></a>顶层宏配置</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> AUTO_FORMAT_LOGGER_MAX_ARGS</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> AUTO_FORMAT_LOGGER_MAX_ARGS 20</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>允许你限制支持的最大参数数量，避免浪费空间或越界访问。</p>
+<h3 id="类型到格式映射机制"><a href="#类型到格式映射机制" class="headerlink" title="类型到格式映射机制"></a>类型到格式映射机制</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> tt&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">type_format</span> &#123; <span class="type">static</span> <span class="keyword">constexpr</span> <span class="type">const</span> <span class="type">char</span>* value = <span class="string">&quot;&#123;&#125;&quot;</span>; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 对于 float/double 提供默认格式</span></span><br><span class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">struct</span> <span class="title class_">type_format</span>&lt;<span class="type">float</span>&gt; &#123; <span class="type">static</span> <span class="keyword">constexpr</span> <span class="type">const</span> <span class="type">char</span>* value = <span class="string">&quot;&#123;:.2f&#125;&quot;</span>; &#125;;</span><br><span class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">struct</span> <span class="title class_">type_format</span>&lt;<span class="type">double</span>&gt; &#123; <span class="type">static</span> <span class="keyword">constexpr</span> <span class="type">const</span> <span class="type">char</span>* value = <span class="string">&quot;&#123;:.2f&#125;&quot;</span>; &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这是系统的核心机制，用于指定不同类型在格式字符串中的默认格式。可以很方便扩展其他类型，比如 <code>bool</code> 显示为 true&#x2F;false，或者为用户自定义类型注册格式化方案。</p>
+<h3 id="检测类型是否为-tuple"><a href="#检测类型是否为-tuple" class="headerlink" title="检测类型是否为 tuple"></a>检测类型是否为 tuple</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> tt&gt;</span><br><span class="line"><span class="keyword">concept</span> is_tuple_like = <span class="keyword">requires</span> &#123; <span class="keyword">typename</span> std::tuple_size&lt;tt&gt;::type; &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>使用 C++20 的 <code>concept</code> 特性，判断某个类型是否具备 tuple 接口。</p>
+<h3 id="编译期格式符收集（支持-tuple-展开）"><a href="#编译期格式符收集（支持-tuple-展开）" class="headerlink" title="编译期格式符收集（支持 tuple 展开）"></a>编译期格式符收集（支持 tuple 展开）</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> tt, <span class="keyword">typename</span> collector_tt&gt;</span><br><span class="line"><span class="function"><span class="keyword">consteval</span> <span class="type">void</span> <span class="title">collect_type_formats</span><span class="params">(collector_tt collector)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个递归 constexpr 函数会：</p>
+<ul>
+<li>如果是 tuple，就展开 tuple 的每个元素，继续递归收集</li>
+<li>如果是普通类型，就调用 <code>type_format&lt;T&gt;</code> 获取对应格式字符串，并送入 collector</li>
+</ul>
+<h3 id="编译期拼接格式串"><a href="#编译期拼接格式串" class="headerlink" title="编译期拼接格式串"></a>编译期拼接格式串</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;std::<span class="type">size_t</span> count_vv, <span class="type">char</span> sep_vv = <span class="string">&#x27; &#x27;</span>&gt;</span><br><span class="line"><span class="keyword">consteval</span> <span class="keyword">auto</span> <span class="built_in">make_format_string</span>(<span class="type">const</span> std::array&lt;<span class="type">const</span> <span class="type">char</span>*, count_vv&gt;&amp; formats, std::<span class="type">size_t</span> used);</span><br></pre></td></tr></table></figure>
+
+<p>此函数将格式占位符如 <code>&quot;&#123;:.2f&#125;&quot;</code>, “{}” 等拼接为完整格式字符串，如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;:.2f&#125; &#123;&#125; &#123;:.2f&#125;</span><br></pre></td></tr></table></figure>
+<p>支持指定分隔符，默认是空格。</p>
+<p>注意我们对格式字符串进行了逆序整数输出（用于兜底），并用 <code>std::reverse</code> 修正顺序，这属于基本的编译期字符处理技巧。</p>
+<h3 id="编译期格式缓存结构"><a href="#编译期格式缓存结构" class="headerlink" title="编译期格式缓存结构"></a>编译期格式缓存结构</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... args_tt&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">type_format_string_placeholders</span> &#123;</span><br><span class="line">  <span class="type">static</span> <span class="keyword">constexpr</span> <span class="keyword">auto</span> fmt = <span class="built_in">make_type_format_string_ct</span>&lt;args_tt...&gt;();</span><br><span class="line">  <span class="type">static</span> <span class="keyword">constexpr</span> <span class="keyword">auto</span> sv = std::string_view&#123;fmt.first.<span class="built_in">data</span>(), fmt.second&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>通过该结构，我们可以以任意模板参数组调用 <code>type_format_string_placeholders&lt;Ts...&gt;::sv</code> 获取格式字符串。</p>
+<p>由于格式串内容是 <code>consteval</code> 拼接的 <code>std::array&lt;char&gt;</code>，我们提供 <code>.sv</code> 封装为 string_view，供 <code>std::vformat</code> 或 <code>spdlog::log</code> 使用。</p>
+<h3 id="多参数处理流程总结："><a href="#多参数处理流程总结：" class="headerlink" title="多参数处理流程总结："></a>多参数处理流程总结：</h3><ol>
+<li>模板参数包输入类型</li>
+<li>展开收集每个类型的格式占位符</li>
+<li>编译期拼接为完整字符串 <code>char[]</code></li>
+<li>提供静态缓存字段供外部访问</li>
+</ol>
+<hr>
+<h2 id="示例使用"><a href="#示例使用" class="headerlink" title="示例使用"></a>示例使用</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> fmt = auto_format_rules::detail::<span class="built_in">make_type_format_string_ct</span>&lt;<span class="type">float</span>, <span class="type">int</span>, <span class="type">float</span>, <span class="type">float</span>&gt;();</span><br><span class="line"><span class="function">std::string_view <span class="title">sv</span><span class="params">(fmt.first.data(), fmt.second)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> a = <span class="number">1.2345f</span>, c = <span class="number">3.14f</span>, d = <span class="number">2.71f</span>;</span><br><span class="line"><span class="type">int</span> b = <span class="number">42</span>;</span><br><span class="line">std::string result = std::<span class="built_in">vformat</span>(sv, std::<span class="built_in">make_format_args</span>(a, b, c, d));</span><br><span class="line">std::cout &lt;&lt; result &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line"><span class="comment">// 输出: 1.23 42 3.14 2.71</span></span><br></pre></td></tr></table></figure>
+
+<p>支持空参数：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">constexpr</span> <span class="keyword">auto</span> fmt2 = auto_format_rules::detail::type_format_string_placeholders&lt;&gt;::sv;</span><br></pre></td></tr></table></figure>
+
+<p>支持 tuple 嵌套：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> my_tuple = std::tuple&lt;<span class="type">int</span>, <span class="type">float</span>, std::tuple&lt;<span class="type">double</span>, <span class="type">int</span>&gt;&gt;;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> fmt = auto_format_rules::detail::type_format_string_placeholders&lt;my_tuple&gt;::sv;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="后续可扩展点"><a href="#后续可扩展点" class="headerlink" title="后续可扩展点"></a>后续可扩展点</h2><ul>
+<li>支持结构体字段名导出（结合反射或宏）</li>
+<li>对于特定字段自动附加单位（如 <code>%</code>, <code>ms</code>, <code>MB</code>）</li>
+<li>自定义格式规则注册机制，如：<code>register_format&lt;MyType&gt;(&quot;&#123;:X&#125;&quot;)</code></li>
+<li>添加 format string 校验器（在编译期验证格式与参数是否一致）</li>
+</ul>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这个工具让我们能够完全在编译期自动生成类型安全、规范统一的格式字符串，非常适合日志系统、调试工具、序列化预设等场景。</p>
+<p>如果你也在追求高性能和低维护成本的日志格式生成，不妨尝试将这个方案引入你的项目！</p>
+<p>欢迎评论交流和优化建议！</p>
+<h1 id="pre"><a href="#pre" class="headerlink" title="pre"></a>pre</h1><p><a target="_blank" rel="noopener" href="https://github.com/gabime/spdlog">spdlog</a> 是一个很不错的日志库，自定义程度很高，之前就用过，只是有同事封装过了就直接用了，没有细看很多，前面看到<a target="_blank" rel="noopener" href="https://gqw.github.io/posts/c++/logger_analyisis/">老顾头博客</a>更新了相关的博文，看了下他在github分享的<a target="_blank" rel="noopener" href="https://github.com/gqw/spdlog_wrapper">wrapper封装</a>，就起了兴致在这个基础上扩展一下，因为用的是 mac + vscode + clang 环境，有些东西也值得记录一下</p>
+<h1 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h1><ul>
+<li><p>支持基础的 daily_file, rotate, hourly_file</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (options._daily_or_hourly == <span class="number">1</span>) &#123;</span><br><span class="line">    sinks.<span class="built_in">push_back</span>(std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::daily_file_sink_mt&gt;(options._filename, <span class="number">0</span>, <span class="number">2</span>));</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (options._daily_or_hourly == <span class="number">2</span>) &#123;</span><br><span class="line">    sinks.<span class="built_in">push_back</span>(std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::hourly_file_sink_mt&gt;(options._filename));</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (options._rotating_file) &#123;</span><br><span class="line">    sinks.<span class="built_in">push_back</span>(std::<span class="built_in">make_shared</span>&lt;spdlog::sinks::rotating_file_sink_mt&gt;(options._filename, max_file_size, <span class="number">1024</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>增加 key 的方式，支持多个分文件的日志，常见的用法里会把异步的行为单独放一个日志文件，比如：网络基础日志 net.log、三方sdk日志 sdk.log….</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="type">const</span> <span class="type">char</span>* Key&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">easy_logger</span> <span class="keyword">final</span> : <span class="keyword">public</span> easy_logger_static</span><br><span class="line">&#123;...&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LOG_TRACE(key, msg,...) &#123; <span class="keyword">if</span> (util::logger::easy_logger_static::should_log(spdlog::level::trace))    util::logger::easy_logger<span class="string">&lt;key&gt;</span>::get().log(&#123;__FILENAME__, __LINE__, __FUNCTION__&#125;, spdlog::level::trace,    msg, ##__VA_ARGS__); &#125;;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>扩展支持 daily_folder (日常使用上希望每天一个日志目录，这样想拉日志的时候比较容易打包)，基本是参考 daily_file_sink 写的</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Mutex, <span class="keyword">typename</span> FolderNameCalc = daily_foldername_calculator&gt;</span><br><span class="line"><span class="keyword">class</span> daily_folder_sink <span class="keyword">final</span> : <span class="keyword">public</span> base_sink&lt;Mutex&gt;</span><br><span class="line">&#123;...&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>future：支持rotating的daily日志，日志还是按天分比较合理，但也不希望一个日志文件过大</p>
+</li>
+</ul>
+<h1 id="需要注意的地方"><a href="#需要注意的地方" class="headerlink" title="需要注意的地方"></a>需要注意的地方</h1><ul>
+<li>mac + vscode + clang 的环境，编译时遇到了一些问题</li>
+<li>没有直接用 xcode 是觉得之后做这种小的开发 vscode 更合适，也需要配置好本地的 vscode c++ 开发环境</li>
+<li>主要依赖的一些 extensions：<ul>
+<li>c&#x2F;c++</li>
+<li>c&#x2F;c++ project generator</li>
+<li>c&#x2F;c++ themes</li>
+<li>code runner</li>
+<li>codelldb</li>
+<li>makefile tools</li>
+</ul>
+</li>
+<li>开始时候 easy_logger.h 头文件依赖是这么写的<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;filesystem&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/spdlog.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/async.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/fmt/bundled/printf.h&gt;</span></span></span><br></pre></td></tr></table></figure></li>
+<li>编译遇到 link error<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">clang++ -std=c++17 -Wall -Wextra -g -Iinclude -Iinclude/sinks -I3rd -I3rd/spdlog -I3rd/spdlog/fmt -I3rd/spdlog/fmt/bundled -I3rd/spdlog/sinks -I3rd/spdlog/details -I3rd/spdlog/cfg -o output/main src/main.o  </span><br><span class="line">Undefined symbols <span class="keyword">for</span> architecture x86_64:</span><br><span class="line">  <span class="string">&quot;fmt::v9::format_error::~format_error()&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::adjust_precision(int&amp;, int) <span class="keyword">in</span> main.o</span><br><span class="line">      void <span class="built_in">fmt</span>::v9::detail::vprintf&lt;char, <span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;&gt;(<span class="built_in">fmt</span>::v9::detail::buffer&lt;char&gt;&amp;, <span class="built_in">fmt</span>::v9::basic_string_view&lt;char&gt;, <span class="built_in">fmt</span>::v9::basic_format_args&lt;<span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;&gt;) <span class="keyword">in</span> main.o</span><br><span class="line">      int <span class="built_in">fmt</span>::v9::detail::parse_header&lt;char, void <span class="built_in">fmt</span>::v9::detail::vprintf&lt;char, <span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;&gt;(<span class="built_in">fmt</span>::v9::detail::buffer&lt;char&gt;&amp;, <span class="built_in">fmt</span>::v9::basic_string_view&lt;char&gt;, <span class="built_in">fmt</span>::v9::basic_format_args&lt;<span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;&gt;)::<span class="string">&#x27;lambda&#x27;</span>(int)&gt;(char const*&amp;, char const*, <span class="built_in">fmt</span>::v9::basic_format_specs&lt;char&gt;&amp;, <span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;) <span class="keyword">in</span> main.o</span><br><span class="line">      unsigned int <span class="built_in">fmt</span>::v9::detail::printf_width_handler&lt;char&gt;::operator()&lt;int, 0&gt;(int) <span class="keyword">in</span> main.o</span><br><span class="line">      unsigned int <span class="built_in">fmt</span>::v9::detail::printf_width_handler&lt;char&gt;::operator()&lt;unsigned int, 0&gt;(unsigned int) <span class="keyword">in</span> main.o</span><br><span class="line">      unsigned int <span class="built_in">fmt</span>::v9::detail::printf_width_handler&lt;char&gt;::operator()&lt;long long, 0&gt;(long long) <span class="keyword">in</span> main.o</span><br><span class="line">      unsigned int <span class="built_in">fmt</span>::v9::detail::printf_width_handler&lt;char&gt;::operator()&lt;unsigned long long, 0&gt;(unsigned long long) <span class="keyword">in</span> main.o</span><br><span class="line">      ...</span><br><span class="line">  <span class="string">&quot;fmt::v9::format_system_error(fmt::v9::detail::buffer&lt;char&gt;&amp;, int, char const*)&quot;</span>, referenced from:</span><br><span class="line">      spdlog::spdlog_ex::spdlog_ex(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt;&gt; const&amp;, int) <span class="keyword">in</span> main.o</span><br><span class="line">  <span class="string">&quot;fmt::v9::detail::assert_fail(char const*, int, char const*)&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::format_decimal_result&lt;char*&gt; <span class="built_in">fmt</span>::v9::detail::format_decimal&lt;char, unsigned int&gt;(char*, unsigned int, int) <span class="keyword">in</span> main.o</span><br><span class="line">      std::__1::make_unsigned&lt;long&gt;::<span class="built_in">type</span> <span class="built_in">fmt</span>::v9::detail::to_unsigned&lt;long&gt;(long) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::format_decimal_result&lt;char*&gt; <span class="built_in">fmt</span>::v9::detail::format_decimal&lt;char, unsigned long long&gt;(char*, unsigned long long, int) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::format_decimal_result&lt;char*&gt; <span class="built_in">fmt</span>::v9::detail::format_decimal&lt;char, unsigned __int128&gt;(char*, unsigned __int128, int) <span class="keyword">in</span> main.o</span><br><span class="line">      std::__1::make_unsigned&lt;int&gt;::<span class="built_in">type</span> <span class="built_in">fmt</span>::v9::detail::to_unsigned&lt;int&gt;(int) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::appender <span class="built_in">fmt</span>::v9::detail::write_exponent&lt;char, <span class="built_in">fmt</span>::v9::appender&gt;(int, <span class="built_in">fmt</span>::v9::appender) <span class="keyword">in</span> main.o</span><br><span class="line">      int <span class="built_in">fmt</span>::v9::detail::snprintf_float&lt;long double&gt;(long double, int, <span class="built_in">fmt</span>::v9::detail::float_specs, <span class="built_in">fmt</span>::v9::detail::buffer&lt;char&gt;&amp;) <span class="keyword">in</span> main.o</span><br><span class="line">      ...</span><br><span class="line">  <span class="string">&quot;fmt::v9::detail::is_printable(unsigned int)&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::needs_escape(unsigned int) <span class="keyword">in</span> main.o</span><br><span class="line">  <span class="string">&quot;char fmt::v9::detail::decimal_point_impl&lt;char&gt;(fmt::v9::detail::locale_ref)&quot;</span>, referenced from:</span><br><span class="line">      char <span class="built_in">fmt</span>::v9::detail::decimal_point&lt;char&gt;(<span class="built_in">fmt</span>::v9::detail::locale_ref) <span class="keyword">in</span> main.o</span><br><span class="line">  <span class="string">&quot;fmt::v9::detail::thousands_sep_result&lt;char&gt; fmt::v9::detail::thousands_sep_impl&lt;char&gt;(fmt::v9::detail::locale_ref)&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::thousands_sep_result&lt;char&gt; <span class="built_in">fmt</span>::v9::detail::thousands_sep&lt;char&gt;(<span class="built_in">fmt</span>::v9::detail::locale_ref) <span class="keyword">in</span> main.o</span><br><span class="line">  <span class="string">&quot;fmt::v9::detail::throw_format_error(char const*)&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::error_handler::on_error(char const*) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::appender <span class="built_in">fmt</span>::v9::detail::write_int_noinline&lt;char, <span class="built_in">fmt</span>::v9::appender, unsigned int&gt;(<span class="built_in">fmt</span>::v9::appender, <span class="built_in">fmt</span>::v9::detail::write_int_arg&lt;unsigned int&gt;, <span class="built_in">fmt</span>::v9::basic_format_specs&lt;char&gt; const&amp;, <span class="built_in">fmt</span>::v9::detail::locale_ref) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::appender <span class="built_in">fmt</span>::v9::detail::write&lt;char, <span class="built_in">fmt</span>::v9::appender, long double, 0&gt;(<span class="built_in">fmt</span>::v9::appender, long double, <span class="built_in">fmt</span>::v9::basic_format_specs&lt;char&gt;, <span class="built_in">fmt</span>::v9::detail::locale_ref) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::appender <span class="built_in">fmt</span>::v9::detail::write&lt;char, <span class="built_in">fmt</span>::v9::appender&gt;(<span class="built_in">fmt</span>::v9::appender, char const*) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::fill_t&lt;char&gt;::operator=(<span class="built_in">fmt</span>::v9::basic_string_view&lt;char&gt;) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::appender <span class="built_in">fmt</span>::v9::detail::write_int_noinline&lt;char, <span class="built_in">fmt</span>::v9::appender, unsigned long long&gt;(<span class="built_in">fmt</span>::v9::appender, <span class="built_in">fmt</span>::v9::detail::write_int_arg&lt;unsigned long long&gt;, <span class="built_in">fmt</span>::v9::basic_format_specs&lt;char&gt; const&amp;, <span class="built_in">fmt</span>::v9::detail::locale_ref) <span class="keyword">in</span> main.o</span><br><span class="line">      <span class="built_in">fmt</span>::v9::appender <span class="built_in">fmt</span>::v9::detail::write_int_noinline&lt;char, <span class="built_in">fmt</span>::v9::appender, unsigned __int128&gt;(<span class="built_in">fmt</span>::v9::appender, <span class="built_in">fmt</span>::v9::detail::write_int_arg&lt;unsigned __int128&gt;, <span class="built_in">fmt</span>::v9::basic_format_specs&lt;char&gt; const&amp;, <span class="built_in">fmt</span>::v9::detail::locale_ref) <span class="keyword">in</span> main.o</span><br><span class="line">      ...</span><br><span class="line">  <span class="string">&quot;fmt::v9::detail::dragonbox::decimal_fp&lt;double&gt; fmt::v9::detail::dragonbox::to_decimal&lt;double&gt;(double)&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::appender <span class="built_in">fmt</span>::v9::detail::write&lt;char, <span class="built_in">fmt</span>::v9::appender, double, 0&gt;(<span class="built_in">fmt</span>::v9::appender, double) <span class="keyword">in</span> main.o</span><br><span class="line">      int <span class="built_in">fmt</span>::v9::detail::format_float&lt;double&gt;(double, int, <span class="built_in">fmt</span>::v9::detail::float_specs, <span class="built_in">fmt</span>::v9::detail::buffer&lt;char&gt;&amp;) <span class="keyword">in</span> main.o</span><br><span class="line">  <span class="string">&quot;fmt::v9::detail::dragonbox::decimal_fp&lt;float&gt; fmt::v9::detail::dragonbox::to_decimal&lt;float&gt;(float)&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::appender <span class="built_in">fmt</span>::v9::detail::write&lt;char, <span class="built_in">fmt</span>::v9::appender, <span class="built_in">float</span>, 0&gt;(<span class="built_in">fmt</span>::v9::appender, <span class="built_in">float</span>) <span class="keyword">in</span> main.o</span><br><span class="line">      int <span class="built_in">fmt</span>::v9::detail::format_float&lt;double&gt;(double, int, <span class="built_in">fmt</span>::v9::detail::float_specs, <span class="built_in">fmt</span>::v9::detail::buffer&lt;char&gt;&amp;) <span class="keyword">in</span> main.o</span><br><span class="line">  <span class="string">&quot;fmt::v9::vformat(fmt::v9::basic_string_view&lt;char&gt;, fmt::v9::basic_format_args&lt;fmt::v9::basic_format_context&lt;fmt::v9::appender, char&gt;&gt;)&quot;</span>, referenced from:</span><br><span class="line">      spdlog::logger::sink_it_(spdlog::details::log_msg const&amp;) <span class="keyword">in</span> main.o</span><br><span class="line">      spdlog::sinks::daily_foldername_calculator::calc_foldername(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt;&gt; const&amp;, std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt;&gt; const&amp;, tm const&amp;) <span class="keyword">in</span> main.o</span><br><span class="line">      spdlog::sinks::daily_filename_calculator::calc_filename(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt;&gt; const&amp;, tm const&amp;) <span class="keyword">in</span> main.o</span><br><span class="line">      spdlog::sinks::hourly_filename_calculator::calc_filename(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt;&gt; const&amp;, tm const&amp;) <span class="keyword">in</span> main.o</span><br><span class="line">      spdlog::sinks::rotating_file_sink&lt;std::__1::mutex&gt;::calc_filename(std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt;&gt; const&amp;, unsigned long) <span class="keyword">in</span> main.o</span><br><span class="line">  <span class="string">&quot;typeinfo for fmt::v9::format_error&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::detail::adjust_precision(int&amp;, int) <span class="keyword">in</span> main.o</span><br><span class="line">      void <span class="built_in">fmt</span>::v9::detail::vprintf&lt;char, <span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;&gt;(<span class="built_in">fmt</span>::v9::detail::buffer&lt;char&gt;&amp;, <span class="built_in">fmt</span>::v9::basic_string_view&lt;char&gt;, <span class="built_in">fmt</span>::v9::basic_format_args&lt;<span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;&gt;) <span class="keyword">in</span> main.o</span><br><span class="line">      int <span class="built_in">fmt</span>::v9::detail::parse_header&lt;char, void <span class="built_in">fmt</span>::v9::detail::vprintf&lt;char, <span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;&gt;(<span class="built_in">fmt</span>::v9::detail::buffer&lt;char&gt;&amp;, <span class="built_in">fmt</span>::v9::basic_string_view&lt;char&gt;, <span class="built_in">fmt</span>::v9::basic_format_args&lt;<span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;&gt;)::<span class="string">&#x27;lambda&#x27;</span>(int)&gt;(char const*&amp;, char const*, <span class="built_in">fmt</span>::v9::basic_format_specs&lt;char&gt;&amp;, <span class="built_in">fmt</span>::v9::basic_printf_context&lt;<span class="built_in">fmt</span>::v9::appender, char&gt;) <span class="keyword">in</span> main.o</span><br><span class="line">      unsigned int <span class="built_in">fmt</span>::v9::detail::printf_width_handler&lt;char&gt;::operator()&lt;int, 0&gt;(int) <span class="keyword">in</span> main.o</span><br><span class="line">      unsigned int <span class="built_in">fmt</span>::v9::detail::printf_width_handler&lt;char&gt;::operator()&lt;unsigned int, 0&gt;(unsigned int) <span class="keyword">in</span> main.o</span><br><span class="line">      unsigned int <span class="built_in">fmt</span>::v9::detail::printf_width_handler&lt;char&gt;::operator()&lt;long long, 0&gt;(long long) <span class="keyword">in</span> main.o</span><br><span class="line">      unsigned int <span class="built_in">fmt</span>::v9::detail::printf_width_handler&lt;char&gt;::operator()&lt;unsigned long long, 0&gt;(unsigned long long) <span class="keyword">in</span> main.o</span><br><span class="line">      ...</span><br><span class="line">  <span class="string">&quot;vtable for fmt::v9::format_error&quot;</span>, referenced from:</span><br><span class="line">      <span class="built_in">fmt</span>::v9::format_error::format_error(char const*) <span class="keyword">in</span> main.o</span><br><span class="line">  NOTE: a missing vtable usually means the first non-inline virtual member <span class="keyword">function</span> has no definition.</span><br><span class="line">ld: symbol(s) not found <span class="keyword">for</span> architecture x86_64</span><br><span class="line">clang: error: linker <span class="built_in">command</span> failed with <span class="built_in">exit</span> code 1 (use -v to see invocation)</span><br><span class="line">make: *** [main] Error 1</span><br></pre></td></tr></table></figure></li>
+<li>fmt 对应的代码是，这里的析构是有default实现的<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">if</span> !FMT_MSC_VERSION</span></span><br><span class="line">FMT_API FMT_FUNC format_error::~format_error() <span class="keyword">noexcept</span> = <span class="keyword">default</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure></li>
+<li>后面尝试了用 g++ &#x2F; clang++ 命令行直接编译没有问题<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clang++ -g -o main src/main.cpp -I./include -I./3rd --std=c++17</span><br></pre></td></tr></table></figure></li>
+<li>放到xcode编译也没有问题</li>
+<li>网上查了些资料: -std&#x3D;libc++, -lstdc++ 但是都不行</li>
+<li>用 spdlog 的例子编译了下是没有问题的<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;spdlog/spdlog.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    spdlog::<span class="built_in">info</span>(<span class="string">&quot;Welcome to spdlog!&quot;</span>);</span><br><span class="line">    spdlog::<span class="built_in">error</span>(<span class="string">&quot;Some error message with arg: &#123;&#125;&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    </span><br><span class="line">    spdlog::<span class="built_in">warn</span>(<span class="string">&quot;Easy padding in numbers like &#123;:08d&#125;&quot;</span>, <span class="number">12</span>);</span><br><span class="line">    spdlog::<span class="built_in">critical</span>(<span class="string">&quot;Support for int: &#123;0:d&#125;;  hex: &#123;0:x&#125;;  oct: &#123;0:o&#125;; bin: &#123;0:b&#125;&quot;</span>, <span class="number">42</span>);</span><br><span class="line">    spdlog::<span class="built_in">info</span>(<span class="string">&quot;Support for floats &#123;:03.2f&#125;&quot;</span>, <span class="number">1.23456</span>);</span><br><span class="line">    spdlog::<span class="built_in">info</span>(<span class="string">&quot;Positional args are &#123;1&#125; &#123;0&#125;..&quot;</span>, <span class="string">&quot;too&quot;</span>, <span class="string">&quot;supported&quot;</span>);</span><br><span class="line">    spdlog::<span class="built_in">info</span>(<span class="string">&quot;&#123;:&lt;30&#125;&quot;</span>, <span class="string">&quot;left aligned&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    spdlog::<span class="built_in">set_level</span>(spdlog::level::debug); <span class="comment">// Set global log level to debug</span></span><br><span class="line">    spdlog::<span class="built_in">debug</span>(<span class="string">&quot;This message should be displayed..&quot;</span>);    </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// change log pattern</span></span><br><span class="line">    spdlog::<span class="built_in">set_pattern</span>(<span class="string">&quot;[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Compile time log levels</span></span><br><span class="line">    <span class="comment">// define SPDLOG_ACTIVE_LEVEL to desired level</span></span><br><span class="line">    <span class="built_in">SPDLOG_TRACE</span>(<span class="string">&quot;Some trace message with param &#123;&#125;&quot;</span>, <span class="number">42</span>);</span><br><span class="line">    <span class="built_in">SPDLOG_DEBUG</span>(<span class="string">&quot;Some debug message&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>然后才发现我的头文件引入顺序上，c++相关的是放在前面的</li>
+<li>尝试调整了头文件的引入顺序就可以正常编译了<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/spdlog.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/async.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;spdlog/fmt/bundled/printf.h&gt;</span></span></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;filesystem&gt;</span></span></span><br></pre></td></tr></table></figure></li>
+<li>怀疑是 spdlog&#x2F;fmt 有一些环境判定的宏相关的代码，但是在 .o -&gt; bin 的时候 .o 没有正确的包含，比如上面的 ~format_error() 的实现函数</li>
+<li>只是还没有完全弄清楚</li>
+<li>搭建了vscode开发环境，是开心的，希望自己继续写日志</li>
+</ul>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/kinly/easy_logger">https://github.com/kinly/easy_logger</a></li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%B0%E5%BD%95/" rel="tag"># 记录</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/41a6a3ab.html" rel="prev" title="知识点备忘">
+      <i class="fa fa-chevron-left"></i> 知识点备忘
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/ef34a010.html" rel="next" title="c++ xlsx 解析 xlsxio 编译">
+      c++ xlsx 解析 xlsxio 编译 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2025-04-18-%E6%9B%B4%E6%96%B0%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">2025-04-18 更新：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%87%AA%E5%8A%A8%E6%8E%A8%E5%AF%BC%E5%B7%A5%E5%85%B7%EF%BC%9A%E5%AE%9E%E7%8E%B0%E4%B8%8E%E6%BC%94%E8%BF%9B%E8%AE%B0%E5%BD%95"><span class="nav-number">2.</span> <span class="nav-text">编译期格式字符串自动推导工具：实现与演进记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E9%9C%80%E6%B1%82"><span class="nav-number">2.1.</span> <span class="nav-text">背景需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%AE%9E%E7%8E%B0%E5%B0%9D%E8%AF%95%E4%B8%8E%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.</span> <span class="nav-text">常见实现尝试与问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%9D%E8%AF%95-1%EF%BC%9A%E7%9B%B4%E6%8E%A5%E6%8B%BC%E6%8E%A5-%E5%8D%A0%E4%BD%8D%E7%AC%A6"><span class="nav-number">2.2.1.</span> <span class="nav-text">尝试 1：直接拼接 {} 占位符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%9D%E8%AF%95-2%EF%BC%9A%E5%9F%BA%E4%BA%8E%E6%A0%BC%E5%BC%8F%E6%8F%8F%E8%BF%B0%E5%85%83%E7%BB%84%E7%94%9F%E6%88%90"><span class="nav-number">2.2.2.</span> <span class="nav-text">尝试 2：基于格式描述元组生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%9D%E8%AF%95-3%EF%BC%9A%E9%80%92%E5%BD%92%E5%A4%84%E7%90%86-tuple"><span class="nav-number">2.2.3.</span> <span class="nav-text">尝试 3：递归处理 tuple</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%BB%88%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%E4%B8%8E%E8%A7%A3%E9%87%8A"><span class="nav-number">2.3.</span> <span class="nav-text">最终代码实现与解释</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B6%E5%B1%82%E5%AE%8F%E9%85%8D%E7%BD%AE"><span class="nav-number">2.3.1.</span> <span class="nav-text">顶层宏配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E5%88%B0%E6%A0%BC%E5%BC%8F%E6%98%A0%E5%B0%84%E6%9C%BA%E5%88%B6"><span class="nav-number">2.3.2.</span> <span class="nav-text">类型到格式映射机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B%E7%B1%BB%E5%9E%8B%E6%98%AF%E5%90%A6%E4%B8%BA-tuple"><span class="nav-number">2.3.3.</span> <span class="nav-text">检测类型是否为 tuple</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%E6%A0%BC%E5%BC%8F%E7%AC%A6%E6%94%B6%E9%9B%86%EF%BC%88%E6%94%AF%E6%8C%81-tuple-%E5%B1%95%E5%BC%80%EF%BC%89"><span class="nav-number">2.3.4.</span> <span class="nav-text">编译期格式符收集（支持 tuple 展开）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%E6%8B%BC%E6%8E%A5%E6%A0%BC%E5%BC%8F%E4%B8%B2"><span class="nav-number">2.3.5.</span> <span class="nav-text">编译期拼接格式串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%E6%A0%BC%E5%BC%8F%E7%BC%93%E5%AD%98%E7%BB%93%E6%9E%84"><span class="nav-number">2.3.6.</span> <span class="nav-text">编译期格式缓存结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%8F%82%E6%95%B0%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">2.3.7.</span> <span class="nav-text">多参数处理流程总结：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BD%BF%E7%94%A8"><span class="nav-number">2.4.</span> <span class="nav-text">示例使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E7%BB%AD%E5%8F%AF%E6%89%A9%E5%B1%95%E7%82%B9"><span class="nav-number">2.5.</span> <span class="nav-text">后续可扩展点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.6.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pre"><span class="nav-number">3.</span> <span class="nav-text">pre</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%81%E8%A3%85"><span class="nav-number">4.</span> <span class="nav-text">封装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E5%9C%B0%E6%96%B9"><span class="nav-number">5.</span> <span class="nav-text">需要注意的地方</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BA%90%E7%A0%81"><span class="nav-number">6.</span> <span class="nav-text">源码</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '09adbb7c325071a8bbe5ccc81f446e67',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="网络：ICMP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络：ICMP">
+<meta property="og:url" content="https://klysisle.space/archives/f04c5e28.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="网络：ICMP">
+<meta property="og:locale">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/ICMP01.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/ICMP02.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/ICMP03.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/ICMP04.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/ICMP05.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/ICMP06.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/icmp-traceroute-diagram.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/trace01.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/trace02.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/trace03.png">
+<meta property="og:image" content="https://klysisle.space/images/network/ICMP/ECMP01.gif">
+<meta property="article:published_time" content="2020-11-27T13:48:44.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.709Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://klysisle.space/images/network/ICMP/ICMP01.png">
+
+<link rel="canonical" href="https://klysisle.space/archives/f04c5e28.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>网络：ICMP | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/f04c5e28.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网络：ICMP
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-27 21:48:44" itemprop="dateCreated datePublished" datetime="2020-11-27T21:48:44+08:00">2020-11-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">网络：ICMP</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="当我们判断网络是否可用的时候"><a href="#当我们判断网络是否可用的时候" class="headerlink" title="当我们判断网络是否可用的时候"></a>当我们判断网络是否可用的时候</h3><p><img src="/images/network/ICMP/ICMP01.png"><br><code>感谢baidu.com</code></p>
+<ul>
+<li><p>ping 命令是使用ICMP报文<br><img src="/images/network/ICMP/ICMP02.png"></p>
+</li>
+<li><p>ICMP 报文具体是什么呢？<br><img src="/images/network/ICMP/ICMP03.png"></p>
+<ul>
+<li><p>from 互联网控制消息协议:<br>  <a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E6%8E%A7%E5%88%B6%E6%B6%88%E6%81%AF%E5%8D%8F%E8%AE%AE">https://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E6%8E%A7%E5%88%B6%E6%B6%88%E6%81%AF%E5%8D%8F%E8%AE%AE</a><br>  <img src="/images/network/ICMP/ICMP04.png"></p>
+</li>
+<li><p>Type - ICMP的类型,标识生成的错误报文；</p>
+</li>
+<li><p>Code - 进一步划分ICMP的类型,该字段用来查找产生错误的原因.；例如，ICMP的目标不可达类型可以把这个位设为1至15等来表示不同的意思。</p>
+</li>
+<li><p>Checksum - Internet校验和（RFC 1071），用于进行错误检查，该校验和是从ICMP头和以该字段替换为0的数据计算得出的。</p>
+</li>
+<li><p>Rest of Header - 报头的其余部分，四字节字段，内容根据ICMP类型和代码而有所不同。</p>
+<ul>
+<li>Identification： 标识符：linux-进程PID，windows-固定值1</li>
+<li>Sequence number: 序列号</li>
+</ul>
+</li>
+<li><p>!! 注意：这里多了Timestamp 8字节，这里测试时用的MacOS（参考：<code>hping</code>）</p>
+</li>
+<li><p>ICMP数据 - 48字节</p>
+</li>
+<li><p>总共是：src-mac(6字节) + dst-mac(6字节) + 类型(2字节) + IP报文(20字节) + ICMP报文(8字节) + ICMP数据(48字节) + Timestamp(8字节)</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="ICMP-作用"><a href="#ICMP-作用" class="headerlink" title="ICMP 作用"></a>ICMP 作用</h3><h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h4><ul>
+<li>ICMP: Internet Control Message Protocol 控制报文协议</li>
+<li>ICMP 和 IP 处于同一层，但是ICMP是配合IP协议一起使用的，补充IP协议的差错控制和辅助机制</li>
+<li>分为差错报告和查询两种报文类型<ul>
+<li>差错：目的主机或者网络路由处理IP数据报文的时候出问题了就报告</li>
+<li>查询：最常见的应用就是ping、traceroute这样的使用了，发送请求，并要求回执</li>
+</ul>
+</li>
+</ul>
+<h4 id="差错报文"><a href="#差错报文" class="headerlink" title="差错报文"></a>差错报文</h4><ul>
+<li>那些情况会有差错报告：<ul>
+<li>目的站不可达，很多可能都会造成这种情况：没有网络，主机找不到，协议，端口找不到，路由失败</li>
+<li>源站抑制，机器本身或者网络上的其他设备网络拥塞导致数据丢了</li>
+<li>超时：假设一个数据报被分片发送了，一定时间内没有收到全部的分片，已经收到的就会被丢弃掉，并且产生一个这样的报文告知</li>
+<li>参数问题：协议数据校验发现错误了，就会丢掉这个数据报，并且报告</li>
+<li>改变路由：A点到B点需要经过很多的路由设备，如果其中一个路由设备不可用或者发现了更优路径了，需要切换路由设备了，会产生这样一个报文，让上一层知道下一次路由用已经切换过的节点吧</li>
+</ul>
+</li>
+<li>那些情况及时出问题也不会报告差错：<ul>
+<li>本身ICMP就是差错报告的包出错了，不会报告，不然就是递归了</li>
+<li>分片的数据报，不会报告(IP分片的第一片会报，其他片不会)</li>
+<li>多播的数据报，不会报告</li>
+<li>localhost地址，不会报告</li>
+</ul>
+</li>
+<li>上面这些差错报告，是可能由路由层发出的，而路由层解包的是IP层的协议，ICMP可以看做是IP协议的子类</li>
+</ul>
+<h4 id="ICMP-报文类型"><a href="#ICMP-报文类型" class="headerlink" title="ICMP 报文类型"></a><a href="(https://zh.wikipedia.org/wiki/%E4%BA%92%E8%81%94%E7%BD%91%E6%8E%A7%E5%88%B6%E6%B6%88%E6%81%AF%E5%8D%8F%E8%AE%AE)">ICMP 报文类型</a></h4><p><img src="/images/network/ICMP/ICMP05.png"><br><img src="/images/network/ICMP/ICMP06.png"></p>
+<h3 id="ICMP-工具"><a href="#ICMP-工具" class="headerlink" title="ICMP 工具"></a>ICMP 工具</h3><h4 id="1-ping"><a href="#1-ping" class="headerlink" title="1. ping"></a>1. ping</h4><ul>
+<li>最常用的工具了，上面介绍ICMP也用的这个</li>
+</ul>
+<h4 id="2-why-dose-ping-need-setuid-permission"><a href="#2-why-dose-ping-need-setuid-permission" class="headerlink" title="2. why dose ping need setuid permission"></a>2. why dose ping need setuid permission</h4><p><a target="_blank" rel="noopener" href="https://unix.stackexchange.com/questions/382771/why-does-ping-need-setuid-permission">https://unix.stackexchange.com/questions/382771/why-does-ping-need-setuid-permission</a>; 这个问题包含的知识挺多的</p>
+<ul>
+<li><code>suid</code> : <a target="_blank" rel="noopener" href="https://www.cnblogs.com/sparkdev/p/9651622.html">https://www.cnblogs.com/sparkdev/p/9651622.html</a></li>
+<li><code>raw network socket</code> : <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/14774668/what-is-raw-socket-in-socket-programming">https://stackoverflow.com/questions/14774668/what-is-raw-socket-in-socket-programming</a></li>
+<li><code>raw network socket</code> wiki: <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Network_socket">https://en.wikipedia.org/wiki/Network_socket</a></li>
+<li><code>getcap</code>: <a target="_blank" rel="noopener" href="https://www.man7.org/linux/man-pages/man8/getcap.8.html">https://www.man7.org/linux/man-pages/man8/getcap.8.html</a></li>
+<li>traceroute -T 需要<code>root</code>也是因为<code>socket_raw</code>的关系</li>
+<li><code>windows</code> 的 <code>tracert</code> 没有 <code>tcp</code> 的选项，但是可以自己写程序模拟，但是自己的程序需要<code>administrator</code>权限</li>
+<li><code>windows</code> 的 <code>ping</code> 没有特别的要求<code>administrator</code>权限，是win有个特殊的<code>icmp.dll</code> 不需要管理员权限就可以用，而<code>ping</code>是基于这个实现的 (<a target="_blank" rel="noopener" href="https://www.thoughtco.com/implementing-ping-without-using-raw-sockets-4068869">https://www.thoughtco.com/implementing-ping-without-using-raw-sockets-4068869</a>)</li>
+<li>有时候icmp的路径探测是不准确的，(不同协议路由的路径很可能不同); 这时候我们需要个tcp的路径探测包在自己的程序里，(TTL递增)代码很简单，只是需要记得需要<code>管理员权限</code></li>
+<li>ttl(Time To Live):代表是报文的存活时间，存活时间以秒为单位，但小于一秒的时间均向上取整到一秒。在现实中，这实际上成了一个跳数计数器：报文经过的每个路由器都将此字段减1，当此字段等于0时，报文不再向下一跳传送并被丢弃，最大值是255（8bit）<br><code>图片来源：https://www.cloudflare.com/zh-cn/learning/cdn/glossary/time-to-live-ttl/</code><br><img src="/images/network/ICMP/icmp-traceroute-diagram.png"></li>
+</ul>
+<h4 id="3-traceroute-路径探测"><a href="#3-traceroute-路径探测" class="headerlink" title="3. traceroute 路径探测"></a>3. traceroute 路径探测</h4><p><code>wiki</code>: (<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Traceroute">https://en.wikipedia.org/wiki/Traceroute</a>)<br><code>man page</code>: (<a target="_blank" rel="noopener" href="https://linux.die.net/man/8/traceroute">https://linux.die.net/man/8/traceroute</a>)</p>
+<ul>
+<li><p>默认是UDP探测，利用IP协议TTL字段，第一次TTL&#x3D;1探测一个路由节点，收到ICMP Type&#x3D;11, Code&#x3D;0的Time Exceeded<br><img src="/images/network/ICMP/trace01.png"></p>
+</li>
+<li><p>做下一次，TTL递增，直到探测到目标节点，到达目标接地那会收到ICMP Type&#x3D;3 Code&#x3D;3<br><code>之前的路径太长了，这次探测换了路径中一个近的路由点</code><br><img src="/images/network/ICMP/trace02.png"><br><img src="/images/network/ICMP/trace03.png"></p>
+</li>
+<li><p>traceroute 可以选择ICMP、UDP、TCP模式，并可以选择最多探测多少（也就是TTL最大多少）</p>
+</li>
+<li><p>指定–mtu也可以探测路径上的mtu，但是下一次发消息不一定是探测的路径，所以这个值只能用作参考</p>
+</li>
+<li><p>行程中的一些附加注释：这些都对应了ICMP的Type&amp;Code，具体抓包可以看到</p>
+<ul>
+<li>!H 主机不可达</li>
+<li>!N 网络不可达</li>
+<li>!P 协议不可访问</li>
+<li>!S 源路由失败</li>
+<li>!F 需要分段</li>
+<li>!X（管理性通信）禁止</li>
+<li>!V 违反主机优先级</li>
+<li>!C 有效优先级截止</li>
+<li>!(num)（ICMP无法访问代码(num)）</li>
+</ul>
+</li>
+<li><p>如果几乎所有的探测导致某种无法到达的情况，traceroute将放弃并退出。</p>
+</li>
+<li><p>traceroute <code>* * *</code> Qos&#x2F;ACL</p>
+</li>
+<li><p>根据差错报文的规则，我们用<code>TCP+TTL</code>访问一个不存在的端口，就可以探测出<code>TCP的路由路径</code>，<code>TTL超时（type=11 code=0)</code>表示没有到达目标点，<code>RST（type=3 code=3 也有可能是其他）</code>、<code>connected</code>表示到达了目标点</p>
+</li>
+</ul>
+<h3 id="ECMP-等价多路径"><a href="#ECMP-等价多路径" class="headerlink" title="ECMP 等价多路径"></a>ECMP 等价多路径</h3><p><code>wiki</code>: (<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Equal-cost_multi-path_routing">https://en.wikipedia.org/wiki/Equal-cost_multi-path_routing</a>)</p>
+<ul>
+<li>消息报从A点发送到B点，链路上会有很多路由节点，但是有一些路由节点是是核心的路由节点，图示的线路<br><img src="/images/network/ICMP/ECMP01.gif"></li>
+<li>如果traceroute遇到ECMP（等价路径点A&amp;B)，也就是这次经过等价路径的A，但是下次很可能经过的B</li>
+</ul>
+<h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><ul>
+<li>由于现在网络环境大都有NAT、防火墙等设备、策略，ICMP的检测只能作为参考，甚至ICMP拿不到结果</li>
+<li>指定目标IP:Port，指定协议，这样检测出来的结果相对价值更大</li>
+<li>ICMP的差错报文可以帮助我们考虑网络问题可能出现在哪个方面</li>
+<li>日常多抓包，多看</li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/3388bb24.html" rel="prev" title="网络：基础">
+      <i class="fa fa-chevron-left"></i> 网络：基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/3b5f401c.html" rel="next" title="网络：TCP">
+      网络：TCP <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93%E6%88%91%E4%BB%AC%E5%88%A4%E6%96%AD%E7%BD%91%E7%BB%9C%E6%98%AF%E5%90%A6%E5%8F%AF%E7%94%A8%E7%9A%84%E6%97%B6%E5%80%99"><span class="nav-number">1.</span> <span class="nav-text">当我们判断网络是否可用的时候</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP-%E4%BD%9C%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">ICMP 作用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%AE%E9%94%99%E6%8A%A5%E6%96%87"><span class="nav-number">2.2.</span> <span class="nav-text">差错报文</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ICMP-%E6%8A%A5%E6%96%87%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.3.</span> <span class="nav-text">ICMP 报文类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ICMP-%E5%B7%A5%E5%85%B7"><span class="nav-number">3.</span> <span class="nav-text">ICMP 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-ping"><span class="nav-number">3.1.</span> <span class="nav-text">1. ping</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-why-dose-ping-need-setuid-permission"><span class="nav-number">3.2.</span> <span class="nav-text">2. why dose ping need setuid permission</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-traceroute-%E8%B7%AF%E5%BE%84%E6%8E%A2%E6%B5%8B"><span class="nav-number">3.3.</span> <span class="nav-text">3. traceroute 路径探测</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ECMP-%E7%AD%89%E4%BB%B7%E5%A4%9A%E8%B7%AF%E5%BE%84"><span class="nav-number">4.</span> <span class="nav-text">ECMP 等价多路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">5.</span> <span class="nav-text">说明</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '1019e73488241632c31846ae75674047',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

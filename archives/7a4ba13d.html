@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="优化：Tips for Optimizing C&#x2F;C++ Code">
+<meta property="og:type" content="article">
+<meta property="og:title" content="优化：Tips for Optimizing C&#x2F;C++ Code">
+<meta property="og:url" content="https://klysisle.space/archives/7a4ba13d.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="优化：Tips for Optimizing C&#x2F;C++ Code">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-07-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.710Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta property="article:tag" content="优化">
+<meta property="article:tag" content="翻译&#x2F;理解">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://klysisle.space/archives/7a4ba13d.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>优化：Tips for Optimizing C/C++ Code | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/7a4ba13d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          优化：Tips for Optimizing C/C++ Code
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-17 00:00:00" itemprop="dateCreated datePublished" datetime="2021-07-17T00:00:00+08:00">2021-07-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index"><span itemprop="name">知识积累</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">优化：Tips for Optimizing C/C++ Code</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>读到一篇不长但是很有指导性，也很实用的优化相关的文章，虽然标题带C&#x2F;C++，内容基本是以游戏客户端举例，不过里面很多内容都是大部分语言通用的语法，可以通用在任何语言</p>
+<p>为了更好的记录，自己翻译一下 (: 还好文章不长，还好有翻译app</p>
+<h2 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h2><p>chrome-extension:&#x2F;&#x2F;ikhdkkncnoglghljlkmcimlnlhkeamad&#x2F;pdf-viewer&#x2F;web&#x2F;viewer.html?file&#x3D;https%3A%2F%2Fpeople.cs.clemson.edu%2F~dhouse%2Fcourses%2F405%2Fpapers%2Foptimize.pdf</p>
+<h2 id="翻译-记录"><a href="#翻译-记录" class="headerlink" title="翻译&#x2F;记录"></a>翻译&#x2F;记录</h2><h3 id="记住阿姆达尔（Ahmdal）定律"><a href="#记住阿姆达尔（Ahmdal）定律" class="headerlink" title="记住阿姆达尔（Ahmdal）定律:"></a>记住阿姆达尔（Ahmdal）定律:</h3><p>$$Speedup &#x3D; \frac {time_{old}}{time_{new}} &#x3D; \frac{1}{(1 - func_{cost}) + func_{cost} &#x2F; func_{speedup}} $$</p>
+<ul>
+<li>其中 $func_{cost}$ 是指函数 $func$ 运行时间的百分比，$func_{speedup}$ 是加速函数的因子</li>
+<li>因此，如果优化占运行时间40%的函数 <code>TriangleIntersect()</code>， 使其运行速度提高两倍，那么你的程序运行速度将提高 25%($\frac{1}{(1 - 0.4) + 0.4 &#x2F; 2} &#x3D; \frac{1}{0.8} &#x3D; 1.25$)</li>
+<li>这意味着不经常使用的代码（例如，场景加载器）可能应该很少被优化（如果有的话）</li>
+<li>这通常被表述为：<code>让常见的情况快速，让罕见的情况正确</code></li>
+</ul>
+<h3 id="先编写代码以获得正确性，然后再优化！"><a href="#先编写代码以获得正确性，然后再优化！" class="headerlink" title="先编写代码以获得正确性，然后再优化！"></a>先编写代码以获得正确性，然后再优化！</h3><ul>
+<li>这并不意味着编写功能齐全的光线追踪器 8 周，然后再优化 8 周！</li>
+<li>分多个步骤对光线追踪器执行优化</li>
+<li>编写正确性，然后如果您知道函数将被频繁调用，执行明显的优化</li>
+<li>然后分析以发现瓶颈，并消除瓶颈（通过优化或改进算法）</li>
+<li>通常改进算法会极大地改变瓶颈——也许是你意想不到的功能。这是对您知道会经常使用的所有函数进行明显优化的一个很好的理由</li>
+</ul>
+<h3 id="我认识的那些编写非常高效的代码的人说，他们优化代码的时间至少是编写代码的两倍"><a href="#我认识的那些编写非常高效的代码的人说，他们优化代码的时间至少是编写代码的两倍" class="headerlink" title="我认识的那些编写非常高效的代码的人说，他们优化代码的时间至少是编写代码的两倍"></a>我认识的那些编写非常高效的代码的人说，他们优化代码的时间至少是编写代码的两倍</h3><h3 id="Jumps-跳转-branches-分支-很贵-尽可能减少它们的使用"><a href="#Jumps-跳转-branches-分支-很贵-尽可能减少它们的使用" class="headerlink" title="Jumps(跳转)&#x2F;branches(分支) 很贵. 尽可能减少它们的使用"></a>Jumps(跳转)&#x2F;branches(分支) 很贵. 尽可能减少它们的使用</h3><ul>
+<li>函数调用需要两次跳转，除了堆栈内存操作</li>
+<li>优先使用迭代而不是递归</li>
+<li>对短函数使用内联函数以消除函数开销</li>
+<li>在函数调用中移动循环<br>例如: <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">100</span>; ++i) </span><br><span class="line">    <span class="built_in">DoSomething</span>();</span><br></pre></td></tr></table></figure>
+修改为<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DoSomething</span>() &#123;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">100</span>; ++i) &#123;...&#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>很长的 <code>if...else if...else if... else if...</code> 对于链结尾附近的情况，需要跳转很多次（除非需要测试每个条件）。如果可能，请转换为 <code>switch</code> 语句，编译器有时会将其优化为单次跳转的表查找。如果不可能有 <code>switch</code> 语句，请将最常用的子句放在 <code>if</code> 链的开头</li>
+</ul>
+<h3 id="关注数组索引的顺序"><a href="#关注数组索引的顺序" class="headerlink" title="关注数组索引的顺序"></a>关注数组索引的顺序</h3><ul>
+<li>二维和更高维的数组仍然存储在一维内存中。这意味着（对于 C&#x2F;C++ 数组）<code>array[i][j]</code> 和 <code>array[i][j+1]</code> 彼此相邻，而<code>array[i][j]</code>和<code>array[i+1][j]</code> 可能距离任意远</li>
+<li>以或多或少的顺序方式访问存储在物理内存中的数据，可以显着加速您的代码（有时是一个数量级或更多）！</li>
+<li>当现代 CPU 将数据从主内存加载到处理器时缓存，它们获取的不仅仅是单个值。相反，它们获取包含请求数据和相邻数据（acacheline）的内存块。这意味着<code>array[i][j]</code>在CPU缓存中之后，<code>array[i][j+1]</code>很有可能已经在缓存中，而<code>array[i+1][j]</code>很可能还在主存中</li>
+</ul>
+<h3 id="关注指令级并行运算"><a href="#关注指令级并行运算" class="headerlink" title="关注指令级并行运算"></a>关注指令级并行运算</h3><ul>
+<li>尽管许多应用程序仍然依赖单线程执行，但现代 CPU 已经在单核内具有大量并行性。这意味着单个 CPU 可能同时执行 4 次浮点乘法，等待 4 次内存请求，并为即将到来的分支执行比较</li>
+<li>为了充分利用这种并行性，代码块（即跳转之间）需要有足够的并行指令以允许充分利用 CPU</li>
+<li>考虑展开循环以改善这一点</li>
+<li>这也是使用内联函数的一个很好的理由</li>
+</ul>
+<h3 id="避免-减少局部变量的数量"><a href="#避免-减少局部变量的数量" class="headerlink" title="避免&#x2F;减少局部变量的数量"></a>避免&#x2F;减少局部变量的数量</h3><ul>
+<li>局部变量通常存储在堆栈中。 但是如果数量足够少，它们也可以被存放在寄存器中。在这种情况下，函数不仅可以获得存储在寄存器中的数据的快速内存访问的好处，而且函数还避免了设置堆栈框架的开销</li>
+<li>（但是，不要完全切换到全局变量！）</li>
+</ul>
+<h3 id="减少函数参数的数量"><a href="#减少函数参数的数量" class="headerlink" title="减少函数参数的数量"></a>减少函数参数的数量</h3><ul>
+<li>与减少局部变量的原因相同–它们也被存储在堆栈中</li>
+</ul>
+<h3 id="通过引用传递struct-结构-，而不是通过值"><a href="#通过引用传递struct-结构-，而不是通过值" class="headerlink" title="通过引用传递struct(结构)，而不是通过值"></a>通过引用传递struct(结构)，而不是通过值</h3><ul>
+<li>据我所知，在光线追踪器中，没有任何情况下结构应该通过值来传递（即使是像矢量、点和颜色这样的简单结构）</li>
+</ul>
+<h3 id="如果你不需要一个函数的返回值，就不要定义一个"><a href="#如果你不需要一个函数的返回值，就不要定义一个" class="headerlink" title="如果你不需要一个函数的返回值，就不要定义一个"></a>如果你不需要一个函数的返回值，就不要定义一个</h3><h3 id="尽量避免casting（强制类型转换）"><a href="#尽量避免casting（强制类型转换）" class="headerlink" title="尽量避免casting（强制类型转换）"></a>尽量避免casting（强制类型转换）</h3><ul>
+<li>整数和浮点指令通常在不同的寄存器上运行，因此强制转换需要复制</li>
+<li>较短的整数类型（<code>char</code> 和 <code>short</code>）仍然需要使用全尺寸寄存器，并且需要将它们填充到 32&#x2F;64 位然后在存储回内存之前转换回较小的大小（但是，此成本必须与较大数据类型的额外内存成本进行权衡）</li>
+</ul>
+<h3 id="声明-C-对象变量时要非常小心"><a href="#声明-C-对象变量时要非常小心" class="headerlink" title="声明 C++ 对象变量时要非常小心"></a>声明 C++ 对象变量时要非常小心</h3><ul>
+<li>使用初始化而不是赋值  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Color <span class="title">c</span><span class="params">(black)</span></span>;</span><br></pre></td></tr></table></figure>
+比下面这种形式快的多<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Color c; c = black;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="让默认的类构造函数尽可能轻巧"><a href="#让默认的类构造函数尽可能轻巧" class="headerlink" title="让默认的类构造函数尽可能轻巧"></a>让默认的类构造函数尽可能轻巧</h3><ul>
+<li>特别是对于简单的、经常使用的类（例如，颜色、向量、点等）</li>
+<li>这些默认的构造函数经常在你意想不到的地方被调用</li>
+<li>使用构造函数初始化器列表<br>使用：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Color::<span class="built_in">Color</span>() </span><br><span class="line">    : <span class="built_in">r</span>(<span class="number">0</span>), <span class="built_in">g</span>(<span class="number">0</span>), <span class="built_in">b</span>(<span class="number">0</span>)</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+而不是<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Color::<span class="built_in">Color</span>()</span><br><span class="line">&#123; r = g = b = <span class="number">0</span>; &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="尽可能使用位操作"><a href="#尽可能使用位操作" class="headerlink" title="尽可能使用位操作&gt;&gt;, &lt;&lt;代替整数乘法和除法"></a>尽可能使用位操作<code>&gt;&gt;, &lt;&lt;</code>代替整数乘法和除法</h3><h3 id="谨慎使用表格查询功能"><a href="#谨慎使用表格查询功能" class="headerlink" title="谨慎使用表格查询功能"></a>谨慎使用表格查询功能</h3><ul>
+<li>许多人鼓励对复杂的函数（例如三角函数）使用预先计算的数值表。对于光线追踪来说，这通常是不必要的。内存查找的成本非常高（而且越来越高），重新计算一个三角函数的速度往往和从内存中检索数值的速度一样快（特别是当你考虑到三角函数的查找会污染CPU的缓存）</li>
+<li>在其他情况下，查找表可能非常有用。对于 GPU 编程，对于复杂函数，通常首选表查找</li>
+</ul>
+<h3 id="对于大多数对象类型，使用运算符-、-、-和-，而不是运算符-、-、-和"><a href="#对于大多数对象类型，使用运算符-、-、-和-，而不是运算符-、-、-和" class="headerlink" title="对于大多数对象类型，使用运算符+=、-=、*=和/=，而不是运算符+、-、*和/"></a>对于大多数对象类型，使用运算符<code>+=</code>、<code>-=</code>、<code>*=</code>和<code>/=</code>，而不是运算符<code>+</code>、<code>-</code>、<code>*</code>和<code>/</code></h3><ul>
+<li><p>简单的操作需要创建一个未命名的、临时的中间对象</p>
+</li>
+<li><p>例如：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vector v = <span class="built_in">Vector</span>(<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>) + <span class="built_in">Vector</span>(<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>) + <span class="built_in">Vector</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>创建五个未命名的临时Vector对象：<br><code>Vector(1,0,0)</code><br><code>Vector(0,1,0)</code><br><code>Vector(0,0,1)</code><br><code>Vector(1,0,0) + Vector(0,1,0)</code><br><code>Vector(1,0,0) + Vector(0,0,0)</code></p>
+</li>
+<li><p>稍微啰嗦的代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Vector <span class="title">v</span><span class="params">(<span class="number">1</span>,<span class="number">0</span>,<span class="number">0</span>)</span></span>; </span><br><span class="line">v+= <span class="built_in">Vector</span>(<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>); </span><br><span class="line">v+= <span class="built_in">Vector</span>(<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>只创建两个临时Vector：<br><code>Vector(0,1,0)</code><br><code>Vector(0,0,1)</code><br>这节省了6个函数调用（3个构造函数和3个析构函数）</p>
+</li>
+</ul>
+<h3 id="对于基本数据类型，使用运算符-、-、-和-而不是运算符-、-、-和"><a href="#对于基本数据类型，使用运算符-、-、-和-而不是运算符-、-、-和" class="headerlink" title="对于基本数据类型，使用运算符+、-、*和/而不是运算符+=、-=、*=和/="></a>对于基本数据类型，使用运算符<code>+</code>、<code>-</code>、<code>*</code>和<code>/</code>而不是运算符<code>+=</code>、<code>-=</code>、<code>*=</code>和<code>/=</code></h3><h3 id="延迟声明局部变量"><a href="#延迟声明局部变量" class="headerlink" title="延迟声明局部变量"></a>延迟声明局部变量</h3><ul>
+<li>声明对象变量总是涉及一个函数调用（构造函数）</li>
+<li>如果一个变量只是有时需要（例如在 <code>if</code> 语句中）只在必要时才声明，那么只有在使用这个变量的时侯才调用构造函数</li>
+</ul>
+<h3 id="对于对象，使用前缀运算符（-obj）而不是后缀运算符（obj-）"><a href="#对于对象，使用前缀运算符（-obj）而不是后缀运算符（obj-）" class="headerlink" title="对于对象，使用前缀运算符（++obj）而不是后缀运算符（obj++）"></a>对于对象，使用前缀运算符（<code>++obj</code>）而不是后缀运算符（<code>obj++</code>）</h3><ul>
+<li>这在你的光线追踪器中可能不会成为一个问题</li>
+<li>使用后缀操作符必然会对对象进行拷贝（额外调用constructor和destructor），而前缀操作符不需要临时拷贝</li>
+</ul>
+<h3 id="谨慎使用模板"><a href="#谨慎使用模板" class="headerlink" title="谨慎使用模板"></a>谨慎使用模板</h3><ul>
+<li>有时候对各种实例可能需要不同方式的优化</li>
+<li>标准模板库优化得相当好，但如果你打算实现交互式光线追踪器，我会避免使用它</li>
+<li>为什么？通过自己实现它，你会知道它使用的算法，所以你会知道使用代码的最有效方式</li>
+<li>更重要的是，我的经验是：STL库的调试编译很慢。 通常情况下，这不是一个问题，除非你需要使用调试版本进行性能剖析。 你会发现STL构造、迭代等使用了15％以上的运行时间，这可能会使性能剖析报告输出很混乱</li>
+</ul>
+<h3 id="在计算过程中避免动态内存分配"><a href="#在计算过程中避免动态内存分配" class="headerlink" title="在计算过程中避免动态内存分配"></a>在计算过程中避免动态内存分配</h3><ul>
+<li>动态内存非常适用于存储场景和其他在计算过程中不改变的数据</li>
+<li>然而，在许多（大多数）系统上，动态内存分配需要使用锁来控制对分配器的访问。对于使用动态内存的多线程应用程序，由于需要等待分配和释放内存，增加额外的处理器实际上可能会导致速度减慢</li>
+<li>即使是单线程的应用程序，在堆上分配内存也比在堆上添加内存要昂贵。 操作系统需要进行一些计算来找到一个大小合适的内存块</li>
+</ul>
+<h3 id="查找并且利用系统内存缓存相关的信息"><a href="#查找并且利用系统内存缓存相关的信息" class="headerlink" title="查找并且利用系统内存缓存相关的信息"></a>查找并且利用系统内存缓存相关的信息</h3><ul>
+<li>如果一个数据结构适合在一个缓存行中，那么只需要从主内存中提取一次就可以处理整个类</li>
+<li>确保所有数据结构都和cache line边界对齐。 （假设你的数据结构和缓存行都是 128 字节，如果你的结构的 1 个字节在第一个缓存行中，而其他 127 个字节在第二个缓存行中，性能仍然会很差）</li>
+</ul>
+<h3 id="避免不必要的数据初始化"><a href="#避免不必要的数据初始化" class="headerlink" title="避免不必要的数据初始化"></a>避免不必要的数据初始化</h3><ul>
+<li>如果你必须初始化一大块内存，考虑使用<code>memset()</code></li>
+</ul>
+<h3 id="尽量提前结束循环和提前返回函数"><a href="#尽量提前结束循环和提前返回函数" class="headerlink" title="尽量提前结束循环和提前返回函数"></a>尽量提前结束循环和提前返回函数</h3><ul>
+<li>考虑将一条射线和一个三角形相交。常见的情况是，射线会错过三角形。因此，这应该被优化</li>
+<li>如果你决定让射线与三角形平面相交，如果射线平面相交的t值为负数，你可以立即返回。 这样你就可以跳过大约一半的射线与三角形相交处的重心坐标计算。这是个大胜利。一旦你知道没有相交发生，相交函数就应该退出</li>
+<li>同样，有些循环可以提前终止。 例如，在拍摄阴影射线时，最近的交叉点的位置是不必要的。 一旦发现任何结论性的相交点，相交程序就可以返回</li>
+</ul>
+<h3 id="在纸上简化你的公式"><a href="#在纸上简化你的公式" class="headerlink" title="在纸上简化你的公式"></a>在纸上简化你的公式</h3><ul>
+<li>在许多方程中，等式两边的项会被抵消……要么总是如此，要么在某些特殊情况下如此</li>
+<li>编译器无法找到这些简化，但你可以。只是消除内循环中一些耗时的操作，比其他需要优化好几天的地方更事半功倍</li>
+</ul>
+<h3 id="integers、fixed-points、32-bit-floats、64-bit-double-在数学运算之间的差别并不像你想象的那么大"><a href="#integers、fixed-points、32-bit-floats、64-bit-double-在数学运算之间的差别并不像你想象的那么大" class="headerlink" title="integers、fixed-points、32-bit floats、64-bit double 在数学运算之间的差别并不像你想象的那么大"></a>integers、fixed-points、32-bit floats、64-bit double 在数学运算之间的差别并不像你想象的那么大</h3><ul>
+<li>在现代 CPU 上，浮点运算与整数运算的吞吐量基本相同。在光线追踪等计算密集型程序中，这导致整数和浮点成本之间的差异可以忽略不计。这意味着，您不应该特意把浮点数转成整数再运算</li>
+<li>双精度浮点运算可能并不比单精度浮点运算慢，特别是在64位机器上。我见过在同一台机器上，射线追踪器使用所有的双精度运算比所有的浮点运算更快。我也看到过相反的情况</li>
+</ul>
+<h3 id="考虑重新表述你的数学的方法，以消除耗时的操作"><a href="#考虑重新表述你的数学的方法，以消除耗时的操作" class="headerlink" title="考虑重新表述你的数学的方法，以消除耗时的操作"></a>考虑重新表述你的数学的方法，以消除耗时的操作</h3><ul>
+<li><code>sqrt()</code>通常是可以避免的，特别是在比较值的平方时可以得到相同的结果</li>
+<li>如果你反复除以x，可以考虑计算$\frac{1}{x}$并乘以结果。这曾经是向量归一化的一个大赢家（3次除法），但我最近发现它现在是一个折腾的过程。 然而，如果你做的除法超过3次，它应该还是有好处的</li>
+<li>如果你执行一个循环，确保在迭代之间没有变化的计算被拉出循环</li>
+<li>考虑是否可以在一个循环中增量计算数值（而不是每次迭代都从头计算）</li>
+</ul>
+<h2 id="待续"><a href="#待续" class="headerlink" title="待续"></a>待续</h2><p><a target="_blank" rel="noopener" href="https://www.eventhelix.com/embedded/optimizing-c-and-cpp-code/">https://www.eventhelix.com/embedded/optimizing-c-and-cpp-code/</a></p>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
+              <a href="/tags/%E4%BC%98%E5%8C%96/" rel="tag"># 优化</a>
+              <a href="/tags/%E7%BF%BB%E8%AF%91-%E7%90%86%E8%A7%A3/" rel="tag"># 翻译/理解</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/ae479ce2.html" rel="prev" title="游戏：AI相关">
+      <i class="fa fa-chevron-left"></i> 游戏：AI相关
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/d8921827.html" rel="next" title="Modern C++: 语法糖">
+      Modern C++: 语法糖 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E6%96%87"><span class="nav-number">2.</span> <span class="nav-text">原文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BF%BB%E8%AF%91-%E8%AE%B0%E5%BD%95"><span class="nav-number">3.</span> <span class="nav-text">翻译&#x2F;记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%B0%E4%BD%8F%E9%98%BF%E5%A7%86%E8%BE%BE%E5%B0%94%EF%BC%88Ahmdal%EF%BC%89%E5%AE%9A%E5%BE%8B"><span class="nav-number">3.1.</span> <span class="nav-text">记住阿姆达尔（Ahmdal）定律:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%88%E7%BC%96%E5%86%99%E4%BB%A3%E7%A0%81%E4%BB%A5%E8%8E%B7%E5%BE%97%E6%AD%A3%E7%A1%AE%E6%80%A7%EF%BC%8C%E7%84%B6%E5%90%8E%E5%86%8D%E4%BC%98%E5%8C%96%EF%BC%81"><span class="nav-number">3.2.</span> <span class="nav-text">先编写代码以获得正确性，然后再优化！</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%91%E8%AE%A4%E8%AF%86%E7%9A%84%E9%82%A3%E4%BA%9B%E7%BC%96%E5%86%99%E9%9D%9E%E5%B8%B8%E9%AB%98%E6%95%88%E7%9A%84%E4%BB%A3%E7%A0%81%E7%9A%84%E4%BA%BA%E8%AF%B4%EF%BC%8C%E4%BB%96%E4%BB%AC%E4%BC%98%E5%8C%96%E4%BB%A3%E7%A0%81%E7%9A%84%E6%97%B6%E9%97%B4%E8%87%B3%E5%B0%91%E6%98%AF%E7%BC%96%E5%86%99%E4%BB%A3%E7%A0%81%E7%9A%84%E4%B8%A4%E5%80%8D"><span class="nav-number">3.3.</span> <span class="nav-text">我认识的那些编写非常高效的代码的人说，他们优化代码的时间至少是编写代码的两倍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Jumps-%E8%B7%B3%E8%BD%AC-branches-%E5%88%86%E6%94%AF-%E5%BE%88%E8%B4%B5-%E5%B0%BD%E5%8F%AF%E8%83%BD%E5%87%8F%E5%B0%91%E5%AE%83%E4%BB%AC%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">3.4.</span> <span class="nav-text">Jumps(跳转)&#x2F;branches(分支) 很贵. 尽可能减少它们的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E6%95%B0%E7%BB%84%E7%B4%A2%E5%BC%95%E7%9A%84%E9%A1%BA%E5%BA%8F"><span class="nav-number">3.5.</span> <span class="nav-text">关注数组索引的顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C%E8%BF%90%E7%AE%97"><span class="nav-number">3.6.</span> <span class="nav-text">关注指令级并行运算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%BF%E5%85%8D-%E5%87%8F%E5%B0%91%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">3.7.</span> <span class="nav-text">避免&#x2F;减少局部变量的数量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%8F%E5%B0%91%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">3.8.</span> <span class="nav-text">减少函数参数的数量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E5%BC%95%E7%94%A8%E4%BC%A0%E9%80%92struct-%E7%BB%93%E6%9E%84-%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E9%80%9A%E8%BF%87%E5%80%BC"><span class="nav-number">3.9.</span> <span class="nav-text">通过引用传递struct(结构)，而不是通过值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E4%BD%A0%E4%B8%8D%E9%9C%80%E8%A6%81%E4%B8%80%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84%E8%BF%94%E5%9B%9E%E5%80%BC%EF%BC%8C%E5%B0%B1%E4%B8%8D%E8%A6%81%E5%AE%9A%E4%B9%89%E4%B8%80%E4%B8%AA"><span class="nav-number">3.10.</span> <span class="nav-text">如果你不需要一个函数的返回值，就不要定义一个</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%BD%E9%87%8F%E9%81%BF%E5%85%8Dcasting%EF%BC%88%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2%EF%BC%89"><span class="nav-number">3.11.</span> <span class="nav-text">尽量避免casting（强制类型转换）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E-C-%E5%AF%B9%E8%B1%A1%E5%8F%98%E9%87%8F%E6%97%B6%E8%A6%81%E9%9D%9E%E5%B8%B8%E5%B0%8F%E5%BF%83"><span class="nav-number">3.12.</span> <span class="nav-text">声明 C++ 对象变量时要非常小心</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A9%E9%BB%98%E8%AE%A4%E7%9A%84%E7%B1%BB%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E5%B0%BD%E5%8F%AF%E8%83%BD%E8%BD%BB%E5%B7%A7"><span class="nav-number">3.13.</span> <span class="nav-text">让默认的类构造函数尽可能轻巧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%BD%E5%8F%AF%E8%83%BD%E4%BD%BF%E7%94%A8%E4%BD%8D%E6%93%8D%E4%BD%9C"><span class="nav-number">3.14.</span> <span class="nav-text">尽可能使用位操作&gt;&gt;, &lt;&lt;代替整数乘法和除法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%A8%E6%85%8E%E4%BD%BF%E7%94%A8%E8%A1%A8%E6%A0%BC%E6%9F%A5%E8%AF%A2%E5%8A%9F%E8%83%BD"><span class="nav-number">3.15.</span> <span class="nav-text">谨慎使用表格查询功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E%E5%A4%A7%E5%A4%9A%E6%95%B0%E5%AF%B9%E8%B1%A1%E7%B1%BB%E5%9E%8B%EF%BC%8C%E4%BD%BF%E7%94%A8%E8%BF%90%E7%AE%97%E7%AC%A6-%E3%80%81-%E3%80%81-%E5%92%8C-%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E8%BF%90%E7%AE%97%E7%AC%A6-%E3%80%81-%E3%80%81-%E5%92%8C"><span class="nav-number">3.16.</span> <span class="nav-text">对于大多数对象类型，使用运算符+&#x3D;、-&#x3D;、*&#x3D;和&#x2F;&#x3D;，而不是运算符+、-、*和&#x2F;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%EF%BC%8C%E4%BD%BF%E7%94%A8%E8%BF%90%E7%AE%97%E7%AC%A6-%E3%80%81-%E3%80%81-%E5%92%8C-%E8%80%8C%E4%B8%8D%E6%98%AF%E8%BF%90%E7%AE%97%E7%AC%A6-%E3%80%81-%E3%80%81-%E5%92%8C"><span class="nav-number">3.17.</span> <span class="nav-text">对于基本数据类型，使用运算符+、-、*和&#x2F;而不是运算符+&#x3D;、-&#x3D;、*&#x3D;和&#x2F;&#x3D;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F%E5%A3%B0%E6%98%8E%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F"><span class="nav-number">3.18.</span> <span class="nav-text">延迟声明局部变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E%E5%AF%B9%E8%B1%A1%EF%BC%8C%E4%BD%BF%E7%94%A8%E5%89%8D%E7%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%EF%BC%88-obj%EF%BC%89%E8%80%8C%E4%B8%8D%E6%98%AF%E5%90%8E%E7%BC%80%E8%BF%90%E7%AE%97%E7%AC%A6%EF%BC%88obj-%EF%BC%89"><span class="nav-number">3.19.</span> <span class="nav-text">对于对象，使用前缀运算符（++obj）而不是后缀运算符（obj++）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%A8%E6%85%8E%E4%BD%BF%E7%94%A8%E6%A8%A1%E6%9D%BF"><span class="nav-number">3.20.</span> <span class="nav-text">谨慎使用模板</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B%E4%B8%AD%E9%81%BF%E5%85%8D%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D"><span class="nav-number">3.21.</span> <span class="nav-text">在计算过程中避免动态内存分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE%E5%B9%B6%E4%B8%94%E5%88%A9%E7%94%A8%E7%B3%BB%E7%BB%9F%E5%86%85%E5%AD%98%E7%BC%93%E5%AD%98%E7%9B%B8%E5%85%B3%E7%9A%84%E4%BF%A1%E6%81%AF"><span class="nav-number">3.22.</span> <span class="nav-text">查找并且利用系统内存缓存相关的信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84%E6%95%B0%E6%8D%AE%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">3.23.</span> <span class="nav-text">避免不必要的数据初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%BD%E9%87%8F%E6%8F%90%E5%89%8D%E7%BB%93%E6%9D%9F%E5%BE%AA%E7%8E%AF%E5%92%8C%E6%8F%90%E5%89%8D%E8%BF%94%E5%9B%9E%E5%87%BD%E6%95%B0"><span class="nav-number">3.24.</span> <span class="nav-text">尽量提前结束循环和提前返回函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E7%BA%B8%E4%B8%8A%E7%AE%80%E5%8C%96%E4%BD%A0%E7%9A%84%E5%85%AC%E5%BC%8F"><span class="nav-number">3.25.</span> <span class="nav-text">在纸上简化你的公式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#integers%E3%80%81fixed-points%E3%80%8132-bit-floats%E3%80%8164-bit-double-%E5%9C%A8%E6%95%B0%E5%AD%A6%E8%BF%90%E7%AE%97%E4%B9%8B%E9%97%B4%E7%9A%84%E5%B7%AE%E5%88%AB%E5%B9%B6%E4%B8%8D%E5%83%8F%E4%BD%A0%E6%83%B3%E8%B1%A1%E7%9A%84%E9%82%A3%E4%B9%88%E5%A4%A7"><span class="nav-number">3.26.</span> <span class="nav-text">integers、fixed-points、32-bit floats、64-bit double 在数学运算之间的差别并不像你想象的那么大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%80%83%E8%99%91%E9%87%8D%E6%96%B0%E8%A1%A8%E8%BF%B0%E4%BD%A0%E7%9A%84%E6%95%B0%E5%AD%A6%E7%9A%84%E6%96%B9%E6%B3%95%EF%BC%8C%E4%BB%A5%E6%B6%88%E9%99%A4%E8%80%97%E6%97%B6%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="nav-number">3.27.</span> <span class="nav-text">考虑重新表述你的数学的方法，以消除耗时的操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%85%E7%BB%AD"><span class="nav-number">4.</span> <span class="nav-text">待续</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '1f926cd2ead7a8b8234d642f0f665d89',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

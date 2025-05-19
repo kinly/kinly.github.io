@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="apollo config C++(20) client">
+<meta property="og:type" content="article">
+<meta property="og:title" content="apollo config C++(20) client">
+<meta property="og:url" content="https://klysisle.space/archives/38b805bc.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="apollo config C++(20) client">
+<meta property="og:locale">
+<meta property="article:published_time" content="2025-04-19T09:40:48.000Z">
+<meta property="article:modified_time" content="2025-04-19T09:49:13.988Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="apollo config">
+<meta property="article:tag" content="配置中心">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://klysisle.space/archives/38b805bc.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>apollo config C++(20) client | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/38b805bc.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          apollo config C++(20) client
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-04-19 17:40:48 / 修改时间：17:49:13" itemprop="dateCreated datePublished" datetime="2025-04-19T17:40:48+08:00">2025-04-19</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">apollo config C++(20) client</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="apollo-config-C-20-client"><a href="#apollo-config-C-20-client" class="headerlink" title="apollo config C++(20) client"></a>apollo config C++(20) client</h2><ul>
+<li>源码：<a target="_blank" rel="noopener" href="https://github.com/kinly/apollo_config-cli">https://github.com/kinly/apollo_config-cli</a></li>
+</ul>
+<h3 id="apollo-or-nacos"><a href="#apollo-or-nacos" class="headerlink" title="apollo or nacos"></a>apollo or nacos</h3><ul>
+<li>两个最小化部署简单试用了一下</li>
+<li>最终选择 apollo 主要有是：<ul>
+<li>权限隔离：修改、提交的权限可以隔离开，实际应用中这点还挺重要的（nacos可能也有类似功能，暂时没有使用到）</li>
+<li>页面配置方式更简洁</li>
+<li>灰度的支持</li>
+<li>之前用过更熟悉</li>
+</ul>
+</li>
+</ul>
+<h3 id="client-实现"><a href="#client-实现" class="headerlink" title="client 实现"></a>client 实现</h3><ul>
+<li><p><strong>核心功能</strong></p>
+<ul>
+<li>配置拉取与缓存</li>
+<li>线程安全配置访问</li>
+<li>HTTP 长轮询（long poll）监听变更</li>
+<li>多命名空间隔离管理</li>
+<li>IP 感知路由支持(灰度)</li>
+</ul>
+</li>
+<li><p><strong>其他</strong></p>
+<ul>
+<li>熔断器（circuit breaker）</li>
+<li><code>callback thread pool</code> TODO: 线程池已经实现，但是总觉得这里放一个线程池有点重，期望是做成切片的方式，由外部决定 callback 怎么处理，但是又会涉及另一个问题如果外部是阻塞的，那么代码里的那个锁会很长。</li>
+<li>而且这里涉及一次数据拷贝，暂时还没太想好怎么做才最好 （<code>trigger_callbacks</code> 函数调用 <code>cb(key, value);</code> 的地方）</li>
+</ul>
+</li>
+<li><p><strong>过程中的问题记录</strong></p>
+<ul>
+<li><code>apollo</code> 服务端 status &#x3D; 304 时没有 body，<code>cpp-httplib</code> 不设置 <code>response function</code> 的情况下会取不到 <code>304</code> 这个 status code，考虑了下还是需要就加上了</li>
+<li><code>apollo</code> 的返回 header 里没有 <code>content-length</code> …. 不太友好 <code>response_body</code> 的 <code>reserve</code> 没有意义了（还是保留在这里了，之后看下 apollo 实现看能不能改掉）</li>
+<li><code>cpp-httplib</code> 里的 <code>encode_url</code> 结果对 <code>apollo</code> 是不够的，所以有了这个函数：<code>strict_url_encode</code></li>
+<li><code>apollo</code> 有更新再拉取的时候也是全量的，一度考虑做个比较器，比较后只 callback 增量给应用方….（暂时还没有实现，<code>namespace_data</code> 结构里保留了 notification_id、messages 信息，应该可以用这两个信息先对比下再看是否要遍历区分这个namespace里是否有更新）</li>
+<li><code>process_config_response</code> 的实现是直接替换了整个 <code>namespace_data</code>, 主要是省事，后面 <code>process_notifications</code> 会再把 <code>notificationId</code>, <code>messages</code> 信息更新掉，再次 <code>fetch_config</code> 时没有变更也会只得到 <code>304</code> 的 status code</li>
+</ul>
+</li>
+</ul>
+<h3 id="依赖要求"><a href="#依赖要求" class="headerlink" title="依赖要求"></a>依赖要求</h3><ul>
+<li>C++20 编译器</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/yhirose/cpp-httplib">cpp-httplib</a> (v0.12.1+)</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/nlohmann/json">nlohmann&#x2F;json</a> (v3.11.2+)</li>
+</ul>
+<h3 id="基础使用"><a href="#基础使用" class="headerlink" title="基础使用"></a>基础使用</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">apollo_test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">using</span> <span class="keyword">namespace</span> apollo::client;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 创建客户端</span></span><br><span class="line">  <span class="keyword">auto</span> client = apollo_client::<span class="built_in">create</span>(<span class="string">&quot;http://localhost:8080&quot;</span>, <span class="string">&quot;cats&quot;</span>, <span class="string">&quot;dev&quot;</span>, <span class="string">&quot;192.168.100.1&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 注册回调</span></span><br><span class="line">  client-&gt;<span class="built_in">register_callback</span>(<span class="string">&quot;application&quot;</span>, <span class="string">&quot;login.port&quot;</span>, [](std::string_view key, std::string_view value) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;application login.port updated to: &quot;</span> &lt;&lt; value &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  client-&gt;<span class="built_in">register_callback</span>(<span class="string">&quot;application&quot;</span>, <span class="string">&quot;game.port&quot;</span>, [](std::string_view key, std::string_view value) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;application game.port changed to: &quot;</span> &lt;&lt; value &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 添加命名空间</span></span><br><span class="line">  client-&gt;<span class="built_in">add_namespace</span>(<span class="string">&quot;application&quot;</span>);</span><br><span class="line">  client-&gt;<span class="built_in">add_namespace</span>(<span class="string">&quot;cats.tables&quot;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 启动客户端</span></span><br><span class="line">  client-&gt;<span class="built_in">start</span>();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 主循环</span></span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="comment">// if (auto val = client.get_value(&quot;database&quot;, &quot;timeout&quot;)) &#123;</span></span><br><span class="line">    <span class="comment">//   std::cout &lt;&lt; &quot;Current timeout: &quot; &lt;&lt; *val &lt;&lt; &quot;\n&quot;;</span></span><br><span class="line">    <span class="comment">// &#125;</span></span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">5</span>));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h4 id="update-message"><a href="#update-message" class="headerlink" title="update message"></a>update message</h4><ul>
+<li>2025-04-08 把 nlohmann json 替换成了 simdjson。最开始理解错误了 simdjson 的 iterate_many 接口，以为是增量解析的；issue 里看到了一些关于增量解析的讨论，期望后续有相关实现<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/simdjson/simdjson/issues/128">https://github.com/simdjson/simdjson/issues/128</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/simdjson/simdjson/issues/1356">https://github.com/simdjson/simdjson/issues/1356</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/simdjson/simdjson/issues/1135">https://github.com/simdjson/simdjson/issues/1135</a></li>
+</ul>
+</li>
+</ul>
+<h4 id="熔断器"><a href="#熔断器" class="headerlink" title="熔断器"></a>熔断器</h4><ul>
+<li>这个熔断器比较简单，失败超过一定次数就以幂值延长等待时间</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">util::circuit_breaker::config cb_cfg&#123;</span><br><span class="line">  .max_failures_before_cooldown = <span class="number">10</span>,</span><br><span class="line">  .get_delay = util::circuit_breaker::config::<span class="built_in">create_exponential_backoff</span>(<span class="number">500</span>, <span class="number">1.5</span>),</span><br><span class="line">  .cooldown_duration = std::chrono::<span class="built_in">seconds</span>(<span class="number">45</span>)</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">client-&gt;<span class="built_in">set_breaker_config</span>(cb_cfg); <span class="comment">// 自定义熔断策略</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h4><ul>
+<li>相比传统线程池，增加了按照 hash_key 固定任务到某个线程</li>
+<li>主要也是想给游戏服务端的存储DB使用，玩家ID作为 hash_key，这样单个玩家的数据库操作是在一个线程有序执行的</li>
+<li>（也可能是这个线程池设计如此的关系，觉得直接用在 apollo client 里有点重度</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">util::thread_pool <span class="title">pool</span><span class="params">(<span class="number">8</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">pool.<span class="built_in">submit</span>(<span class="string">&quot;user_123&quot;</span>, []&#123;</span><br><span class="line">    <span class="comment">// 保证相同路由键的任务顺序执行</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="TODO"><a href="#TODO" class="headerlink" title="TODO:"></a>TODO:</h4><ul>
+<li>callback 的线程问题，最简单的方式是丢到 <code>std::async</code> 里，目前是在网络线程同步调用的，后面根据实际使用修改</li>
+<li>apollo fetch 到的内容是完整的，也就是整个 <code>namespace</code> 下的东西都会被 <code>fetch</code> 下来，这个最终到底是封装到 client 里合适还是丢到外面处理合适暂时还不确定</li>
+<li>如果遇到配置依赖：<code>shop</code> 配置检查 <code>item</code> 配置里是否有对应的 <code>item_id</code>，那么遇到 <code>shop</code> 配置更新回调先于 <code>item</code> 配置更新传递到外部，应该如何处理</li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C++</a>
+              <a href="/tags/apollo-config/" rel="tag"># apollo config</a>
+              <a href="/tags/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" rel="tag"># 配置中心</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/63e4b7b2.html" rel="prev" title="快速笔记:域名中使用下划线的限制">
+      <i class="fa fa-chevron-left"></i> 快速笔记:域名中使用下划线的限制
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/fa403e19.html" rel="next" title="快速笔记：inline namespace">
+      快速笔记：inline namespace <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#apollo-config-C-20-client"><span class="nav-number">1.</span> <span class="nav-text">apollo config C++(20) client</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#apollo-or-nacos"><span class="nav-number">1.1.</span> <span class="nav-text">apollo or nacos</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#client-%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.</span> <span class="nav-text">client 实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E8%A6%81%E6%B1%82"><span class="nav-number">1.3.</span> <span class="nav-text">依赖要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E4%BD%BF%E7%94%A8"><span class="nav-number">1.4.</span> <span class="nav-text">基础使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96"><span class="nav-number">1.5.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#update-message"><span class="nav-number">1.5.1.</span> <span class="nav-text">update message</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%86%94%E6%96%AD%E5%99%A8"><span class="nav-number">1.5.2.</span> <span class="nav-text">熔断器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0"><span class="nav-number">1.5.3.</span> <span class="nav-text">线程池</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TODO"><span class="nav-number">1.5.4.</span> <span class="nav-text">TODO:</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : 'fa344558640c38a4f97ab0519e4c47c1',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="random helper：范围、权重随机算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="random helper：范围、权重随机算法">
+<meta property="og:url" content="https://klysisle.space/archives/eba4529e.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="random helper：范围、权重随机算法">
+<meta property="og:locale">
+<meta property="article:published_time" content="2025-04-28T02:30:33.000Z">
+<meta property="article:modified_time" content="2025-05-14T07:53:04.398Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="c++">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://klysisle.space/archives/eba4529e.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>random helper：范围、权重随机算法 | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/eba4529e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          random helper：范围、权重随机算法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-04-28 10:30:33" itemprop="dateCreated datePublished" datetime="2025-04-28T10:30:33+08:00">2025-04-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-05-14 15:53:04" itemprop="dateModified" datetime="2025-05-14T15:53:04+08:00">2025-05-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">random helper：范围、权重随机算法</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="inlay-random"><a href="#inlay-random" class="headerlink" title="inlay::random"></a>inlay::random</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/kinly/random_helper.git">https://github.com/kinly/random_helper.git</a></li>
+</ul>
+<p>一个高性能、线程安全的 C++ 随机数工具库，支持线程局部随机引擎、通用区间采样函数 <code>range</code>，以及三种不同策略的权重采样器（Alias、Expansion、Binary）。</p>
+<h2 id="特性-Features"><a href="#特性-Features" class="headerlink" title="特性 Features"></a>特性 Features</h2><ul>
+<li>💡 线程局部随机引擎封装：<code>thread_rng()</code></li>
+<li>🎲 通用区间采样函数：<code>range(min, max)</code></li>
+<li>📦 三种权重采样器：<ul>
+<li><code>weight_faster_alias</code>: O(1) 采样，适合频繁调用</li>
+<li><code>weight_faster_expansion</code>: 极致快速采样，适合小权重集合</li>
+<li><code>weight_faster_binary</code>: 适合通用场景，支持整数&#x2F;浮点权重</li>
+</ul>
+</li>
+</ul>
+<h2 id="示例-Example"><a href="#示例-Example" class="headerlink" title="示例 Example"></a>示例 Example</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;random.hpp&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  std::vector&lt;<span class="type">int</span>&gt; values&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>&#125;;</span><br><span class="line">  std::vector&lt;<span class="type">double</span>&gt; weights&#123;<span class="number">0.1</span>, <span class="number">0.2</span>, <span class="number">0.3</span>, <span class="number">0.4</span>&#125;;</span><br><span class="line"></span><br><span class="line">  inlay::<span class="function">random::weight_faster_alias&lt;<span class="type">int</span>&gt; <span class="title">sampler</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">      values.begin(), values.end(),</span></span></span><br><span class="line"><span class="params"><span class="function">      weights.begin(), weights.end()</span></span></span><br><span class="line"><span class="params"><span class="function">  )</span></span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="built_in">sampler</span>() &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="性能比较-Benchmark"><a href="#性能比较-Benchmark" class="headerlink" title="性能比较 Benchmark"></a>性能比较 Benchmark</h2><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>初始化复杂度</th>
+<th>采样复杂度</th>
+<th>适用场景说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Alias</code></td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>高频采样、浮点权重</td>
+</tr>
+<tr>
+<td><code>Expansion</code></td>
+<td>O(n × w)</td>
+<td>O(1)</td>
+<td>小权重集合、最快采样</td>
+</tr>
+<tr>
+<td><code>Binary</code></td>
+<td>O(n)</td>
+<td>O(log n)</td>
+<td>通用、整数权重优先</td>
+</tr>
+</tbody></table>
+<h2 id="编译要求"><a href="#编译要求" class="headerlink" title="编译要求"></a>编译要求</h2><ul>
+<li>C++20 及以上（仅少量语法）</li>
+<li>无第三方依赖（仅 STL）</li>
+</ul>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2><ul>
+<li><input disabled="" type="checkbox"> 添加更多采样策略支持</li>
+<li><input disabled="" type="checkbox"> 支持分布策略插件式扩展</li>
+</ul>
+<h2 id="信息备忘"><a href="#信息备忘" class="headerlink" title="信息备忘"></a>信息备忘</h2><blockquote>
+<blockquote>
+<p>引擎（Engine）：像是一台骰子机，不停地吐出“基础随机数”。</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>分布（Distribution）：是一个数学过滤器，告诉你“这些随机数应该分布成什么样子”。</p>
+</blockquote>
+</blockquote>
+<ul>
+<li>如何选择随机引擎</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>应用场景</th>
+<th>推荐引擎</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>游戏中的非关键随机行为</td>
+<td>default_random_engine 或 minstd_rand</td>
+<td>快速，易于使用</td>
+</tr>
+<tr>
+<td>科学模拟</td>
+<td>mt19937 或 ranlux48</td>
+<td>高质量随机数</td>
+</tr>
+<tr>
+<td>加密相关</td>
+<td>❌ 不使用这些引擎</td>
+<td>请使用 std::random_device + 专业加密库</td>
+</tr>
+<tr>
+<td>教学 &#x2F; 学习</td>
+<td>minstd_rand, knuth_b</td>
+<td>简单，容易理解</td>
+</tr>
+<tr>
+<td>嵌入式系统</td>
+<td>minstd_rand0</td>
+<td>小内存，占用低</td>
+</tr>
+<tr>
+<td>跨平台一致性要求</td>
+<td>明确指定 mt19937 并使用固定种子</td>
+<td>保证可重现性</td>
+</tr>
+</tbody></table>
+<ul>
+<li>常见分布种类及用途</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>分布名称</th>
+<th>类名</th>
+<th>描述</th>
+<th>典型用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>均匀整数分布</td>
+<td>std::uniform_int_distribution</td>
+<td>等概率生成某范围内的整数</td>
+<td>抽奖、骰子、游戏事件</td>
+</tr>
+<tr>
+<td>均匀实数分布</td>
+<td>std::uniform_real_distribution</td>
+<td>生成实数范围内等概率值</td>
+<td>物理模拟、归一化值</td>
+</tr>
+<tr>
+<td>伯努利分布</td>
+<td>std::bernoulli_distribution</td>
+<td>成功概率 p 的二项分布（0 或 1）</td>
+<td>掷硬币、概率判断</td>
+</tr>
+<tr>
+<td>二项分布</td>
+<td>std::binomial_distribution</td>
+<td>n 次试验中成功次数</td>
+<td>离散事件成功次数模拟</td>
+</tr>
+<tr>
+<td>几何分布</td>
+<td>std::geometric_distribution</td>
+<td>成功一次前失败的次数</td>
+<td>等待第一次成功的模型</td>
+</tr>
+<tr>
+<td>泊松分布</td>
+<td>std::poisson_distribution</td>
+<td>单位时间内事件发生次数</td>
+<td>网络包、电话中心模拟</td>
+</tr>
+<tr>
+<td>正态分布（高斯）</td>
+<td>std::normal_distribution</td>
+<td>钟形曲线</td>
+<td>噪声、误差模拟、机器学习初始化</td>
+</tr>
+<tr>
+<td>对数正态分布</td>
+<td>std::lognormal_distribution</td>
+<td>变量对数正态分布</td>
+<td>股票收益、金融模型</td>
+</tr>
+<tr>
+<td>指数分布</td>
+<td>std::exponential_distribution</td>
+<td>时间间隔模拟</td>
+<td>排队、寿命建模</td>
+</tr>
+<tr>
+<td>gamma 分布</td>
+<td>std::gamma_distribution</td>
+<td>广义泊松时间间隔</td>
+<td>生物模型、贝叶斯方法</td>
+</tr>
+<tr>
+<td>Weibull 分布</td>
+<td>std::weibull_distribution</td>
+<td>产品寿命分析</td>
+<td>工业可靠性</td>
+</tr>
+<tr>
+<td>extreme value 分布</td>
+<td>std::extreme_value_distribution</td>
+<td>极端事件概率</td>
+<td>风速、洪水预测</td>
+</tr>
+</tbody></table>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/c/" rel="tag"># c++</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/fa403e19.html" rel="prev" title="快速笔记：inline namespace">
+      <i class="fa fa-chevron-left"></i> 快速笔记：inline namespace
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/c3812e38.html" rel="next" title="在使用 Cursor 半个月后，我总结了这些使用心得">
+      在使用 Cursor 半个月后，我总结了这些使用心得 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#inlay-random"><span class="nav-number">1.</span> <span class="nav-text">inlay::random</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E6%80%A7-Features"><span class="nav-number">2.</span> <span class="nav-text">特性 Features</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-Example"><span class="nav-number">3.</span> <span class="nav-text">示例 Example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E6%AF%94%E8%BE%83-Benchmark"><span class="nav-number">4.</span> <span class="nav-text">性能比较 Benchmark</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E8%A6%81%E6%B1%82"><span class="nav-number">5.</span> <span class="nav-text">编译要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TODO"><span class="nav-number">6.</span> <span class="nav-text">TODO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E5%A4%87%E5%BF%98"><span class="nav-number">7.</span> <span class="nav-text">信息备忘</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '3dcea4cfd47a88a0298ecd0d7c56df91',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="记录：简易CD-Key算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录：简易CD-Key算法">
+<meta property="og:url" content="https://klysisle.space/archives/1206f424.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="记录：简易CD-Key算法">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-06-15T07:09:32.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.709Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="常用备忘">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://klysisle.space/archives/1206f424.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>记录：简易CD-Key算法 | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/1206f424.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记录：简易CD-Key算法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-15 15:09:32" itemprop="dateCreated datePublished" datetime="2021-06-15T15:09:32+08:00">2021-06-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E5%A4%87%E5%BF%98/" itemprop="url" rel="index"><span itemprop="name">知识备忘</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">记录：简易CD-Key算法</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><p>工作业务需求，生成一批随机的CD-Key，要求如下</p>
+<ul>
+<li>随机长度10-15字符（大写英文字母+数字）</li>
+<li>带一个自定义前缀用来区分 CD-Key 的批次</li>
+<li>一个批次内不重复</li>
+<li>一个批次的生成以万为数量级</li>
+</ul>
+<p><code>其实是个很简单uuid就好，用语言的set/hashset特性去重，实际写的时候用了觉得会更快的方式</code></p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><h4 id="基于洗牌算法"><a href="#基于洗牌算法" class="headerlink" title="基于洗牌算法"></a>基于洗牌算法</h4><ul>
+<li>因为考虑一些字符：1,L,0,O 显示区分上有点烦就考虑去掉这些字符（虽然没有这个需求，后面策划觉得一般都是复制粘贴使用的，这个需求也不重要）</li>
+<li>这样相当于在一些字符里面随机<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">source_list = [<span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;3&#x27;</span>, <span class="string">&#x27;4&#x27;</span>, <span class="string">&#x27;5&#x27;</span>, <span class="string">&#x27;6&#x27;</span>, <span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;8&#x27;</span>, <span class="string">&#x27;9&#x27;</span>,</span><br><span class="line">                <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;G&#x27;</span>, <span class="string">&#x27;H&#x27;</span>,</span><br><span class="line">                <span class="string">&#x27;J&#x27;</span>, <span class="string">&#x27;K&#x27;</span>, <span class="string">&#x27;L&#x27;</span>, <span class="string">&#x27;M&#x27;</span>, <span class="string">&#x27;N&#x27;</span>, <span class="string">&#x27;P&#x27;</span>, <span class="string">&#x27;Q&#x27;</span>, <span class="string">&#x27;R&#x27;</span>,</span><br><span class="line">                <span class="string">&#x27;S&#x27;</span>, <span class="string">&#x27;T&#x27;</span>, <span class="string">&#x27;U&#x27;</span>, <span class="string">&#x27;V&#x27;</span>, <span class="string">&#x27;W&#x27;</span>, <span class="string">&#x27;X&#x27;</span>, <span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;Z&#x27;</span>]</span><br></pre></td></tr></table></figure></li>
+<li>然后第一个想到的就是洗牌了</li>
+<li>具体实现：比如要生成10长度的串，极端情况这个串里都是相同的字符，也就是初始随机库里每个字符先重复10次，得到新的<code>source_list</code><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rand_list = []</span><br><span class="line"><span class="keyword">for</span> src <span class="keyword">in</span> source_list:</span><br><span class="line">    <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(length):</span><br><span class="line">        rand_list.append(src)</span><br></pre></td></tr></table></figure></li>
+<li>洗牌一次就可以按照实际长度取出结果了<ul>
+<li>洗牌一次可以取出的结果个数: <code>len(source_list)</code></li>
+<li>这里没有把 <code>source_list</code> 当成一个环队列处理，当成环的话理论上可以取出更多个结果</li>
+<li>当然，这里的结果还是要依赖set&#x2F;hashset来去除重复的</li>
+</ul>
+</li>
+<li>python 代码<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">__gen_alg</span>(<span class="params">self, prefix, length, count</span>):</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">self</span>._message = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> length &lt;= <span class="number">0</span> <span class="keyword">or</span> count &lt;= <span class="number">0</span>:</span><br><span class="line">        <span class="variable language_">self</span>._message = <span class="string">&quot;!!!! [length] and [count] must &gt; 0 !!!!&quot;</span></span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    <span class="variable language_">self</span>._random_set.clear()</span><br><span class="line">    <span class="variable language_">self</span>._random_prefix = prefix</span><br><span class="line">    source_list = [<span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;3&#x27;</span>, <span class="string">&#x27;4&#x27;</span>, <span class="string">&#x27;5&#x27;</span>, <span class="string">&#x27;6&#x27;</span>, <span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;8&#x27;</span>, <span class="string">&#x27;9&#x27;</span>,</span><br><span class="line">                    <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;G&#x27;</span>, <span class="string">&#x27;H&#x27;</span>,</span><br><span class="line">                    <span class="string">&#x27;J&#x27;</span>, <span class="string">&#x27;K&#x27;</span>, <span class="string">&#x27;L&#x27;</span>, <span class="string">&#x27;M&#x27;</span>, <span class="string">&#x27;N&#x27;</span>, <span class="string">&#x27;P&#x27;</span>, <span class="string">&#x27;Q&#x27;</span>, <span class="string">&#x27;R&#x27;</span>,</span><br><span class="line">                    <span class="string">&#x27;S&#x27;</span>, <span class="string">&#x27;T&#x27;</span>, <span class="string">&#x27;U&#x27;</span>, <span class="string">&#x27;V&#x27;</span>, <span class="string">&#x27;W&#x27;</span>, <span class="string">&#x27;X&#x27;</span>, <span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;Z&#x27;</span>]</span><br><span class="line">    merge_len = length</span><br><span class="line">    rand_list = []</span><br><span class="line">    <span class="keyword">for</span> src <span class="keyword">in</span> source_list:</span><br><span class="line">        <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(merge_len):</span><br><span class="line">            rand_list.append(src)</span><br><span class="line">    total_len = <span class="built_in">len</span>(rand_list)</span><br><span class="line">    <span class="keyword">while</span> <span class="built_in">len</span>(<span class="variable language_">self</span>._random_set) &lt; count:</span><br><span class="line">        random.shuffle(rand_list)</span><br><span class="line">        index = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> index + merge_len &lt; total_len:</span><br><span class="line">            result_str = <span class="string">&#x27;&#x27;</span>.join(rand_list[index:merge_len + index])</span><br><span class="line">            index += <span class="number">1</span></span><br><span class="line">            <span class="variable language_">self</span>._random_set.add(prefix + <span class="string">&#x27;-&#x27;</span> + result_str)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="built_in">len</span>(<span class="variable language_">self</span>._random_set) &gt; count:</span><br><span class="line">        <span class="variable language_">self</span>._random_set.pop()</span><br></pre></td></tr></table></figure></li>
+<li>实际测下来，30W结果大概需要300ms，达到工具的使用</li>
+</ul>
+<h4 id="基于Hash"><a href="#基于Hash" class="headerlink" title="基于Hash"></a>基于Hash</h4><ul>
+<li>英文字符+数字的组合，这符合大部分Hash算法的特征</li>
+<li>直接拷贝库里面hash算法来处理</li>
+<li>局限性是长度最大值，当然也可以用其他办法处理掉</li>
+<li>cpp 代码<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;set&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std::chrono_literals;</span><br><span class="line"></span><br><span class="line">std::vector&lt;<span class="type">char</span>&gt; shows;</span><br><span class="line">std::vector&lt;std::vector&lt;std::string&gt;&gt; res;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">static</span> std::string <span class="title">hash</span><span class="params">(<span class="type">const</span> std::string&amp; key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">thread_local</span> std::string ret;</span><br><span class="line">    ret.<span class="built_in">clear</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">constexpr</span> <span class="type">static</span> <span class="type">uint64_t</span> _FNV_offset_basis = <span class="number">14695981039346656037ULL</span>;</span><br><span class="line">    <span class="keyword">constexpr</span> <span class="type">static</span> <span class="type">uint64_t</span> _FNV_prime = <span class="number">1099511628211ULL</span>;</span><br><span class="line">    <span class="type">uint64_t</span> _Vals[<span class="number">3</span>] = &#123; _FNV_offset_basis , _FNV_offset_basis , _FNV_offset_basis &#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> iter = key.<span class="built_in">begin</span>(); iter != key.<span class="built_in">end</span>();)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">auto</span> index = <span class="built_in">rand</span>() % <span class="number">3</span>;</span><br><span class="line">        _Vals[index] ^= <span class="built_in">static_cast</span>&lt;<span class="type">uint64_t</span>&gt;(*iter);</span><br><span class="line">        _Vals[index] *= _FNV_prime;</span><br><span class="line">        iter++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">static</span> <span class="keyword">auto</span> show_size = shows.<span class="built_in">size</span>();</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[(_Vals[<span class="number">0</span>] &amp; <span class="number">0x3FF</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">0</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">10</span>)) &gt;&gt; <span class="number">10</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">0</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">20</span>)) &gt;&gt; <span class="number">20</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">0</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">30</span>)) &gt;&gt; <span class="number">30</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">0</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">40</span>)) &gt;&gt; <span class="number">40</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">0</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">50</span>)) &gt;&gt; <span class="number">50</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[(((_Vals[<span class="number">0</span>] &amp; (<span class="number">0xFull</span> &lt;&lt; <span class="number">60</span>)) &gt;&gt; <span class="number">60</span>) | (_Vals[<span class="number">1</span>] &amp; <span class="number">0x3F</span>)) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">1</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">6</span>)) &gt;&gt; <span class="number">6</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">1</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">16</span>)) &gt;&gt; <span class="number">16</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">1</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">26</span>)) &gt;&gt; <span class="number">26</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">1</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">36</span>)) &gt;&gt; <span class="number">36</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">1</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">46</span>)) &gt;&gt; <span class="number">46</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[(((_Vals[<span class="number">1</span>] &amp; (<span class="number">0xFFull</span> &lt;&lt; <span class="number">56</span>)) &gt;&gt; <span class="number">56</span>) | (_Vals[<span class="number">2</span>] &amp; <span class="number">0x3</span>)) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">2</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">2</span>)) &gt;&gt; <span class="number">2</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">2</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">12</span>)) &gt;&gt; <span class="number">12</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">2</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">22</span>)) &gt;&gt; <span class="number">22</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">2</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">32</span>)) &gt;&gt; <span class="number">32</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">2</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">42</span>)) &gt;&gt; <span class="number">42</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">2</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">52</span>)) &gt;&gt; <span class="number">52</span>) % show_size]);</span><br><span class="line">    ret.<span class="built_in">append</span>(<span class="number">1</span>, shows[((_Vals[<span class="number">2</span>] &amp; (<span class="number">0x3FFull</span> &lt;&lt; <span class="number">54</span>)) &gt;&gt; <span class="number">54</span>) % show_size]); <span class="comment">// 不足10bit,特殊处理下</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">char</span> i = <span class="string">&#x27;A&#x27;</span>; i &lt;= <span class="string">&#x27;Z&#x27;</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        shows.<span class="built_in">emplace_back</span>(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">char</span> i = <span class="string">&#x27;2&#x27;</span>; i &lt;= <span class="string">&#x27;9&#x27;</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        shows.<span class="built_in">emplace_back</span>(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">auto</span> iter = std::<span class="built_in">remove_if</span>(shows.<span class="built_in">begin</span>(), shows.<span class="built_in">end</span>(), [](<span class="type">char</span> ch) &#123;</span><br><span class="line">        <span class="keyword">return</span> ch == <span class="string">&#x27;i&#x27;</span></span><br><span class="line">            || ch == <span class="string">&#x27;l&#x27;</span></span><br><span class="line">            || ch == <span class="string">&#x27;I&#x27;</span></span><br><span class="line">            || ch == <span class="string">&#x27;o&#x27;</span></span><br><span class="line">            || ch == <span class="string">&#x27;O&#x27;</span></span><br><span class="line">            || ch == <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    shows.<span class="built_in">erase</span>(iter, shows.<span class="built_in">end</span>());</span><br><span class="line">    <span class="keyword">auto</span> t0 = <span class="built_in">time</span>(<span class="number">0</span>);</span><br><span class="line">    <span class="built_in">srand</span>(t0);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> before = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line">    <span class="type">uint64_t</span> thread_count = <span class="number">10</span>;</span><br><span class="line">    <span class="type">uint64_t</span> count_per_thread = <span class="number">30000</span>;</span><br><span class="line">    std::vector&lt;std::thread&gt; threads;</span><br><span class="line">    res.<span class="built_in">resize</span>(thread_count);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">uint64_t</span> i = <span class="number">0</span>; i &lt; thread_count; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        threads.<span class="built_in">emplace_back</span>([i, count_per_thread]() &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> k = count_per_thread * i; k &lt; count_per_thread *(i + <span class="number">1</span>); ++k)</span><br><span class="line">            &#123;</span><br><span class="line">                res[i].<span class="built_in">emplace_back</span>(<span class="built_in">hash</span>(std::<span class="built_in">to_string</span>(k)));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp;&amp; t : threads)</span><br><span class="line">    &#123;</span><br><span class="line">        t.<span class="built_in">join</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">auto</span> after = std::chrono::system_clock::<span class="built_in">now</span>();</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;total: &quot;</span> &lt;&lt; count_per_thread * thread_count &lt;&lt; <span class="string">&quot; got: &quot;</span> &lt;&lt; res.<span class="built_in">size</span>() * count_per_thread &lt;&lt; <span class="string">&quot; cost: &quot;</span> &lt;&lt; std::chrono::<span class="built_in">duration_cast</span>&lt;std::chrono::milliseconds&gt;(after - before).<span class="built_in">count</span>() &lt;&lt; <span class="string">&quot;ms&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="end"><a href="#end" class="headerlink" title="end"></a>end</h3><ul>
+<li>最后还是选择了理解上更简单的<code>洗牌</code>方式</li>
+<li>结果组织上写入数据库的SQL语句</li>
+<li>操作上用<code>dearPyGui</code><ul>
+<li><strong>虽然是基于imgui，但是C++里面是循环进入函数刷新的，而这个是类似把控件推入栈的方式，也许还有其他方式暂时没有太多研究</strong></li>
+</ul>
+</li>
+<li>完整代码<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> dearpygui.core <span class="keyword">as</span> core</span><br><span class="line"><span class="keyword">import</span> dearpygui.simple <span class="keyword">as</span> simple</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CDKeyApp</span>:</span><br><span class="line"></span><br><span class="line">    window_name = <span class="string">&quot;CD-Key Generate: &quot;</span></span><br><span class="line">    cdKey_prefix_src = <span class="string">&quot;cdKey-prefix&quot;</span></span><br><span class="line">    cdKey_length_src = <span class="string">&quot;cdKey-length&quot;</span></span><br><span class="line">    cdKey_count_src = <span class="string">&quot;cdKey-count&quot;</span></span><br><span class="line">    cdKey_length_combo = [<span class="string">&#x27;5&#x27;</span>, <span class="string">&#x27;6&#x27;</span>, <span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;8&#x27;</span>, <span class="string">&#x27;9&#x27;</span>, <span class="string">&#x27;10&#x27;</span>, <span class="string">&#x27;11&#x27;</span>, <span class="string">&#x27;12&#x27;</span>]</span><br><span class="line"></span><br><span class="line">    _random_set = <span class="built_in">set</span>()</span><br><span class="line">    _random_prefix = <span class="string">&quot;&quot;</span></span><br><span class="line">    _message = <span class="string">&quot;&quot;</span></span><br><span class="line">    copy_cdKeys = <span class="string">&quot;&quot;</span></span><br><span class="line">    copy_cdKeys_mongo = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        core.add_additional_font(<span class="string">&#x27;C:\\Windows\\Fonts\\simyou.ttf&#x27;</span>, <span class="number">13</span>, glyph_ranges = <span class="string">&#x27;chinese_full&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__gen_txt</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="variable language_">self</span>.copy_cdKeys = <span class="string">&quot;&quot;</span></span><br><span class="line">        <span class="variable language_">self</span>.copy_cdKeys_mongo = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.copy_cdKeys_mongo += <span class="string">&#x27;try &#123;\n&#x27;</span></span><br><span class="line">        <span class="variable language_">self</span>.copy_cdKeys_mongo += <span class="string">&#x27;db.DiceCDKey.insertMany([\n&#x27;</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> one <span class="keyword">in</span> <span class="variable language_">self</span>._random_set:</span><br><span class="line">            <span class="variable language_">self</span>.copy_cdKeys += one + <span class="string">&#x27;\n&#x27;</span></span><br><span class="line">            <span class="variable language_">self</span>.copy_cdKeys_mongo += <span class="string">&#x27;&#123;_id:&quot;&#x27;</span> + one + <span class="string">&#x27;&quot;, keys:&quot;&#x27;</span> + <span class="variable language_">self</span>._random_prefix + <span class="string">&#x27;&quot;&#125;,\n&#x27;</span></span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.copy_cdKeys_mongo += <span class="string">&#x27;]);&#125; catch(e) &#123; print(e); &#125;&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__gen_alg</span>(<span class="params">self, prefix, length, count</span>):</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>._message = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> length &lt;= <span class="number">0</span> <span class="keyword">or</span> count &lt;= <span class="number">0</span>:</span><br><span class="line">            <span class="variable language_">self</span>._message = <span class="string">&quot;!!!! [length] and [count] must &gt; 0 !!!!&quot;</span></span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>._random_set.clear()</span><br><span class="line">        <span class="variable language_">self</span>._random_prefix = prefix</span><br><span class="line">        source_list = [<span class="string">&#x27;2&#x27;</span>, <span class="string">&#x27;3&#x27;</span>, <span class="string">&#x27;4&#x27;</span>, <span class="string">&#x27;5&#x27;</span>, <span class="string">&#x27;6&#x27;</span>, <span class="string">&#x27;7&#x27;</span>, <span class="string">&#x27;8&#x27;</span>, <span class="string">&#x27;9&#x27;</span>,</span><br><span class="line">                       <span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;G&#x27;</span>, <span class="string">&#x27;H&#x27;</span>, <span class="string">&#x27;J&#x27;</span>, <span class="string">&#x27;K&#x27;</span>, <span class="string">&#x27;L&#x27;</span>, <span class="string">&#x27;M&#x27;</span>, <span class="string">&#x27;N&#x27;</span>, <span class="string">&#x27;P&#x27;</span>, <span class="string">&#x27;Q&#x27;</span>, <span class="string">&#x27;R&#x27;</span>, <span class="string">&#x27;S&#x27;</span>, <span class="string">&#x27;T&#x27;</span>, <span class="string">&#x27;U&#x27;</span>,</span><br><span class="line">                       <span class="string">&#x27;V&#x27;</span>, <span class="string">&#x27;W&#x27;</span>, <span class="string">&#x27;X&#x27;</span>, <span class="string">&#x27;Y&#x27;</span>, <span class="string">&#x27;Z&#x27;</span>]</span><br><span class="line">        merge_len = length</span><br><span class="line">        rand_list = []</span><br><span class="line">        <span class="keyword">for</span> src <span class="keyword">in</span> source_list:</span><br><span class="line">            <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(merge_len):</span><br><span class="line">                rand_list.append(src)</span><br><span class="line">        total_len = <span class="built_in">len</span>(rand_list)</span><br><span class="line">        <span class="keyword">while</span> <span class="built_in">len</span>(<span class="variable language_">self</span>._random_set) &lt; count:</span><br><span class="line">            random.shuffle(rand_list)</span><br><span class="line">            index = <span class="number">0</span></span><br><span class="line">            <span class="keyword">while</span> index + merge_len &lt; total_len:</span><br><span class="line">                result_str = <span class="string">&#x27;&#x27;</span>.join(rand_list[index:merge_len + index])</span><br><span class="line">                index += <span class="number">1</span></span><br><span class="line">                <span class="variable language_">self</span>._random_set.add(prefix + <span class="string">&#x27;-&#x27;</span> + result_str)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> <span class="built_in">len</span>(<span class="variable language_">self</span>._random_set) &gt; count:</span><br><span class="line">            <span class="variable language_">self</span>._random_set.pop()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__gen</span>(<span class="params">self</span>):</span><br><span class="line">        prefix = core.get_value(<span class="variable language_">self</span>.cdKey_prefix_src)</span><br><span class="line">        length = <span class="built_in">int</span>(<span class="string">&#x27;0&#x27;</span>+core.get_value(<span class="variable language_">self</span>.cdKey_length_src))</span><br><span class="line">        count = <span class="built_in">int</span>(<span class="string">&#x27;0&#x27;</span>+core.get_value(<span class="variable language_">self</span>.cdKey_count_src))</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.__gen_alg(prefix, length, count)</span><br><span class="line">        <span class="variable language_">self</span>.__gen_txt()</span><br><span class="line"></span><br><span class="line">        static_item_1 = <span class="string">&quot;static_item_1&quot;</span></span><br><span class="line">        static_item_2 = <span class="string">&quot;static_item_2&quot;</span></span><br><span class="line">        static_item_3 = <span class="string">&quot;static_item_3&quot;</span></span><br><span class="line">        static_item_4 = <span class="string">&quot;static_item_4&quot;</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> core.does_item_exist(<span class="string">&quot;##&quot;</span>+static_item_1):</span><br><span class="line">            core.delete_item(<span class="string">&quot;##&quot;</span>+static_item_1)</span><br><span class="line">            core.delete_item(<span class="string">&quot;##&quot;</span>+static_item_2)</span><br><span class="line">            core.delete_item(<span class="string">&quot;##&quot;</span>+static_item_3)</span><br><span class="line">            core.delete_item(<span class="string">&quot;##&quot;</span>+static_item_4)</span><br><span class="line"></span><br><span class="line">        core.add_spacing(name=<span class="string">&quot;##&quot;</span>+static_item_1, count=<span class="number">2</span>, parent=<span class="variable language_">self</span>.window_name)</span><br><span class="line">        core.add_input_text(name=<span class="string">&quot;##&quot;</span>+static_item_2, parent=<span class="variable language_">self</span>.window_name,</span><br><span class="line">                            default_value=<span class="variable language_">self</span>.copy_cdKeys,</span><br><span class="line">                            multiline=<span class="literal">True</span>, readonly=<span class="literal">True</span>, width=<span class="number">200</span>, height=<span class="number">250</span>)</span><br><span class="line">        core.add_same_line(name=<span class="string">&quot;##&quot;</span>+static_item_3, spacing=<span class="number">20</span>, parent=<span class="variable language_">self</span>.window_name)</span><br><span class="line">        core.add_input_text(name=<span class="string">&quot;##&quot;</span>+static_item_4, parent=<span class="variable language_">self</span>.window_name,</span><br><span class="line">                            default_value=<span class="variable language_">self</span>.copy_cdKeys_mongo,</span><br><span class="line">                            multiline=<span class="literal">True</span>, readonly=<span class="literal">True</span>, width=<span class="number">300</span>, height=<span class="number">250</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(<span class="variable language_">self</span>._message) &gt; <span class="number">0</span>:</span><br><span class="line">            core.add_separator(parent=<span class="variable language_">self</span>.window_name)</span><br><span class="line">            core.add_text(<span class="string">&quot;ERROR: &quot;</span> + <span class="variable language_">self</span>._message, parent=<span class="variable language_">self</span>.window_name, color=[<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">            core.add_separator(parent=<span class="variable language_">self</span>.window_name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">show</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">with</span> simple.window(<span class="variable language_">self</span>.window_name):</span><br><span class="line">            core.set_main_window_size(<span class="number">550</span>, <span class="number">550</span>)</span><br><span class="line">            core.set_main_window_resizable(<span class="literal">False</span>)</span><br><span class="line">            core.set_main_window_title(<span class="variable language_">self</span>.window_name)</span><br><span class="line"></span><br><span class="line">            core.add_spacing()</span><br><span class="line">            core.add_separator()</span><br><span class="line"></span><br><span class="line">            core.add_text(<span class="string">&quot;CD-Key Generate&quot;</span>)</span><br><span class="line">            core.add_text(<span class="string">&quot;生成随机兑换码对应的 key 文本&quot;</span>, bullet=<span class="literal">True</span>, color=[<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">            core.add_text(<span class="string">&quot;生成随机兑换码对应的 mongoDB insert 代码&quot;</span>, bullet=<span class="literal">True</span>)</span><br><span class="line">            core.add_text(<span class="string">&quot;mongoDB 代码记得提交给运维执行导入到数据库&quot;</span>, bullet=<span class="literal">True</span>, color=[<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line"></span><br><span class="line">            core.add_spacing()</span><br><span class="line">            core.add_separator()</span><br><span class="line"></span><br><span class="line">            core.add_spacing(count=<span class="number">8</span>)</span><br><span class="line">            core.add_input_text(name=<span class="string">&quot;Prefix&quot;</span>, source=<span class="variable language_">self</span>.cdKey_prefix_src, width=<span class="number">100</span>, hexadecimal=<span class="literal">True</span>)</span><br><span class="line">            core.add_same_line(spacing=<span class="number">20</span>)</span><br><span class="line">            core.add_combo(<span class="string">&quot;Length&quot;</span>, items=<span class="variable language_">self</span>.cdKey_length_combo, source=<span class="variable language_">self</span>.cdKey_length_src, default_value=<span class="string">&#x27;10&#x27;</span>, width=<span class="number">80</span>)</span><br><span class="line">            core.add_same_line(spacing=<span class="number">20</span>)</span><br><span class="line">            core.add_input_text(name=<span class="string">&quot;Count&quot;</span>, source=<span class="variable language_">self</span>.cdKey_count_src, default_value=<span class="string">&#x27;10&#x27;</span>, width=<span class="number">100</span>, decimal=<span class="literal">True</span>)</span><br><span class="line">            core.add_spacing(count=<span class="number">2</span>)</span><br><span class="line">            core.add_button(<span class="string">&quot;Gen&quot;</span>, callback=<span class="variable language_">self</span>.__gen, width=<span class="number">500</span>)</span><br><span class="line"></span><br><span class="line">            core.add_spacing(count=<span class="number">2</span>)</span><br><span class="line">            core.add_separator()</span><br><span class="line"></span><br><span class="line">            <span class="comment"># self.__render()</span></span><br><span class="line">            <span class="comment"># core.set_render_callback(self.render)</span></span><br><span class="line">        core.start_dearpygui(primary_window=<span class="variable language_">self</span>.window_name)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    cdkeyApp = CDKeyApp()</span><br><span class="line">    cdkeyApp.show()</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B8%B8%E7%94%A8%E5%A4%87%E5%BF%98/" rel="tag"># 常用备忘</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/de38e5db.html" rel="prev" title="模块：时间轮定时器">
+      <i class="fa fa-chevron-left"></i> 模块：时间轮定时器
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/ae479ce2.html" rel="next" title="游戏：AI相关">
+      游戏：AI相关 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%B4%97%E7%89%8C%E7%AE%97%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">基于洗牌算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EHash"><span class="nav-number">2.2.</span> <span class="nav-text">基于Hash</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#end"><span class="nav-number">3.</span> <span class="nav-text">end</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '3833645cc87ccfa745aee083e8eacc96',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="折腾：std::format placeholder">
+<meta property="og:type" content="article">
+<meta property="og:title" content="折腾：std::format placeholder">
+<meta property="og:url" content="https://klysisle.space/archives/ff186d23.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="折腾：std::format placeholder">
+<meta property="og:locale">
+<meta property="article:published_time" content="2025-02-19T12:21:30.000Z">
+<meta property="article:modified_time" content="2025-04-19T09:24:41.325Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://klysisle.space/archives/ff186d23.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>折腾：std::format placeholder | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/ff186d23.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          折腾：std::format placeholder
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2025-02-19 20:21:30" itemprop="dateCreated datePublished" datetime="2025-02-19T20:21:30+08:00">2025-02-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-04-19 17:24:41" itemprop="dateModified" datetime="2025-04-19T17:24:41+08:00">2025-04-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C++</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">折腾：std::format placeholder</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="编译期：std-format-placeholder"><a href="#编译期：std-format-placeholder" class="headerlink" title="编译期：std::format placeholder"></a>编译期：<code>std::format</code> placeholder</h1><ul>
+<li>最终代码：<a target="_blank" rel="noopener" href="https://github.com/kinly/easy_logger/blob/main/include/auto_format_rules.h">https://github.com/kinly/easy_logger/blob/main/include/auto_format_rules.h</a></li>
+</ul>
+<h2 id="背景与目标"><a href="#背景与目标" class="headerlink" title="背景与目标"></a>背景与目标</h2><p>现代 C++ 提供了 <code>std::format</code>，比传统的 <code>std::stringstream</code> 更安全、高效，也避免了手动拼接。但对于旧代码或者希望“自动推导格式串”的开发者来说，迁移成本高。</p>
+<p>我有一个常用的辅助函数 <code>inner_string(...)</code>，基于 <code>stringstream</code> 构建字符串拼接，现在我希望用 <code>std::format</code> 替代它，并自动推导 <code>&#123;&#125;</code> 占位符的数量与格式。</p>
+<p><strong>目标是：</strong></p>
+<ul>
+<li>保留调用方式不变（如 <code>inner_string(1.23, &quot;abc&quot;, 42)</code>）</li>
+<li>自动生成合适的 <code>format_string</code> 结构</li>
+<li>对于 float&#x2F;double 自动加 <code>&#123;:.2f&#125;</code> 之类的精度</li>
+<li>支持 <code>tuple</code> 等复合类型拆解</li>
+<li>最好在<strong>编译期</strong>完成这些逻辑</li>
+</ul>
+<hr>
+<h2 id="旧代码方式回顾：stream-拼接"><a href="#旧代码方式回顾：stream-拼接" class="headerlink" title="旧代码方式回顾：stream 拼接"></a>旧代码方式回顾：stream 拼接</h2><p>我们之前常用 <code>stringstream</code> 实现类似 <code>print</code> 效果：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">std::stringstream ss;</span><br><span class="line">ss &lt;&lt; <span class="number">123</span> &lt;&lt; <span class="string">&quot;abc&quot;</span> &lt;&lt; <span class="number">1.9</span> &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>封装过后是这样的：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Func, <span class="keyword">typename</span>..._Args&gt;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> _inner_unpak(_Func fun, <span class="type">const</span> _Args&amp;... args) &#123;</span><br><span class="line">    (<span class="type">void</span>)std::initializer_list&lt;<span class="type">int</span>&gt;&#123;</span><br><span class="line">        [&amp;](<span class="type">const</span> <span class="keyword">auto</span>&amp; arg) &#123;</span><br><span class="line">            <span class="built_in">fun</span>(arg);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;(args)...</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>..._Args&gt;</span><br><span class="line"><span class="keyword">inline</span> <span class="type">static</span> <span class="type">void</span> _inner_format(std::ostream&amp; stream, <span class="type">const</span> _Args&amp;... args) &#123;</span><br><span class="line">    _inner_unpak([&amp;](<span class="type">const</span> <span class="keyword">auto</span>&amp; arg) &#123;</span><br><span class="line">        stream &lt;&lt; arg;</span><br><span class="line">    &#125;, args...);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... _Args&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">static</span> std::string <span class="title">inner_string</span><span class="params">(<span class="type">const</span> _Args&amp;... args)</span> </span>&#123;</span><br><span class="line">    std::stringstream ss;</span><br><span class="line">    _inner_format(ss, args...);</span><br><span class="line">    <span class="keyword">return</span> ss.<span class="built_in">str</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这其实已经是很泛化的流拼接工具了，和 <code>std::format</code> 的格式感知能力相比较，缺点是：</p>
+<ul>
+<li>不支持精度控制</li>
+<li>输出不统一</li>
+<li>类型错误编译期无法发现</li>
+</ul>
+<hr>
+<h2 id="起点尝试：运行时构造-format-string"><a href="#起点尝试：运行时构造-format-string" class="headerlink" title="起点尝试：运行时构造 format string"></a>起点尝试：运行时构造 format string</h2><p>为了接近 <code>std::format</code> 的风格，第一步尝试是：根据参数个数生成一串 <code>&#123;&#125;</code> 占位符。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Args&gt;</span></span><br><span class="line"><span class="function">std::string <span class="title">format_string</span><span class="params">(<span class="type">const</span> Args&amp;... args)</span> </span>&#123;</span><br><span class="line">  std::<span class="type">size_t</span> arg_count = <span class="keyword">sizeof</span>...(args);</span><br><span class="line">  std::string placeholders;</span><br><span class="line">  <span class="keyword">for</span> (std::<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; arg_count; ++i) &#123;</span><br><span class="line">      placeholders += <span class="string">&quot;&#123;&#125;&quot;</span>;</span><br><span class="line">      <span class="keyword">if</span> (i &lt; arg_count - <span class="number">1</span>) placeholders += <span class="string">&#x27; &#x27;</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> std::<span class="built_in">vformat</span>(placeholders, std::<span class="built_in">make_format_args</span>(args...));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是存在几个问题：</p>
+<ul>
+<li>每次都运行时构造格式字符串，效率低</li>
+<li>无法针对类型生成特定格式（如 float 想输出 <code>&#123;:.2f&#125;</code>）</li>
+<li>不支持结构体 &#x2F; tuple 等更复杂类型</li>
+</ul>
+<hr>
+<h2 id="编译期自动推导格式字符串：终极方案"><a href="#编译期自动推导格式字符串：终极方案" class="headerlink" title="编译期自动推导格式字符串：终极方案"></a>编译期自动推导格式字符串：终极方案</h2><p>我设计了一个完全在编译期推导格式串的系统，基于：</p>
+<ul>
+<li><code>consteval</code> 编译期函数</li>
+<li><code>concepts</code> 判断是否是 tuple</li>
+<li>模板参数展开</li>
+<li><code>std::array&lt;char&gt;</code> 拼接字符串</li>
+<li>C++20 <code>string_view</code> 缓存格式串</li>
+</ul>
+<h3 id="类型到格式映射机制"><a href="#类型到格式映射机制" class="headerlink" title="类型到格式映射机制"></a>类型到格式映射机制</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">type_format</span> &#123; <span class="type">static</span> <span class="keyword">constexpr</span> <span class="type">const</span> <span class="type">char</span>* value = <span class="string">&quot;&#123;&#125;&quot;</span>; &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">struct</span> <span class="title class_">type_format</span>&lt;<span class="type">float</span>&gt; &#123; <span class="type">static</span> <span class="keyword">constexpr</span> <span class="type">const</span> <span class="type">char</span>* value = <span class="string">&quot;&#123;:.2f&#125;&quot;</span>; &#125;;</span><br><span class="line"><span class="keyword">template</span> &lt;&gt; <span class="keyword">struct</span> <span class="title class_">type_format</span>&lt;<span class="type">double</span>&gt; &#123; <span class="type">static</span> <span class="keyword">constexpr</span> <span class="type">const</span> <span class="type">char</span>* value = <span class="string">&quot;&#123;:.2f&#125;&quot;</span>; &#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="判断是否-tuple-类型"><a href="#判断是否-tuple-类型" class="headerlink" title="判断是否 tuple 类型"></a>判断是否 tuple 类型</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">concept</span> is_tuple_like = <span class="keyword">requires</span> &#123; <span class="keyword">typename</span> std::tuple_size&lt;T&gt;::type; &#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="递归收集格式"><a href="#递归收集格式" class="headerlink" title="递归收集格式"></a>递归收集格式</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> Collector&gt;</span><br><span class="line"><span class="function"><span class="keyword">consteval</span> <span class="type">void</span> <span class="title">collect_type_formats</span><span class="params">(Collector collector)</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">if</span> <span class="title">constexpr</span> <span class="params">(is_tuple_like&lt;T&gt;)</span> </span>&#123;</span><br><span class="line">    [&amp;]&lt;std::<span class="type">size_t</span>... Is&gt;(std::index_sequence&lt;Is...&gt;) &#123;</span><br><span class="line">      (collect_type_formats&lt;std::<span class="type">tuple_element_t</span>&lt;Is, T&gt;&gt;(collector), ...);</span><br><span class="line">    &#125;(std::make_index_sequence&lt;std::tuple_size_v&lt;T&gt;&gt;&#123;&#125;);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">collector</span>(type_format&lt;std::<span class="type">decay_t</span>&lt;T&gt;&gt;::value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="拼接格式串（含分隔符）"><a href="#拼接格式串（含分隔符）" class="headerlink" title="拼接格式串（含分隔符）"></a>拼接格式串（含分隔符）</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;std::<span class="type">size_t</span> Count, <span class="type">char</span> Sep = <span class="string">&#x27; &#x27;</span>&gt;</span><br><span class="line"><span class="keyword">consteval</span> <span class="keyword">auto</span> <span class="built_in">make_format_string</span>(<span class="type">const</span> std::array&lt;<span class="type">const</span> <span class="type">char</span>*, Count&gt;&amp; formats, std::<span class="type">size_t</span> used) &#123;</span><br><span class="line">  std::array&lt;<span class="type">char</span>, AUTO_FORMAT_LOGGER_MAX_ARGS * <span class="number">16</span>&gt; buf&#123;&#125;;</span><br><span class="line">  std::<span class="type">size_t</span> pos = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">for</span> (std::<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; used; ++i) &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* f = formats[i];</span><br><span class="line">    <span class="keyword">while</span> (*f) buf[pos++] = *f++;</span><br><span class="line">    <span class="keyword">if</span> (i &lt; used - <span class="number">1</span>) buf[pos++] = Sep;</span><br><span class="line">  &#125;</span><br><span class="line">  std::array&lt;<span class="type">char</span>, AUTO_FORMAT_LOGGER_MAX_ARGS * 16&gt; result&#123;&#125;;</span><br><span class="line">  std::<span class="built_in">copy_n</span>(buf.<span class="built_in">begin</span>(), pos, result.<span class="built_in">begin</span>());</span><br><span class="line">  <span class="keyword">return</span> std::pair&#123;result, pos&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="外部统一封装接口"><a href="#外部统一封装接口" class="headerlink" title="外部统一封装接口"></a>外部统一封装接口</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span>... Args&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">type_format_string_placeholders</span> &#123;</span><br><span class="line">  <span class="type">static</span> <span class="keyword">constexpr</span> <span class="keyword">auto</span> fmt = <span class="built_in">make_type_format_string_ct</span>&lt;Args...&gt;();</span><br><span class="line">  <span class="type">static</span> <span class="keyword">constexpr</span> <span class="keyword">auto</span> sv = std::string_view&#123;fmt.first.<span class="built_in">data</span>(), fmt.second&#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> fmt = auto_format_rules::detail::<span class="built_in">make_type_format_string_ct</span>&lt;<span class="type">float</span>, <span class="type">int</span>, <span class="type">float</span>&gt;();</span><br><span class="line"><span class="function">std::string_view <span class="title">sv</span><span class="params">(fmt.first.data(), fmt.second)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> a = <span class="number">1.2345f</span>, c = <span class="number">3.14f</span>;</span><br><span class="line"><span class="type">int</span> b = <span class="number">42</span>;</span><br><span class="line">std::string result = std::<span class="built_in">vformat</span>(sv, std::<span class="built_in">make_format_args</span>(a, b, c));</span><br><span class="line"><span class="comment">// 输出: 1.23 42 3.14</span></span><br></pre></td></tr></table></figure>
+
+<p>也支持 tuple 嵌套：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> tup = std::tuple&lt;<span class="type">int</span>, <span class="type">float</span>, std::tuple&lt;<span class="type">double</span>&gt;&gt;;</span><br><span class="line"><span class="keyword">constexpr</span> <span class="keyword">auto</span> sv = auto_format_rules::detail::type_format_string_placeholders&lt;tup&gt;::sv;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="编译期优势对比"><a href="#编译期优势对比" class="headerlink" title="编译期优势对比"></a>编译期优势对比</h2><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>编译期</th>
+<th>类型感知</th>
+<th>精度控制</th>
+<th>性能开销</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>手动写格式串</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>最低</td>
+</tr>
+<tr>
+<td>运行时拼接 <code>&#123;&#125;</code></td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>中</td>
+</tr>
+<tr>
+<td>本文方案：类型推导 + 缓存</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>最优</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="后续扩展想法"><a href="#后续扩展想法" class="headerlink" title="后续扩展想法"></a>后续扩展想法</h2><ul>
+<li><code>&#123;name&#125;</code> 风格格式串支持（需配合索引与映射）</li>
+<li>自动为 struct 提供格式（结合 C++23 <code>reflexpr</code>）</li>
+<li>支持单位后缀拼接（如 <code>KB</code>、<code>ms</code>）</li>
+<li>编译期格式串验证与调试输出</li>
+</ul>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这个系统完全基于编译期的 constexpr + 模板机制实现，支持自动生成符合类型的格式字符串，并为日志、调试、格式输出等提供了更高的性能与更好的类型安全。</p>
+<p>欢迎留言交流优化建议或 fork 后自定义扩展。</p>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C++</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/e0b61275.html" rel="prev" title="AI: windows-dllexport-dllimport">
+      <i class="fa fa-chevron-left"></i> AI: windows-dllexport-dllimport
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/63e4b7b2.html" rel="next" title="快速笔记:域名中使用下划线的限制">
+      快速笔记:域名中使用下划线的限制 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%EF%BC%9Astd-format-placeholder"><span class="nav-number">1.</span> <span class="nav-text">编译期：std::format placeholder</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">背景与目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A7%E4%BB%A3%E7%A0%81%E6%96%B9%E5%BC%8F%E5%9B%9E%E9%A1%BE%EF%BC%9Astream-%E6%8B%BC%E6%8E%A5"><span class="nav-number">1.2.</span> <span class="nav-text">旧代码方式回顾：stream 拼接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%B7%E7%82%B9%E5%B0%9D%E8%AF%95%EF%BC%9A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%9E%84%E9%80%A0-format-string"><span class="nav-number">1.3.</span> <span class="nav-text">起点尝试：运行时构造 format string</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%E8%87%AA%E5%8A%A8%E6%8E%A8%E5%AF%BC%E6%A0%BC%E5%BC%8F%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9A%E7%BB%88%E6%9E%81%E6%96%B9%E6%A1%88"><span class="nav-number">1.4.</span> <span class="nav-text">编译期自动推导格式字符串：终极方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%9E%8B%E5%88%B0%E6%A0%BC%E5%BC%8F%E6%98%A0%E5%B0%84%E6%9C%BA%E5%88%B6"><span class="nav-number">1.4.1.</span> <span class="nav-text">类型到格式映射机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6-tuple-%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.4.2.</span> <span class="nav-text">判断是否 tuple 类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%92%E5%BD%92%E6%94%B6%E9%9B%86%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.4.3.</span> <span class="nav-text">递归收集格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%BC%E6%8E%A5%E6%A0%BC%E5%BC%8F%E4%B8%B2%EF%BC%88%E5%90%AB%E5%88%86%E9%9A%94%E7%AC%A6%EF%BC%89"><span class="nav-number">1.4.4.</span> <span class="nav-text">拼接格式串（含分隔符）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E7%BB%9F%E4%B8%80%E5%B0%81%E8%A3%85%E6%8E%A5%E5%8F%A3"><span class="nav-number">1.4.5.</span> <span class="nav-text">外部统一封装接口</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.5.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%9C%9F%E4%BC%98%E5%8A%BF%E5%AF%B9%E6%AF%94"><span class="nav-number">1.6.</span> <span class="nav-text">编译期优势对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8E%E7%BB%AD%E6%89%A9%E5%B1%95%E6%83%B3%E6%B3%95"><span class="nav-number">1.7.</span> <span class="nav-text">后续扩展想法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.8.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '5a194054b5b60c8534ec5dd4412bfc36',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="记录：线上内存问题处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记录：线上内存问题处理">
+<meta property="og:url" content="https://klysisle.space/archives/62116300.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="记录：线上内存问题处理">
+<meta property="og:locale">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png01.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png02.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png03.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png04.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png05.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/64memory.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/brk.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/mmap.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png06.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png07.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png08.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png09.png">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png10.gif">
+<meta property="og:image" content="https://klysisle.space/images/ArenaMemory/png10.png">
+<meta property="article:published_time" content="2020-11-02T09:30:10.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.708Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="内存">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://klysisle.space/images/ArenaMemory/png01.png">
+
+<link rel="canonical" href="https://klysisle.space/archives/62116300.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>记录：线上内存问题处理 | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/62116300.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          记录：线上内存问题处理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-11-02 17:30:10" itemprop="dateCreated datePublished" datetime="2020-11-02T17:30:10+08:00">2020-11-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%86%85%E5%AD%98/" itemprop="url" rel="index"><span itemprop="name">内存</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">记录：线上内存问题处理</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h4><p><code>线上环境配置：Centos 7.5 3.10.0 2核 4G</code><br>游戏上线，其中2组服务器遇到了内存增长异常的问题</p>
+<p><img src="/images/ArenaMemory/png01.png"></p>
+<h4 id="程序内存泄漏？"><a href="#程序内存泄漏？" class="headerlink" title="程序内存泄漏？"></a>程序内存泄漏？</h4><p><code>程序内部对象都是以对象池方式分配的, 唯一malloc的地方是网络buffer缓冲</code></p>
+<ul>
+<li>grep -rn ‘chunk’ .&#x2F;*     log 目录, 查对象池分配日志<br><img src="/images/ArenaMemory/png02.png"><br><code>对象池没有新分配的内容</code> 这些都是原始的分配，分别是 gate 管理的 user 对象 &amp; timer 定时器对象（1个chunk 1024 个对象）</li>
+<li>涉及malloc free的内存，跟随net session的accept &amp; bedelete<br><img src="/images/ArenaMemory/png03.png"><br><code>上图指令分别是: accept次数, bedelete次数, 当前连接数</code> socket-session 对象建立，每个session 1M (send-buffer) + 1M (recv-buffer)，不是session没有释放导致的</li>
+<li>pmap 看具体占用<br><img src="/images/ArenaMemory/png04.png"><br><code>大量没有释放出来的内存  64M</code><br>程序是不会分配这么大的内存的，内存分配器是glibc，glibc官方说明<br><code>Starting with glibc 2.11 (for example, customers upgrading from RHEL 5 to RHEL 6), by default, when glibc malloc detects mutex contention (i.e. concurrent mallocs), then the native malloc heap is broken up into sub-pools called arenas. This is achieved by assigning threads their own memory pools and by avoiding locking in some situations. The amount of additional memory used for the memory pools (if any) can be controlled using the environment variables MALLOC_ARENA_TEST and MALLOC_ARENA_MAX. MALLOC_ARENA_TEST specifies that a test for the number of cores is performed once the number of memory pools reaches this value. MALLOC_ARENA_MAX sets the maximum number of memory pools used, regardless of the number of cores. The default maximum arena size is 1MB on 32-bit and 64MB on 64-bit. The default maximum number of arenas is the number of cores multiplied by 2 for 32-bit and 8 for 64-bit. This can increase fragmentation because the free trees are separate. In principle, the net performance impact should be positive of per thread arenas, but testing different arena numbers and sizes may result in performance improvements depending on your workload. You can revert the arena behavior with the environment variable MALLOC_ARENA_MAX=1</code><br>解释: glibc 在多线程竞争malloc时候，会创建新的arena块，一个arena是64M（64位系统上） 截图里面 64516 + 1020 &#x3D; 65536 64M<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ldd gate  <span class="comment"># 查libc.so所在目录 (libc)</span></span><br><span class="line">/lib64/libc.so.6  <span class="comment"># 查版本</span></span><br></pre></td></tr></table></figure>
+<img src="/images/ArenaMemory/png05.png"></li>
+</ul>
+<h4 id="线上只有两组服务器有内存增长过快的问题，是否和系统版本、环境变量有关？"><a href="#线上只有两组服务器有内存增长过快的问题，是否和系统版本、环境变量有关？" class="headerlink" title="线上只有两组服务器有内存增长过快的问题，是否和系统版本、环境变量有关？"></a>线上只有两组服务器有内存增长过快的问题，是否和系统版本、环境变量有关？</h4><ul>
+<li>kernel 确认相同</li>
+<li>程序使用的环境变量 <code>cat /proc/2948/environ | tr &#39;\000&#39; &#39;\n&#39;</code>  基本相同（相差的对内存问题没有关系）</li>
+<li>SA 帮忙确认<code>宿主机内核、glibc</code>版本对内存没有影响</li>
+</ul>
+<h4 id="glibc的内存管理"><a href="#glibc的内存管理" class="headerlink" title="glibc的内存管理"></a><a target="_blank" rel="noopener" href="https://sourceware.org/glibc/wiki/MallocInternals">glibc的内存管理</a></h4><ul>
+<li><a target="_blank" rel="noopener" href="https://sploitfun.wordpress.com/2015/02/11/syscalls-used-by-malloc/">内存布局</a><br><img src="/images/ArenaMemory/64memory.png"></li>
+<li>malloc 内存分配的系统调用<ul>
+<li><code>brk() sbrk()</code><br>  <img src="/images/ArenaMemory/brk.png"><br>  申请heap(移动最高地址指针，性能损耗小)<br>  内存碎片的产生：先申请了10 指针移动到curr +&#x3D; 10, 然后申请20 指针移动到curr +&#x3D; 20; 释放10 当前指针在20位置，20还在使用，无法释放。<code>只有高地址内存释放了，低地址才会释放</code><br>  为了避免这种内存<code>空洞</code>的产生，在分配&gt;&#x3D;128K内存的时候glibc使用的是 <code>mmap</code>； 由<code>M_MMAP_THRESHOLD</code>调节；<code>M_TRIM_THRESHOLD</code>调节空闲归还</li>
+<li><code>mmap() munmap()</code><br>  <img src="/images/ArenaMemory/mmap.png"><br>  申请memory mapping segment(在虚拟地址空间找空闲的内存，性能损耗稍大)<br>  整页分配，整页释放<br>  但是如果程序使用的都是大内存(&gt;128K)，为了避免<code>mmap/munmap</code>带来的性能消耗，常见的设置是<br>  <code>mallopt(M_MMAP_MAX, 0); mallopt(M_TRIM_THRESHOLD, -1);</code> 显然这样会带来更大的内存消耗（<code>brk</code>造成的内存空洞）<br>  可用 <code>for ((i = 1; i &lt;100; i++)); do ps -o majflt,minflt -C npl-gate; sleep 1; done</code> 监测某个程序是否需要这种设置</li>
+<li><code>linux内存管理的基本思想: 内存延迟分配，分配的是虚拟内存，只有真正访问的时候才建立虚拟内存和物理内存的映射</code></li>
+</ul>
+</li>
+<li>glibc的malloc<br>size &lt; M_MMAP_THRESHOLD 先尝试从brk已经释放的内存中获取，获取不到，调用sbrk<br>size &gt;&#x3D; M_MMAP_THRESHOLD 调用mmap<br><code>M_MMAP_THRESHOLD default:(128 * 1024) min:(0) max(512 * 1024 or 4 * 1024 * 1024)</code><br><code>M_TRIM_THRESHOLD default:(128 * 1024) -1 disables trimming completely</code><br><a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/mallopt.3.html"><code>mallopt</code>文档</a></li>
+<li><a target="_blank" rel="noopener" href="https://sploitfun.wordpress.com/2015/02/10/understanding-glibc-malloc/">glibc 内存分配算法</a><ul>
+<li><code>Arena</code>: 管理堆内存链表的; 每个线程有自己的arena区域，arena有上限 <code>32-bit: 2 * cores; 64-bit: 8 * cores</code><br>  当线程数量超过arena上限的时候，多个线程会共享一个arena区域，多线程竞争时加锁处理</li>
+<li><code>Chunk</code>: 每次分配的堆内存，会根据需要被分割成&gt;&#x3D;1的chunk</li>
+<li><code>Bins</code>: 管理已经被释放的chunk链表<ul>
+<li>fastbin</li>
+<li>unsorted bin [free’d]</li>
+<li>small bin (2-63) [&lt; 512 bytes]</li>
+<li>large bin (64-126) [&gt;&#x3D; 512 bytes]</li>
+</ul>
+</li>
+<li><code>分配策略</code>: fastbin -&gt; unsortedbin -&gt; smallbin -&gt; largebin -&gt; top chunk -&gt; 系统分配，并把多余的内存放回到bins里面</li>
+<li><code>释放策略</code>：在释放某个时检查附近的块是不是free的，如果是，那么合并添加到unsortedbin里面</li>
+</ul>
+</li>
+</ul>
+<h4 id="写测试程序测试验证内存分配问题"><a href="#写测试程序测试验证内存分配问题" class="headerlink" title="写测试程序测试验证内存分配问题"></a>写测试程序测试验证内存分配问题</h4><ul>
+<li><p>测试代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;malloc.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> K (1024)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> M (1024 * 1024)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> K_NUM 500000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> M_NUM  500</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> block_size = K;</span><br><span class="line">    <span class="type">int</span> block_num = K_NUM;</span><br><span class="line">    <span class="meta">#<span class="keyword">ifdef</span> BLOCK_M</span></span><br><span class="line">    block_size = M;</span><br><span class="line">    block_num = M_NUM;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;----- block M&quot;</span>);</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="meta">#<span class="keyword">ifdef</span> M_MMAP</span></span><br><span class="line">    <span class="built_in">mallopt</span>(M_MMAP_THRESHOLD, M * <span class="number">2</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;----- glibc mmap threshold&quot;</span>);</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *ptrs[K_NUM];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; block_num; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        ptrs[i] = (<span class="type">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span> * block_size);</span><br><span class="line">        <span class="built_in">memset</span>(ptrs[i], <span class="number">0</span>, <span class="number">1</span> * block_size);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">#<span class="keyword">ifdef</span> ONE_MORE</span></span><br><span class="line">    <span class="type">char</span> *tmp1 = (<span class="type">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="built_in">memset</span>(tmp1, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;----- one more 1 malloc&quot;</span>);</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//malloc_info(0, stdout);</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;##### malloc done&quot;</span>);</span><br><span class="line">    <span class="built_in">getchar</span>();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;##### start free memory&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; block_num; ++i) &#123;</span><br><span class="line">        <span class="built_in">free</span>(ptrs[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;##### free done&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//malloc_info(0, stdout);</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">getchar</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/ArenaMemory/png06.png" alt="分配500M" title="分配500M"><br><img src="/images/ArenaMemory/png07.png" alt="释放500M" title="释放500M"><br><img src="/images/ArenaMemory/png08.png" alt="分配500M+1Byte" title="分配500M+1Byte"><br><img src="/images/ArenaMemory/png09.png" alt="释放500M" title="释放500M"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -g -o memory_test01 -std=c++11 memory_test01.cpp -lpthread -DBLOCK_M</span><br></pre></td></tr></table></figure>
+<p>这次编译结果 .&#x2F;strace -f .&#x2F;memory_test 可以看到调用都是mmap</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g++ -g -o memory_test01 -std=c++11 memory_test01.cpp -lpthread -DBLOCK_M -DM_MMAP</span><br></pre></td></tr></table></figure>
+<p>这次编译结果 .&#x2F;strace -f .&#x2F;memory_test 可以看到调用都是brk</p>
+</li>
+<li><p>测试2：线程内存分配</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mutex&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> K (1024)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_NUM 500000</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_THREAD 10</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    std::mutex lock_;</span><br><span class="line">    std::vector&lt;<span class="type">char</span>*&gt; ptrs;</span><br><span class="line"></span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; func_create = [&amp;]() &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; MAX_NUM / MAX_THREAD; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">                std::lock_guard&lt;std::mutex&gt; _lock(lock_);</span><br><span class="line">                ptrs.<span class="built_in">emplace_back</span>((<span class="type">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span> * K));</span><br><span class="line">                <span class="built_in">memset</span>(ptrs.<span class="built_in">back</span>(), <span class="number">0</span>, <span class="number">1</span> * K);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">char</span> *tmp1 = (<span class="type">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span>);</span><br><span class="line">        <span class="built_in">memset</span>(tmp1, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    std::vector&lt;std::thread&gt; tasks;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; MAX_THREAD; ++i) &#123;</span><br><span class="line">        tasks.<span class="built_in">push_back</span>(std::<span class="built_in">thread</span>(func_create));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::for_each(tasks.<span class="built_in">begin</span>(), tasks.<span class="built_in">end</span>(), [](std::thread&amp; t)&#123;t.<span class="built_in">join</span>();&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> *tmp1 = (<span class="type">char</span> *)<span class="built_in">malloc</span>(<span class="number">1</span>);</span><br><span class="line">    <span class="built_in">memset</span>(tmp1, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;malloc done&quot;</span>);</span><br><span class="line">    <span class="built_in">getchar</span>();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;start free memory&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; MAX_NUM; ++i) &#123;</span><br><span class="line">        <span class="built_in">free</span>(ptrs[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s\n&quot;</span>, <span class="string">&quot;free done&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">getchar</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用测试1类似的办法，可以看到多线程内存的分配和释放</p>
+</li>
+<li><p>测试3：内存一边分配一边释放，监控内存占用</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;chrono&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;atomic&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;memory&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mutex&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;queue&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;google/malloc_extension.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;malloc.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">void</span>*                           <span class="type">pvoid_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">void</span>*                     <span class="type">cvoid_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">asio_NetBuffer</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// .... 一个简单的内存管理器</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">session</span></span><br><span class="line">&#123;</span><br><span class="line">    asio_NetBuffer _send_buffer;</span><br><span class="line">    asio_NetBuffer _recv_buffer;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">NetEvent</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pvoid_t</span> session;</span><br><span class="line">    <span class="type">uint32_t</span> handle;</span><br><span class="line">    <span class="type">uint32_t</span> event;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">NetData</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int32_t</span> length;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> NET_PACKET_SIZE( Length ) (sizeof(NetEvent) + sizeof(NetData) + Length)</span></span><br><span class="line"></span><br><span class="line">std::queue&lt; std::tuple&lt; <span class="type">pvoid_t</span>, <span class="type">size_t</span> &gt; &gt; event_queue_;</span><br><span class="line">std::mutex lock_queue_;</span><br><span class="line"><span class="type">char</span>* _1Mdata;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Push</span><span class="params">( <span class="type">pvoid_t</span> data, <span class="type">size_t</span> size )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::lock_guard&lt; std::mutex &gt; _lock( lock_queue_ );</span><br><span class="line">    event_queue_.<span class="built_in">push</span>( std::<span class="built_in">make_tuple</span>( data, size ) );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Kick</span><span class="params">( <span class="type">pvoid_t</span> &amp;data, <span class="type">size_t</span> &amp;size )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::lock_guard&lt; std::mutex &gt; _lock( lock_queue_ );</span><br><span class="line">    <span class="keyword">if</span>( event_queue_.<span class="built_in">empty</span>() )</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> pkg = event_queue_.<span class="built_in">front</span>();</span><br><span class="line">    data = std::<span class="built_in">get</span>&lt;<span class="number">0</span>&gt;( pkg );</span><br><span class="line">    size = std::<span class="built_in">get</span>&lt;<span class="number">1</span>&gt;( pkg );</span><br><span class="line"></span><br><span class="line">    event_queue_.<span class="built_in">pop</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_THREAD 10</span></span><br><span class="line"></span><br><span class="line">std::atomic&lt;<span class="type">int</span>&gt; _index;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;random&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">std::mt19937&amp; <span class="title">get_random_driver</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function"><span class="type">static</span> std::mt19937 <span class="title">mt</span><span class="params">( (<span class="type">int32_t</span>) time( <span class="literal">nullptr</span> ) )</span></span>;</span><br><span class="line">    <span class="keyword">return</span> mt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt; <span class="keyword">class</span> <span class="title class_">T1</span>, <span class="keyword">class</span> <span class="title class_">T2</span>, <span class="keyword">typename</span> std::enable_if&lt; !std::is_floating_point&lt; T1 &gt;::value &amp;&amp; !std::is_floating_point&lt;T2&gt;::value, <span class="type">bool</span> &gt;::type = <span class="literal">true</span> &gt;</span><br><span class="line"><span class="keyword">auto</span> <span class="built_in">random_range</span>( T1 Min, T2 Max )-&gt;<span class="keyword">decltype</span>( Min + Max )</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>( Min == Max )</span><br><span class="line">    <span class="keyword">return</span> Min;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">using</span> NewT = <span class="keyword">decltype</span>( Min + Max );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( Min &gt; Max )</span><br><span class="line">    <span class="keyword">return</span> std::<span class="built_in">uniform_int_distribution</span>&lt;NewT&gt;( Max, Min )( <span class="built_in">get_random_driver</span>() );</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    <span class="keyword">return</span> std::<span class="built_in">uniform_int_distribution</span>&lt;NewT&gt;( Min, Max )( <span class="built_in">get_random_driver</span>() );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    _1Mdata = (<span class="type">char</span>*)<span class="built_in">malloc</span>(<span class="number">80</span> * <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line">    <span class="built_in">memset</span>(_1Mdata, <span class="string">&#x27;a&#x27;</span>, <span class="number">80</span> * <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; func_create = [_index]()&#123;</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;thread : &quot;</span>&lt;&lt;std::this_thread::<span class="built_in">get_id</span>() &lt;&lt; std::endl;</span><br><span class="line"></span><br><span class="line">    session* _ss = <span class="keyword">new</span> <span class="built_in">session</span>();</span><br><span class="line">    _ss-&gt;_send_buffer.<span class="built_in">open</span>(<span class="number">10</span> * <span class="number">10024</span> * <span class="number">1024</span>);</span><br><span class="line">    _ss-&gt;_recv_buffer.<span class="built_in">open</span>(<span class="number">10</span> * <span class="number">10024</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> event_id = _index.<span class="built_in">load</span>();</span><br><span class="line">    _index += <span class="number">1000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> packet_length = <span class="built_in">random_range</span>(<span class="number">10</span>, <span class="number">80</span> * <span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line">        NetEvent evt;</span><br><span class="line">        evt.session = <span class="literal">nullptr</span>;</span><br><span class="line">        evt.handle = <span class="number">1</span>;</span><br><span class="line">        evt.event = event_id++;</span><br><span class="line">        NetData dat;</span><br><span class="line">        dat.length = packet_length;</span><br><span class="line">        <span class="function">asio_NetBuffer <span class="title">packet</span><span class="params">(NET_PACKET_SIZE(packet_length))</span></span>;</span><br><span class="line">        packet.<span class="built_in">put</span>(&amp;evt, <span class="built_in">sizeof</span>(evt));</span><br><span class="line">        packet.<span class="built_in">put</span>(&amp;dat, <span class="built_in">sizeof</span>(dat));</span><br><span class="line">        packet.<span class="built_in">put</span>(_1Mdata, packet_length);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">Push</span>(packet.<span class="built_in">release</span>(), <span class="built_in">NET_PACKET_SIZE</span>(packet_length));</span><br><span class="line"></span><br><span class="line">        std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">milliseconds</span>(<span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">delete</span> _ss;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;thread end : &quot;</span> &lt;&lt;std::this_thread::<span class="built_in">get_id</span>() &lt;&lt; std::endl;</span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">30</span>));</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    std::vector&lt;std::thread&gt; tasks;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; MAX_THREAD; ++i) &#123;</span><br><span class="line">    tasks.<span class="built_in">push_back</span>(std::<span class="built_in">thread</span>(func_create));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="type">pvoid_t</span> data = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="type">size_t</span> size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">Kick</span>(data, size))</span><br><span class="line">    &#123;</span><br><span class="line">        NetEvent* pHeader = (NetEvent*)data;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// std::cout &lt;&lt; &quot;event:&quot; &lt;&lt; pHeader-&gt;event &lt;&lt; std::endl;</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">free</span>(data);</span><br><span class="line"></span><br><span class="line">        std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">milliseconds</span>(<span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::for_each(tasks.<span class="built_in">begin</span>(), tasks.<span class="built_in">end</span>(), [](std::thread&amp; t)&#123;t.<span class="built_in">join</span>();&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(_1Mdata);</span><br><span class="line"></span><br><span class="line">    MallocExtension::<span class="built_in">instance</span>()-&gt;<span class="built_in">ReleaseFreeMemory</span>();</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;threads joined ... &quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">30</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Shell</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ((i=<span class="number">1</span>; i&lt;<span class="number">100</span>; i++)); <span class="keyword">do</span> pmap -x 4454 | grep total; <span class="built_in">sleep</span> 1; <span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p><code>RSS在3.5G左右会有一次比较大的空间释放</code><br><img src="/images/ArenaMemory/png10.gif"></p>
+</li>
+</ul>
+<h4 id="暂时的结果和线上临时处理"><a href="#暂时的结果和线上临时处理" class="headerlink" title="暂时的结果和线上临时处理"></a>暂时的结果和线上临时处理</h4><h5 id="暂时的结果"><a href="#暂时的结果" class="headerlink" title="暂时的结果"></a>暂时的结果</h5><p>根据上面问题的筛查和测试程序，基本可以确认不是程序内存泄漏<br>由于程序net代码用的package和event内存都是是每次单独malloc出来的，分配大小比较乱，基本定位大概率是由于这里的使用方式加上内存分配器机制导致的<br>也在线上没有人的时候<code>gdb attach</code>到进程 <code>dump memory</code>看了其中一块64M的内存，<code>strings</code>结果基本都是网络收发包的文本<br>理论上这些内存是可以归还给系统的，但是由于增长速度过快，而且还只有2组服务器有这种情况，不敢任由服务器有OOM的风险</p>
+<h5 id="线上临时处理"><a href="#线上临时处理" class="headerlink" title="线上临时处理"></a>线上临时处理</h5><p>由于开发过程中使用过 <code>tcmalloc + gperftools</code> 查内存问题，稍微看过api，知道有<code>ReleaseFreeMemory</code>的操作，就临时把一台服务器换成了<code>tcmalloc</code>的内存分配器<br>程序链接 <a target="_blank" rel="noopener" href="https://github.com/google/tcmalloc">google tcmalloc</a><a target="_blank" rel="noopener" href="http://goog-perftools.sourceforge.net/doc/tcmalloc.html">（介绍）</a> 重新编译<br>程序新增信号执行 <a target="_blank" rel="noopener" href="https://github.com/google/tcmalloc/blob/master/docs/tuning.md">MallocExtension::instance()-&gt;ReleaseFreeMemory()</a>，以防万一</p>
+<hr>
+<h4 id="记录"><a href="#记录" class="headerlink" title="记录"></a>记录</h4><p>线上环境不比测试环境，很多操作都要很小心，特别是长连接的服务器，不敢有过多和长时间的操作</p>
+<h5 id="一些内存指令"><a href="#一些内存指令" class="headerlink" title="一些内存指令"></a>一些内存指令</h5><ul>
+<li><code>free</code><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">              total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:        4046216     2444056      238012      194580     1364148     1117984</span><br><span class="line">Swap:       4193276      706248     3487028</span><br></pre></td></tr></table></figure>
+<code>total</code>: 物理内存总量<br><code>used</code>: 使用中的内存总量<br><code>free</code>: 空闲内存总量<br><code>Buffers/cached</code>: 磁盘缓存的内存量<br><code>SWAP</code>: 虚拟内存</li>
+<li><code>/proc/meminfo</code><br><img src="/images/ArenaMemory/png10.png"></li>
+<li><code>/proc/pid/maps</code><br>同 pmap -x pid</li>
+<li><code>sar -r</code></li>
+<li><code>sar -B</code></li>
+</ul>
+<h4 id="后续：关于tcmalloc-ptmalloc-jmalloc"><a href="#后续：关于tcmalloc-ptmalloc-jmalloc" class="headerlink" title="后续：关于tcmalloc, ptmalloc, jmalloc"></a>后续：关于tcmalloc, ptmalloc, jmalloc</h4><p><a target="_blank" rel="noopener" href="https://www.cyningsun.com/07-07-2018/memory-allocator-contrasts.html">参考</a></p>
+<ul>
+<li><p>目前：</p>
+<ul>
+<li><code>tcmalloc</code> 分配内存更快，因为用的大都是sbrk？ptmalloc大内存会用mmap&#x2F;munmap</li>
+<li><code>tcmalloc</code> 应该是更占内存的？因为sbrk回收的问题</li>
+<li><code>tcmalloc</code> 像系统要的内存维护在PageHeap，8K&#x3D;1page，释放的内存都在FreeList，线程有自己的ThreadCache，但是内存都是从同一地方拿，归还同一地方；内存利用率相对更高？</li>
+<li><code>jmalloc</code> facebook推出的， 最早的时候是freebsd的libc malloc实现。 目前在firefox、facebook服务器各种组件中大量使用。</li>
+</ul>
+</li>
+<li><h2 id="汇总：-ptmalloc-ptmalloc-有一个主分配区-main-arena-，-有多个非主分配区。非主分配区只能使用mmap向操作系统批发申请HEAP-MAX-SIZE（64位系统为64MB）大小的虚拟内存。当某个线程调用malloc的时候，会先查看线程私有变量中是否已经存在一个分配区，如果存在则尝试加锁，如果加锁失败则遍历arena链表试图获取一个没加锁的arena，-如果依然获取不到则创建一个新的非主分配区。free-的时候也要获取锁。分配小块内存容易产生碎片，ptmalloc在整理合并的时候也要对arena做加锁操作。在线程多的时候，锁的开销就会增大。-ptmalloc-用户请求分配的内存使用chunk表示，-每个chunk至少需要8个字节额外的开销。用户free掉的内存不会马上归还操作系统，ptmalloc会统一管理heap和mmap区域的空闲chunk，避免了频繁的系统调用。-ptmalloc-将相似大小的-chunk-用双向链表链接起来-这样的一个链表被称为一个-bin。-Ptmalloc-一共-维护了-128-个-bin-并使用一个数组来存储这些-bin-ptmalloc-数组中的第一个为-unsorted-bin-数组中从-2-开始编号的前-64-个-bin-称为-small-bins-同一个small-bin中的chunk具有相同的大小。-small-bins后面的bin被称作large-bins-ptmalloc-当free一个chunk并放入bin的时候，-还会检查它前后的chunk-是否也是空闲的-如果是的话-会首先把它们合并为一个大的chunk-然后将合并后的chunk-放到unstored-bin中。另外为了提高分配的速度-会把一些小的-不大于64B-chunk先放到一个叫做-fast-bins-的容器内。-ptmalloc-在fast-bins和bins都不能满足需求后，会设法在一个叫做top-chunk的空间分配内存。对于非主分配区会预先通过mmap分配一大块内存作为top-chunk，-当bins和fast-bins都不能满足分配需要的时候-c会设法在top-chunk中分出一块内存给用户-如果top-chunk本身不够大-分配程序会重新mmap分配一块内存chunk-并将top-chunk-迁移到新的chunk上，并用单链表链接起来。如果free-的chunk恰好-与-top-chunk-相邻-那么这两个-chunk-就会合并成新的-top-chunk，如果top-chunk大小大于某个阈值才还给操作系统。主分配区类似，不过通过sbrk-分配和调整top-chunk的大小，只有heap顶部连续内存空闲超过阈值的时候才能回收内存-ptmalloc-需要分配的-chunk-足够大-而且-fast-bins-和-bins-都不能满足要求-甚至-top-chunk-本身也不能满足分配需求时-会使用-mmap-来直接使用内存映射来将页映射到进程空间-ptmalloc缺陷-后分配的内存先释放-因为-ptmalloc-收缩内存是从-top-chunk-开始-如果与-top-chunk-相邻的-chunk-不能释放-top-chunk-以下的-chunk-都无法释放。-ptmalloc缺陷-多线程锁开销大，-需要避免多线程频繁分配释放。-ptmalloc缺陷-内存从thread的areana中分配，-内存不能从一个arena移动到另一个arena，-就是说如果多线程使用内存不均衡，容易导致内存的浪费。比如说线程1使用了300M内存，完成任务后glibc没有释放给操作系统，线程2开始创建了一个新的arena，-但是线程1的300M却不能用了。-ptmalloc缺陷-每个chunk至少8字节的开销很大-ptmalloc缺陷-不定期分配长生命周期的内存容易造成内存碎片，不利于回收。-64位系统最好分配32M以上内存，这是使用mmap的阈值-ptmalloc使用经验-避免多线程频繁分配和释放内存，会造成频繁加解锁。-ptmalloc使用经验-不要分配长生命周期的内存块，容易造成内碎片，影响内存回收。-ptmalloc使用经验-对于动态增长STL容器，要注意它维护的队列却是分配在heap上的。也就是说一个这样的临时对象所操作过的内存，依然可能产生碎片。如果这样的函数被频繁调用，碎片就会非常多。尽量成批reserve一块内存使用。减少在容器已满的情况下仍然push-back单个元素的操作，这样非常容易产生碎片。-ptmalloc使用经验-即便我们做过shrink-to-fit的工作（std-vector-v-swap-v-），如果里面是碎片，那也会被驻留在brk维护的free-list中，不会被释放。-ptmalloc使用经验-长时间的线上服务更应该注重编码习惯，尽量减少内存碎片。-ptmalloc使用经验-每个线程至少有一个，至多有cores-num-8个自己的arena（看成by线程的内存池），减少锁的使用。不同arena之间不能交替使用。多尝试arena数目的设置，对虚拟内存的消耗有挺大的影响。"><a href="#汇总：-ptmalloc-ptmalloc-有一个主分配区-main-arena-，-有多个非主分配区。非主分配区只能使用mmap向操作系统批发申请HEAP-MAX-SIZE（64位系统为64MB）大小的虚拟内存。当某个线程调用malloc的时候，会先查看线程私有变量中是否已经存在一个分配区，如果存在则尝试加锁，如果加锁失败则遍历arena链表试图获取一个没加锁的arena，-如果依然获取不到则创建一个新的非主分配区。free-的时候也要获取锁。分配小块内存容易产生碎片，ptmalloc在整理合并的时候也要对arena做加锁操作。在线程多的时候，锁的开销就会增大。-ptmalloc-用户请求分配的内存使用chunk表示，-每个chunk至少需要8个字节额外的开销。用户free掉的内存不会马上归还操作系统，ptmalloc会统一管理heap和mmap区域的空闲chunk，避免了频繁的系统调用。-ptmalloc-将相似大小的-chunk-用双向链表链接起来-这样的一个链表被称为一个-bin。-Ptmalloc-一共-维护了-128-个-bin-并使用一个数组来存储这些-bin-ptmalloc-数组中的第一个为-unsorted-bin-数组中从-2-开始编号的前-64-个-bin-称为-small-bins-同一个small-bin中的chunk具有相同的大小。-small-bins后面的bin被称作large-bins-ptmalloc-当free一个chunk并放入bin的时候，-还会检查它前后的chunk-是否也是空闲的-如果是的话-会首先把它们合并为一个大的chunk-然后将合并后的chunk-放到unstored-bin中。另外为了提高分配的速度-会把一些小的-不大于64B-chunk先放到一个叫做-fast-bins-的容器内。-ptmalloc-在fast-bins和bins都不能满足需求后，会设法在一个叫做top-chunk的空间分配内存。对于非主分配区会预先通过mmap分配一大块内存作为top-chunk，-当bins和fast-bins都不能满足分配需要的时候-c会设法在top-chunk中分出一块内存给用户-如果top-chunk本身不够大-分配程序会重新mmap分配一块内存chunk-并将top-chunk-迁移到新的chunk上，并用单链表链接起来。如果free-的chunk恰好-与-top-chunk-相邻-那么这两个-chunk-就会合并成新的-top-chunk，如果top-chunk大小大于某个阈值才还给操作系统。主分配区类似，不过通过sbrk-分配和调整top-chunk的大小，只有heap顶部连续内存空闲超过阈值的时候才能回收内存-ptmalloc-需要分配的-chunk-足够大-而且-fast-bins-和-bins-都不能满足要求-甚至-top-chunk-本身也不能满足分配需求时-会使用-mmap-来直接使用内存映射来将页映射到进程空间-ptmalloc缺陷-后分配的内存先释放-因为-ptmalloc-收缩内存是从-top-chunk-开始-如果与-top-chunk-相邻的-chunk-不能释放-top-chunk-以下的-chunk-都无法释放。-ptmalloc缺陷-多线程锁开销大，-需要避免多线程频繁分配释放。-ptmalloc缺陷-内存从thread的areana中分配，-内存不能从一个arena移动到另一个arena，-就是说如果多线程使用内存不均衡，容易导致内存的浪费。比如说线程1使用了300M内存，完成任务后glibc没有释放给操作系统，线程2开始创建了一个新的arena，-但是线程1的300M却不能用了。-ptmalloc缺陷-每个chunk至少8字节的开销很大-ptmalloc缺陷-不定期分配长生命周期的内存容易造成内存碎片，不利于回收。-64位系统最好分配32M以上内存，这是使用mmap的阈值-ptmalloc使用经验-避免多线程频繁分配和释放内存，会造成频繁加解锁。-ptmalloc使用经验-不要分配长生命周期的内存块，容易造成内碎片，影响内存回收。-ptmalloc使用经验-对于动态增长STL容器，要注意它维护的队列却是分配在heap上的。也就是说一个这样的临时对象所操作过的内存，依然可能产生碎片。如果这样的函数被频繁调用，碎片就会非常多。尽量成批reserve一块内存使用。减少在容器已满的情况下仍然push-back单个元素的操作，这样非常容易产生碎片。-ptmalloc使用经验-即便我们做过shrink-to-fit的工作（std-vector-v-swap-v-），如果里面是碎片，那也会被驻留在brk维护的free-list中，不会被释放。-ptmalloc使用经验-长时间的线上服务更应该注重编码习惯，尽量减少内存碎片。-ptmalloc使用经验-每个线程至少有一个，至多有cores-num-8个自己的arena（看成by线程的内存池），减少锁的使用。不同arena之间不能交替使用。多尝试arena数目的设置，对虚拟内存的消耗有挺大的影响。" class="headerlink" title="汇总：  - ptmalloc  - ptmalloc 有一个主分配区(main arena)， 有多个非主分配区。非主分配区只能使用mmap向操作系统批发申请HEAP_MAX_SIZE（64位系统为64MB）大小的虚拟内存。当某个线程调用malloc的时候，会先查看线程私有变量中是否已经存在一个分配区，如果存在则尝试加锁，如果加锁失败则遍历arena链表试图获取一个没加锁的arena， 如果依然获取不到则创建一个新的非主分配区。free()的时候也要获取锁。分配小块内存容易产生碎片，ptmalloc在整理合并的时候也要对arena做加锁操作。在线程多的时候，锁的开销就会增大。  - ptmalloc 用户请求分配的内存使用chunk表示， 每个chunk至少需要8个字节额外的开销。用户free掉的内存不会马上归还操作系统，ptmalloc会统一管理heap和mmap区域的空闲chunk，避免了频繁的系统调用。  - ptmalloc 将相似大小的 chunk 用双向链表链接起来, 这样的一个链表被称为一个 bin。 Ptmalloc 一共 维护了 128 个 bin,并使用一个数组来存储这些 bin  - ptmalloc 数组中的第一个为 unsorted bin, 数组中从 2 开始编号的前 64 个 bin 称为 small bins, 同一个small bin中的chunk具有相同的大小。 small bins后面的bin被称作large bins  - ptmalloc 当free一个chunk并放入bin的时候， 还会检查它前后的chunk 是否也是空闲的, 如果是的话, 会首先把它们合并为一个大的chunk, 然后将合并后的chunk 放到unstored bin中。另外为了提高分配的速度,会把一些小的(不大于64B) chunk先放到一个叫做 fast bins 的容器内。  - ptmalloc 在fast bins和bins都不能满足需求后，会设法在一个叫做top chunk的空间分配内存。对于非主分配区会预先通过mmap分配一大块内存作为top chunk， 当bins和fast bins都不能满足分配需要的时候, c会设法在top chunk中分出一块内存给用户, 如果top chunk本身不够大, 分配程序会重新mmap分配一块内存chunk, 并将top chunk 迁移到新的chunk上，并用单链表链接起来。如果free()的chunk恰好 与 top chunk 相邻,那么这两个 chunk 就会合并成新的 top chunk，如果top chunk大小大于某个阈值才还给操作系统。主分配区类似，不过通过sbrk()分配和调整top chunk的大小，只有heap顶部连续内存空闲超过阈值的时候才能回收内存  - ptmalloc 需要分配的 chunk 足够大,而且 fast bins 和 bins 都不能满足要求,甚至 top chunk 本身也不能满足分配需求时, 会使用 mmap 来直接使用内存映射来将页映射到进程空间  - ptmalloc缺陷 后分配的内存先释放,因为 ptmalloc 收缩内存是从 top chunk 开始,如果与 top chunk 相邻的 chunk 不能释放, top chunk 以下的 chunk 都无法释放。  - ptmalloc缺陷 多线程锁开销大， 需要避免多线程频繁分配释放。  - ptmalloc缺陷 内存从thread的areana中分配， 内存不能从一个arena移动到另一个arena， 就是说如果多线程使用内存不均衡，容易导致内存的浪费。比如说线程1使用了300M内存，完成任务后glibc没有释放给操作系统，线程2开始创建了一个新的arena， 但是线程1的300M却不能用了。  - ptmalloc缺陷 每个chunk至少8字节的开销很大  - ptmalloc缺陷 不定期分配长生命周期的内存容易造成内存碎片，不利于回收。 64位系统最好分配32M以上内存，这是使用mmap的阈值  - ptmalloc使用经验 避免多线程频繁分配和释放内存，会造成频繁加解锁。  - ptmalloc使用经验 不要分配长生命周期的内存块，容易造成内碎片，影响内存回收。  - ptmalloc使用经验 对于动态增长STL容器，要注意它维护的队列却是分配在heap上的。也就是说一个这样的临时对象所操作过的内存，依然可能产生碎片。如果这样的函数被频繁调用，碎片就会非常多。尽量成批reserve一块内存使用。减少在容器已满的情况下仍然push_back单个元素的操作，这样非常容易产生碎片。  - ptmalloc使用经验 即便我们做过shrink_to_fit的工作（std::vector&lt;t*&gt;(v).swap(v)），如果里面是碎片，那也会被驻留在brk维护的free_list中，不会被释放。  - ptmalloc使用经验 长时间的线上服务更应该注重编码习惯，尽量减少内存碎片。  - ptmalloc使用经验 每个线程至少有一个，至多有cores_num*8个自己的arena（看成by线程的内存池），减少锁的使用。不同arena之间不能交替使用。多尝试arena数目的设置，对虚拟内存的消耗有挺大的影响。"></a>汇总：<br>  - <strong><code>ptmalloc</code></strong><br>  - <code>ptmalloc</code> 有一个主分配区(main arena)， 有多个非主分配区。非主分配区只能使用mmap向操作系统批发申请HEAP_MAX_SIZE（64位系统为64MB）大小的虚拟内存。当某个线程调用malloc的时候，会先查看线程私有变量中是否已经存在一个分配区，如果存在则尝试加锁，如果加锁失败则遍历arena链表试图获取一个没加锁的arena， 如果依然获取不到则创建一个新的非主分配区。free()的时候也要获取锁。分配小块内存容易产生碎片，ptmalloc在整理合并的时候也要对arena做加锁操作。在线程多的时候，锁的开销就会增大。<br>  - <code>ptmalloc</code> 用户请求分配的内存使用chunk表示， 每个chunk至少需要8个字节额外的开销。用户free掉的内存不会马上归还操作系统，ptmalloc会统一管理heap和mmap区域的空闲chunk，避免了频繁的系统调用。<br>  - <code>ptmalloc</code> 将相似大小的 chunk 用双向链表链接起来, 这样的一个链表被称为一个 bin。 Ptmalloc 一共 维护了 128 个 bin,并使用一个数组来存储这些 bin<br>  - <code>ptmalloc</code> 数组中的第一个为 unsorted bin, 数组中从 2 开始编号的前 64 个 bin 称为 small bins, 同一个small bin中的chunk具有相同的大小。 small bins后面的bin被称作large bins<br>  - <code>ptmalloc</code> 当free一个chunk并放入bin的时候， 还会检查它前后的chunk 是否也是空闲的, 如果是的话, 会首先把它们合并为一个大的chunk, 然后将合并后的chunk 放到unstored bin中。另外为了提高分配的速度,会把一些小的(不大于64B) chunk先放到一个叫做 fast bins 的容器内。<br>  - <code>ptmalloc</code> 在fast bins和bins都不能满足需求后，会设法在一个叫做top chunk的空间分配内存。对于非主分配区会预先通过mmap分配一大块内存作为top chunk， 当bins和fast bins都不能满足分配需要的时候, c会设法在top chunk中分出一块内存给用户, 如果top chunk本身不够大, 分配程序会重新mmap分配一块内存chunk, 并将top chunk 迁移到新的chunk上，并用单链表链接起来。如果free()的chunk恰好 与 top chunk 相邻,那么这两个 chunk 就会合并成新的 top chunk，如果top chunk大小大于某个阈值才还给操作系统。主分配区类似，不过通过sbrk()分配和调整top chunk的大小，只有heap顶部连续内存空闲超过阈值的时候才能回收内存<br>  - <code>ptmalloc</code> 需要分配的 chunk 足够大,而且 fast bins 和 bins 都不能满足要求,甚至 top chunk 本身也不能满足分配需求时, 会使用 mmap 来直接使用内存映射来将页映射到进程空间<br>  - <code>ptmalloc缺陷</code> 后分配的内存先释放,因为 ptmalloc 收缩内存是从 top chunk 开始,如果与 top chunk 相邻的 chunk 不能释放, top chunk 以下的 chunk 都无法释放。<br>  - <code>ptmalloc缺陷</code> 多线程锁开销大， 需要避免多线程频繁分配释放。<br>  - <code>ptmalloc缺陷</code> 内存从thread的areana中分配， 内存不能从一个arena移动到另一个arena， 就是说如果多线程使用内存不均衡，容易导致内存的浪费。比如说线程1使用了300M内存，完成任务后glibc没有释放给操作系统，线程2开始创建了一个新的arena， 但是线程1的300M却不能用了。<br>  - <code>ptmalloc缺陷</code> 每个chunk至少8字节的开销很大<br>  - <code>ptmalloc缺陷</code> 不定期分配长生命周期的内存容易造成内存碎片，不利于回收。 64位系统最好分配32M以上内存，这是使用mmap的阈值<br>  - <code>ptmalloc使用经验</code> 避免多线程频繁分配和释放内存，会造成频繁加解锁。<br>  - <code>ptmalloc使用经验</code> 不要分配长生命周期的内存块，容易造成内碎片，影响内存回收。<br>  - <code>ptmalloc使用经验</code> 对于动态增长STL容器，要注意它维护的队列却是分配在heap上的。也就是说一个这样的临时对象所操作过的内存，依然可能产生碎片。如果这样的函数被频繁调用，碎片就会非常多。尽量成批reserve一块内存使用。减少在容器已满的情况下仍然push_back单个元素的操作，这样非常容易产生碎片。<br>  - <code>ptmalloc使用经验</code> 即便我们做过shrink_to_fit的工作（std::vector&lt;t*&gt;(v).swap(v)），如果里面是碎片，那也会被驻留在brk维护的free_list中，不会被释放。<br>  - <code>ptmalloc使用经验</code> 长时间的线上服务更应该注重编码习惯，尽量减少内存碎片。<br>  - <code>ptmalloc使用经验</code> 每个线程至少有一个，至多有cores_num*8个自己的arena（看成by线程的内存池），减少锁的使用。不同arena之间不能交替使用。多尝试arena数目的设置，对虚拟内存的消耗有挺大的影响。</h2><ul>
+<li><strong><code>tcmalloc</code></strong></li>
+<li><code>tcmalloc</code> 为每个线程分配了一个线程本地ThreadCache，小内存从ThreadCache分配，此外还有个中央堆（CentralCache），ThreadCache不够用的时候，会从CentralCache中获取空间放到ThreadCache中。</li>
+<li><code>tcmalloc</code> 小对象（&lt;&#x3D;32K）从ThreadCache分配，大对象从CentralCache分配。大对象分配的空间都是4k页面对齐的，多个pages也能切割成多个小对象划分到ThreadCache中</li>
+<li><code>tcmalloc</code> 小对象有将近170个不同的大小分类(class)，每个class有个该大小内存块的FreeList单链表，分配的时候先找到best fit的class，然后无锁的获取该链表首元素返回。如果链表中无空间了，则到CentralCache中划分几个页面并切割成该class的大小，放入链表中</li>
+<li><code>tcmalloc</code> 大对象(&gt;32K)先4k对齐后，从CentralCache中分配。 CentralCache维护的PageHeap数组中第256个元素是所有大于255个页面都挂到该链表中</li>
+<li><code>tcmalloc</code> 当best fit的页面链表中没有空闲空间时，则一直往更大的页面空间则，如果所有256个链表遍历后依然没有成功分配。则使用sbrk, mmap, &#x2F;dev&#x2F;mem从系统中分配。</li>
+<li><code>tcmalloc</code> PageHeap管理的连续的页面被称为span. 如果span未分配， 则span是PageHeap中的一个链表元素. 如果span已经分配，​​它可能是返回给应用程序的大对象， 或者已经被切割成多小对象，该小对象的size-class会被记录在span中</li>
+<li><code>tcmalloc</code> 在32位系统中，使用一个中央数组(central array)映射了页面和span对应关系， 数组索引号是页面号，数组元素是页面所在的span。在64位系统中，使用一个<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%9F%BA%E6%95%B0%E6%A0%91"><code>3-level radix tree</code></a>记录了该映射关系</li>
+<li><code>tcmalloc</code> 当一个object free的时候，会根据地址对齐计算所在的页面号，然后通过central array找到对应的span。</li>
+<li><code>tcmalloc</code> 如果是小对象，span会告诉我们他的size class，然后把该对象插入当前线程的ThreadCache中。如果此时ThreadCache超过一个预算的值（默认2MB），则会使用垃圾回收机制把未使用的object从ThreadCache移动到CentralCache的central free lists中。</li>
+<li><code>tcmalloc</code> 如果是大对象，span会告诉我们对象锁在的页面号范围。假设这个范围是[p,q]， 先查找页面p-1和q+1所在的span，如果这些临近的span也是free的，则合并到[p,q]所在的span， 然后把这个span回收到PageHeap中。</li>
+<li><code>tcmalloc</code> CentralCache的central free lists类似ThreadCache的FreeList，不过它增加了一级结构，先根据size-class关联到spans的集合， 然后是对应span的object链表。如果span的链表中所有object已经free， 则span回收到PageHeap中</li>
+<li><code>tcmalloc相比ptmalloc</code> ThreadCache会阶段性的回收内存到CentralCache里。解决了ptmalloc2中arena之间不能迁移的问题。</li>
+<li><code>tcmalloc相比ptmalloc</code> tcmalloc占用更少的额外空间。例如，分配N个8字节对象可能要使用大约8N * 1.01字节的空间。即，多用百分之一的空间。 ptmalloc2使用最少8字节描述一个chunk。</li>
+<li><code>tcmalloc相比ptmalloc</code> 更快。小对象几乎无锁， &gt;32KB的对象从CentralCache中分配使用自旋锁。并且&gt;32KB对象都是页面对齐分配，多线程的时候应尽量避免频繁分配，否则也会造成自旋锁的竞争和页面对齐造成的浪费</li>
+</ul>
+<hr>
+<ul>
+<li><strong><code>jmalloc</code></strong></li>
+<li><code>jmalloc</code> 与tcmalloc类似，每个线程同样在&lt;32KB的时候无锁使用线程本地cache。</li>
+<li><code>jmalloc</code> 在64bits系统上使用下面的size-class分类：<br>  <code>Small</code>: [8], [16, 32, 48, …, 128], [192, 256, 320, …, 512], [768, 1024, 1280, …, 3840]<br>  <code>Large</code>: [4 KiB, 8 KiB, 12 KiB, …, 4072 KiB]<br>  <code>Huge</code>: [4 MiB, 8 MiB, 12 MiB, …]</li>
+<li><code>jmalloc</code> small&#x2F;large对象查找metadata需要常量时间， huge对象通过全局红黑树在对数时间内查找。</li>
+<li><code>jmalloc</code> 虚拟内存被逻辑上分割成chunks（默认是4MB，1024个4k页），应用线程通过round-robin算法在第一次malloc的时候分配arena， 每个arena都是相互独立的，维护自己的chunks， chunk切割pages到small&#x2F;large对象。free()的内存总是返回到所属的arena中，而不管是哪个线程调用free()。</li>
+<li><code>jmalloc</code> 小对象也根据size-class，但是它使用了低地址优先的策略，来降低内存碎片化。</li>
+<li><code>jmalloc</code> 大概需要2%的额外开销。（tcmalloc 1%， ptmalloc最少8B）</li>
+<li><code>jmalloc</code> 和tcmalloc类似的线程本地缓存，避免锁的竞争</li>
+<li><code>jmalloc</code> 相对未使用的页面，优先使用dirty page，提升缓存命中。</li>
+</ul>
+</li>
+</ul>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ul>
+<li><code>深入理解glibc malloc</code> (<a target="_blank" rel="noopener" href="https://wooyun.js.org/drops/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%20glibc%20malloc.html">https://wooyun.js.org/drops/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%20glibc%20malloc.html</a>)</li>
+<li><code>Linux内存点滴 用户进程内存空间</code> (<a target="_blank" rel="noopener" href="https://www.cnblogs.com/muahao/p/5974594.html">https://www.cnblogs.com/muahao/p/5974594.html</a>)</li>
+<li><code>Linux下/proc目录简介</code> (<a target="_blank" rel="noopener" href="https://blog.spoock.com/2019/10/08/proc/">https://blog.spoock.com/2019/10/08/proc/</a>)</li>
+<li><code>mallopt(3) - Linux man page</code> (<a target="_blank" rel="noopener" href="https://linux.die.net/man/3/mallopt">https://linux.die.net/man/3/mallopt</a>)</li>
+<li><code>glibc wiki</code> (<a target="_blank" rel="noopener" href="https://sourceware.org/glibc/wiki/MallocInternals">https://sourceware.org/glibc/wiki/MallocInternals</a>)</li>
+<li><code>禁用 mmap 和 memory trip 来加速 MPI RMA</code> (<a target="_blank" rel="noopener" href="https://enigmahuang.me/2018/09/05/MPI_mmap_trim/">https://enigmahuang.me/2018/09/05/MPI_mmap_trim/</a>)</li>
+<li><code>kernel-memory</code> (<a target="_blank" rel="noopener" href="https://hhb584520.github.io/kvm_blog/2017/03/06/kernel-memory.html">https://hhb584520.github.io/kvm_blog/2017/03/06/kernel-memory.html</a>)</li>
+<li><code>TCMalloc : Thread-Caching Malloc</code> (<a target="_blank" rel="noopener" href="https://github.com/google/tcmalloc/blob/master/docs/design.md">https://github.com/google/tcmalloc/blob/master/docs/design.md</a>)</li>
+<li><code>3-level radix tree 基数树</code> (<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%9F%BA%E6%95%B0%E6%A0%91">https://zh.wikipedia.org/wiki/%E5%9F%BA%E6%95%B0%E6%A0%91</a>)</li>
+<li><code>understanding-glibc-malloc</code> (<a target="_blank" rel="noopener" href="https://sploitfun.wordpress.com/2015/02/10/understanding-glibc-malloc/">https://sploitfun.wordpress.com/2015/02/10/understanding-glibc-malloc/</a>)</li>
+<li><code>Syscalls used by malloc</code> (<a target="_blank" rel="noopener" href="https://sploitfun.wordpress.com/2015/02/11/syscalls-used-by-malloc/">https://sploitfun.wordpress.com/2015/02/11/syscalls-used-by-malloc/</a>)</li>
+<li><code>几种malloc实现原理 ptmalloc(glibc) &amp;&amp; tcmalloc(google) &amp;&amp; jemalloc(facebook)</code> (<a target="_blank" rel="noopener" href="https://msd.misuland.com/pd/300184051069751296">https://msd.misuland.com/pd/300184051069751296</a>)</li>
+<li><code>ptmalloc、tcmalloc与jemalloc对比分析</code> (<a target="_blank" rel="noopener" href="https://www.cyningsun.com/07-07-2018/memory-allocator-contrasts.html#%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D">https://www.cyningsun.com/07-07-2018/memory-allocator-contrasts.html#%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D</a>)</li>
+<li><code>内存优化总结:ptmalloc、tcmalloc和jemalloc</code> (<a target="_blank" rel="noopener" href="http://www.cnhalo.net/2016/06/13/memory-optimize/">http://www.cnhalo.net/2016/06/13/memory-optimize/</a>)</li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/linux/" rel="tag"># linux</a>
+              <a href="/tags/%E5%86%85%E5%AD%98/" rel="tag"># 内存</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/9e52da14.html" rel="prev" title="mysql sequence 生成 & 遇到的问题">
+      <i class="fa fa-chevron-left"></i> mysql sequence 生成 & 遇到的问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/571a5caf.html" rel="next" title="asan 内存越界检查">
+      asan 内存越界检查 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%B4%E6%98%8E"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">程序内存泄漏？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E4%B8%8A%E5%8F%AA%E6%9C%89%E4%B8%A4%E7%BB%84%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%9C%89%E5%86%85%E5%AD%98%E5%A2%9E%E9%95%BF%E8%BF%87%E5%BF%AB%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%8C%E6%98%AF%E5%90%A6%E5%92%8C%E7%B3%BB%E7%BB%9F%E7%89%88%E6%9C%AC%E3%80%81%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E6%9C%89%E5%85%B3%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">线上只有两组服务器有内存增长过快的问题，是否和系统版本、环境变量有关？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#glibc%E7%9A%84%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">glibc的内存管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%99%E6%B5%8B%E8%AF%95%E7%A8%8B%E5%BA%8F%E6%B5%8B%E8%AF%95%E9%AA%8C%E8%AF%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">写测试程序测试验证内存分配问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9A%82%E6%97%B6%E7%9A%84%E7%BB%93%E6%9E%9C%E5%92%8C%E7%BA%BF%E4%B8%8A%E4%B8%B4%E6%97%B6%E5%A4%84%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">暂时的结果和线上临时处理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%9A%82%E6%97%B6%E7%9A%84%E7%BB%93%E6%9E%9C"><span class="nav-number">6.1.</span> <span class="nav-text">暂时的结果</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%BA%BF%E4%B8%8A%E4%B8%B4%E6%97%B6%E5%A4%84%E7%90%86"><span class="nav-number">6.2.</span> <span class="nav-text">线上临时处理</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%B0%E5%BD%95"><span class="nav-number">7.</span> <span class="nav-text">记录</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%86%85%E5%AD%98%E6%8C%87%E4%BB%A4"><span class="nav-number">7.1.</span> <span class="nav-text">一些内存指令</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8E%E7%BB%AD%EF%BC%9A%E5%85%B3%E4%BA%8Etcmalloc-ptmalloc-jmalloc"><span class="nav-number">8.</span> <span class="nav-text">后续：关于tcmalloc, ptmalloc, jmalloc</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%87%E6%80%BB%EF%BC%9A-ptmalloc-ptmalloc-%E6%9C%89%E4%B8%80%E4%B8%AA%E4%B8%BB%E5%88%86%E9%85%8D%E5%8C%BA-main-arena-%EF%BC%8C-%E6%9C%89%E5%A4%9A%E4%B8%AA%E9%9D%9E%E4%B8%BB%E5%88%86%E9%85%8D%E5%8C%BA%E3%80%82%E9%9D%9E%E4%B8%BB%E5%88%86%E9%85%8D%E5%8C%BA%E5%8F%AA%E8%83%BD%E4%BD%BF%E7%94%A8mmap%E5%90%91%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%89%B9%E5%8F%91%E7%94%B3%E8%AF%B7HEAP-MAX-SIZE%EF%BC%8864%E4%BD%8D%E7%B3%BB%E7%BB%9F%E4%B8%BA64MB%EF%BC%89%E5%A4%A7%E5%B0%8F%E7%9A%84%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E3%80%82%E5%BD%93%E6%9F%90%E4%B8%AA%E7%BA%BF%E7%A8%8B%E8%B0%83%E7%94%A8malloc%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E4%BC%9A%E5%85%88%E6%9F%A5%E7%9C%8B%E7%BA%BF%E7%A8%8B%E7%A7%81%E6%9C%89%E5%8F%98%E9%87%8F%E4%B8%AD%E6%98%AF%E5%90%A6%E5%B7%B2%E7%BB%8F%E5%AD%98%E5%9C%A8%E4%B8%80%E4%B8%AA%E5%88%86%E9%85%8D%E5%8C%BA%EF%BC%8C%E5%A6%82%E6%9E%9C%E5%AD%98%E5%9C%A8%E5%88%99%E5%B0%9D%E8%AF%95%E5%8A%A0%E9%94%81%EF%BC%8C%E5%A6%82%E6%9E%9C%E5%8A%A0%E9%94%81%E5%A4%B1%E8%B4%A5%E5%88%99%E9%81%8D%E5%8E%86arena%E9%93%BE%E8%A1%A8%E8%AF%95%E5%9B%BE%E8%8E%B7%E5%8F%96%E4%B8%80%E4%B8%AA%E6%B2%A1%E5%8A%A0%E9%94%81%E7%9A%84arena%EF%BC%8C-%E5%A6%82%E6%9E%9C%E4%BE%9D%E7%84%B6%E8%8E%B7%E5%8F%96%E4%B8%8D%E5%88%B0%E5%88%99%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84%E9%9D%9E%E4%B8%BB%E5%88%86%E9%85%8D%E5%8C%BA%E3%80%82free-%E7%9A%84%E6%97%B6%E5%80%99%E4%B9%9F%E8%A6%81%E8%8E%B7%E5%8F%96%E9%94%81%E3%80%82%E5%88%86%E9%85%8D%E5%B0%8F%E5%9D%97%E5%86%85%E5%AD%98%E5%AE%B9%E6%98%93%E4%BA%A7%E7%94%9F%E7%A2%8E%E7%89%87%EF%BC%8Cptmalloc%E5%9C%A8%E6%95%B4%E7%90%86%E5%90%88%E5%B9%B6%E7%9A%84%E6%97%B6%E5%80%99%E4%B9%9F%E8%A6%81%E5%AF%B9arena%E5%81%9A%E5%8A%A0%E9%94%81%E6%93%8D%E4%BD%9C%E3%80%82%E5%9C%A8%E7%BA%BF%E7%A8%8B%E5%A4%9A%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C%E9%94%81%E7%9A%84%E5%BC%80%E9%94%80%E5%B0%B1%E4%BC%9A%E5%A2%9E%E5%A4%A7%E3%80%82-ptmalloc-%E7%94%A8%E6%88%B7%E8%AF%B7%E6%B1%82%E5%88%86%E9%85%8D%E7%9A%84%E5%86%85%E5%AD%98%E4%BD%BF%E7%94%A8chunk%E8%A1%A8%E7%A4%BA%EF%BC%8C-%E6%AF%8F%E4%B8%AAchunk%E8%87%B3%E5%B0%91%E9%9C%80%E8%A6%818%E4%B8%AA%E5%AD%97%E8%8A%82%E9%A2%9D%E5%A4%96%E7%9A%84%E5%BC%80%E9%94%80%E3%80%82%E7%94%A8%E6%88%B7free%E6%8E%89%E7%9A%84%E5%86%85%E5%AD%98%E4%B8%8D%E4%BC%9A%E9%A9%AC%E4%B8%8A%E5%BD%92%E8%BF%98%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%EF%BC%8Cptmalloc%E4%BC%9A%E7%BB%9F%E4%B8%80%E7%AE%A1%E7%90%86heap%E5%92%8Cmmap%E5%8C%BA%E5%9F%9F%E7%9A%84%E7%A9%BA%E9%97%B2chunk%EF%BC%8C%E9%81%BF%E5%85%8D%E4%BA%86%E9%A2%91%E7%B9%81%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E3%80%82-ptmalloc-%E5%B0%86%E7%9B%B8%E4%BC%BC%E5%A4%A7%E5%B0%8F%E7%9A%84-chunk-%E7%94%A8%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8%E9%93%BE%E6%8E%A5%E8%B5%B7%E6%9D%A5-%E8%BF%99%E6%A0%B7%E7%9A%84%E4%B8%80%E4%B8%AA%E9%93%BE%E8%A1%A8%E8%A2%AB%E7%A7%B0%E4%B8%BA%E4%B8%80%E4%B8%AA-bin%E3%80%82-Ptmalloc-%E4%B8%80%E5%85%B1-%E7%BB%B4%E6%8A%A4%E4%BA%86-128-%E4%B8%AA-bin-%E5%B9%B6%E4%BD%BF%E7%94%A8%E4%B8%80%E4%B8%AA%E6%95%B0%E7%BB%84%E6%9D%A5%E5%AD%98%E5%82%A8%E8%BF%99%E4%BA%9B-bin-ptmalloc-%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E7%AC%AC%E4%B8%80%E4%B8%AA%E4%B8%BA-unsorted-bin-%E6%95%B0%E7%BB%84%E4%B8%AD%E4%BB%8E-2-%E5%BC%80%E5%A7%8B%E7%BC%96%E5%8F%B7%E7%9A%84%E5%89%8D-64-%E4%B8%AA-bin-%E7%A7%B0%E4%B8%BA-small-bins-%E5%90%8C%E4%B8%80%E4%B8%AAsmall-bin%E4%B8%AD%E7%9A%84chunk%E5%85%B7%E6%9C%89%E7%9B%B8%E5%90%8C%E7%9A%84%E5%A4%A7%E5%B0%8F%E3%80%82-small-bins%E5%90%8E%E9%9D%A2%E7%9A%84bin%E8%A2%AB%E7%A7%B0%E4%BD%9Clarge-bins-ptmalloc-%E5%BD%93free%E4%B8%80%E4%B8%AAchunk%E5%B9%B6%E6%94%BE%E5%85%A5bin%E7%9A%84%E6%97%B6%E5%80%99%EF%BC%8C-%E8%BF%98%E4%BC%9A%E6%A3%80%E6%9F%A5%E5%AE%83%E5%89%8D%E5%90%8E%E7%9A%84chunk-%E6%98%AF%E5%90%A6%E4%B9%9F%E6%98%AF%E7%A9%BA%E9%97%B2%E7%9A%84-%E5%A6%82%E6%9E%9C%E6%98%AF%E7%9A%84%E8%AF%9D-%E4%BC%9A%E9%A6%96%E5%85%88%E6%8A%8A%E5%AE%83%E4%BB%AC%E5%90%88%E5%B9%B6%E4%B8%BA%E4%B8%80%E4%B8%AA%E5%A4%A7%E7%9A%84chunk-%E7%84%B6%E5%90%8E%E5%B0%86%E5%90%88%E5%B9%B6%E5%90%8E%E7%9A%84chunk-%E6%94%BE%E5%88%B0unstored-bin%E4%B8%AD%E3%80%82%E5%8F%A6%E5%A4%96%E4%B8%BA%E4%BA%86%E6%8F%90%E9%AB%98%E5%88%86%E9%85%8D%E7%9A%84%E9%80%9F%E5%BA%A6-%E4%BC%9A%E6%8A%8A%E4%B8%80%E4%BA%9B%E5%B0%8F%E7%9A%84-%E4%B8%8D%E5%A4%A7%E4%BA%8E64B-chunk%E5%85%88%E6%94%BE%E5%88%B0%E4%B8%80%E4%B8%AA%E5%8F%AB%E5%81%9A-fast-bins-%E7%9A%84%E5%AE%B9%E5%99%A8%E5%86%85%E3%80%82-ptmalloc-%E5%9C%A8fast-bins%E5%92%8Cbins%E9%83%BD%E4%B8%8D%E8%83%BD%E6%BB%A1%E8%B6%B3%E9%9C%80%E6%B1%82%E5%90%8E%EF%BC%8C%E4%BC%9A%E8%AE%BE%E6%B3%95%E5%9C%A8%E4%B8%80%E4%B8%AA%E5%8F%AB%E5%81%9Atop-chunk%E7%9A%84%E7%A9%BA%E9%97%B4%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98%E3%80%82%E5%AF%B9%E4%BA%8E%E9%9D%9E%E4%B8%BB%E5%88%86%E9%85%8D%E5%8C%BA%E4%BC%9A%E9%A2%84%E5%85%88%E9%80%9A%E8%BF%87mmap%E5%88%86%E9%85%8D%E4%B8%80%E5%A4%A7%E5%9D%97%E5%86%85%E5%AD%98%E4%BD%9C%E4%B8%BAtop-chunk%EF%BC%8C-%E5%BD%93bins%E5%92%8Cfast-bins%E9%83%BD%E4%B8%8D%E8%83%BD%E6%BB%A1%E8%B6%B3%E5%88%86%E9%85%8D%E9%9C%80%E8%A6%81%E7%9A%84%E6%97%B6%E5%80%99-c%E4%BC%9A%E8%AE%BE%E6%B3%95%E5%9C%A8top-chunk%E4%B8%AD%E5%88%86%E5%87%BA%E4%B8%80%E5%9D%97%E5%86%85%E5%AD%98%E7%BB%99%E7%94%A8%E6%88%B7-%E5%A6%82%E6%9E%9Ctop-chunk%E6%9C%AC%E8%BA%AB%E4%B8%8D%E5%A4%9F%E5%A4%A7-%E5%88%86%E9%85%8D%E7%A8%8B%E5%BA%8F%E4%BC%9A%E9%87%8D%E6%96%B0mmap%E5%88%86%E9%85%8D%E4%B8%80%E5%9D%97%E5%86%85%E5%AD%98chunk-%E5%B9%B6%E5%B0%86top-chunk-%E8%BF%81%E7%A7%BB%E5%88%B0%E6%96%B0%E7%9A%84chunk%E4%B8%8A%EF%BC%8C%E5%B9%B6%E7%94%A8%E5%8D%95%E9%93%BE%E8%A1%A8%E9%93%BE%E6%8E%A5%E8%B5%B7%E6%9D%A5%E3%80%82%E5%A6%82%E6%9E%9Cfree-%E7%9A%84chunk%E6%81%B0%E5%A5%BD-%E4%B8%8E-top-chunk-%E7%9B%B8%E9%82%BB-%E9%82%A3%E4%B9%88%E8%BF%99%E4%B8%A4%E4%B8%AA-chunk-%E5%B0%B1%E4%BC%9A%E5%90%88%E5%B9%B6%E6%88%90%E6%96%B0%E7%9A%84-top-chunk%EF%BC%8C%E5%A6%82%E6%9E%9Ctop-chunk%E5%A4%A7%E5%B0%8F%E5%A4%A7%E4%BA%8E%E6%9F%90%E4%B8%AA%E9%98%88%E5%80%BC%E6%89%8D%E8%BF%98%E7%BB%99%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E3%80%82%E4%B8%BB%E5%88%86%E9%85%8D%E5%8C%BA%E7%B1%BB%E4%BC%BC%EF%BC%8C%E4%B8%8D%E8%BF%87%E9%80%9A%E8%BF%87sbrk-%E5%88%86%E9%85%8D%E5%92%8C%E8%B0%83%E6%95%B4top-chunk%E7%9A%84%E5%A4%A7%E5%B0%8F%EF%BC%8C%E5%8F%AA%E6%9C%89heap%E9%A1%B6%E9%83%A8%E8%BF%9E%E7%BB%AD%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B2%E8%B6%85%E8%BF%87%E9%98%88%E5%80%BC%E7%9A%84%E6%97%B6%E5%80%99%E6%89%8D%E8%83%BD%E5%9B%9E%E6%94%B6%E5%86%85%E5%AD%98-ptmalloc-%E9%9C%80%E8%A6%81%E5%88%86%E9%85%8D%E7%9A%84-chunk-%E8%B6%B3%E5%A4%9F%E5%A4%A7-%E8%80%8C%E4%B8%94-fast-bins-%E5%92%8C-bins-%E9%83%BD%E4%B8%8D%E8%83%BD%E6%BB%A1%E8%B6%B3%E8%A6%81%E6%B1%82-%E7%94%9A%E8%87%B3-top-chunk-%E6%9C%AC%E8%BA%AB%E4%B9%9F%E4%B8%8D%E8%83%BD%E6%BB%A1%E8%B6%B3%E5%88%86%E9%85%8D%E9%9C%80%E6%B1%82%E6%97%B6-%E4%BC%9A%E4%BD%BF%E7%94%A8-mmap-%E6%9D%A5%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E6%9D%A5%E5%B0%86%E9%A1%B5%E6%98%A0%E5%B0%84%E5%88%B0%E8%BF%9B%E7%A8%8B%E7%A9%BA%E9%97%B4-ptmalloc%E7%BC%BA%E9%99%B7-%E5%90%8E%E5%88%86%E9%85%8D%E7%9A%84%E5%86%85%E5%AD%98%E5%85%88%E9%87%8A%E6%94%BE-%E5%9B%A0%E4%B8%BA-ptmalloc-%E6%94%B6%E7%BC%A9%E5%86%85%E5%AD%98%E6%98%AF%E4%BB%8E-top-chunk-%E5%BC%80%E5%A7%8B-%E5%A6%82%E6%9E%9C%E4%B8%8E-top-chunk-%E7%9B%B8%E9%82%BB%E7%9A%84-chunk-%E4%B8%8D%E8%83%BD%E9%87%8A%E6%94%BE-top-chunk-%E4%BB%A5%E4%B8%8B%E7%9A%84-chunk-%E9%83%BD%E6%97%A0%E6%B3%95%E9%87%8A%E6%94%BE%E3%80%82-ptmalloc%E7%BC%BA%E9%99%B7-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E9%94%81%E5%BC%80%E9%94%80%E5%A4%A7%EF%BC%8C-%E9%9C%80%E8%A6%81%E9%81%BF%E5%85%8D%E5%A4%9A%E7%BA%BF%E7%A8%8B%E9%A2%91%E7%B9%81%E5%88%86%E9%85%8D%E9%87%8A%E6%94%BE%E3%80%82-ptmalloc%E7%BC%BA%E9%99%B7-%E5%86%85%E5%AD%98%E4%BB%8Ethread%E7%9A%84areana%E4%B8%AD%E5%88%86%E9%85%8D%EF%BC%8C-%E5%86%85%E5%AD%98%E4%B8%8D%E8%83%BD%E4%BB%8E%E4%B8%80%E4%B8%AAarena%E7%A7%BB%E5%8A%A8%E5%88%B0%E5%8F%A6%E4%B8%80%E4%B8%AAarena%EF%BC%8C-%E5%B0%B1%E6%98%AF%E8%AF%B4%E5%A6%82%E6%9E%9C%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%BD%BF%E7%94%A8%E5%86%85%E5%AD%98%E4%B8%8D%E5%9D%87%E8%A1%A1%EF%BC%8C%E5%AE%B9%E6%98%93%E5%AF%BC%E8%87%B4%E5%86%85%E5%AD%98%E7%9A%84%E6%B5%AA%E8%B4%B9%E3%80%82%E6%AF%94%E5%A6%82%E8%AF%B4%E7%BA%BF%E7%A8%8B1%E4%BD%BF%E7%94%A8%E4%BA%86300M%E5%86%85%E5%AD%98%EF%BC%8C%E5%AE%8C%E6%88%90%E4%BB%BB%E5%8A%A1%E5%90%8Eglibc%E6%B2%A1%E6%9C%89%E9%87%8A%E6%94%BE%E7%BB%99%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%EF%BC%8C%E7%BA%BF%E7%A8%8B2%E5%BC%80%E5%A7%8B%E5%88%9B%E5%BB%BA%E4%BA%86%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84arena%EF%BC%8C-%E4%BD%86%E6%98%AF%E7%BA%BF%E7%A8%8B1%E7%9A%84300M%E5%8D%B4%E4%B8%8D%E8%83%BD%E7%94%A8%E4%BA%86%E3%80%82-ptmalloc%E7%BC%BA%E9%99%B7-%E6%AF%8F%E4%B8%AAchunk%E8%87%B3%E5%B0%918%E5%AD%97%E8%8A%82%E7%9A%84%E5%BC%80%E9%94%80%E5%BE%88%E5%A4%A7-ptmalloc%E7%BC%BA%E9%99%B7-%E4%B8%8D%E5%AE%9A%E6%9C%9F%E5%88%86%E9%85%8D%E9%95%BF%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%9A%84%E5%86%85%E5%AD%98%E5%AE%B9%E6%98%93%E9%80%A0%E6%88%90%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87%EF%BC%8C%E4%B8%8D%E5%88%A9%E4%BA%8E%E5%9B%9E%E6%94%B6%E3%80%82-64%E4%BD%8D%E7%B3%BB%E7%BB%9F%E6%9C%80%E5%A5%BD%E5%88%86%E9%85%8D32M%E4%BB%A5%E4%B8%8A%E5%86%85%E5%AD%98%EF%BC%8C%E8%BF%99%E6%98%AF%E4%BD%BF%E7%94%A8mmap%E7%9A%84%E9%98%88%E5%80%BC-ptmalloc%E4%BD%BF%E7%94%A8%E7%BB%8F%E9%AA%8C-%E9%81%BF%E5%85%8D%E5%A4%9A%E7%BA%BF%E7%A8%8B%E9%A2%91%E7%B9%81%E5%88%86%E9%85%8D%E5%92%8C%E9%87%8A%E6%94%BE%E5%86%85%E5%AD%98%EF%BC%8C%E4%BC%9A%E9%80%A0%E6%88%90%E9%A2%91%E7%B9%81%E5%8A%A0%E8%A7%A3%E9%94%81%E3%80%82-ptmalloc%E4%BD%BF%E7%94%A8%E7%BB%8F%E9%AA%8C-%E4%B8%8D%E8%A6%81%E5%88%86%E9%85%8D%E9%95%BF%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%9A%84%E5%86%85%E5%AD%98%E5%9D%97%EF%BC%8C%E5%AE%B9%E6%98%93%E9%80%A0%E6%88%90%E5%86%85%E7%A2%8E%E7%89%87%EF%BC%8C%E5%BD%B1%E5%93%8D%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6%E3%80%82-ptmalloc%E4%BD%BF%E7%94%A8%E7%BB%8F%E9%AA%8C-%E5%AF%B9%E4%BA%8E%E5%8A%A8%E6%80%81%E5%A2%9E%E9%95%BFSTL%E5%AE%B9%E5%99%A8%EF%BC%8C%E8%A6%81%E6%B3%A8%E6%84%8F%E5%AE%83%E7%BB%B4%E6%8A%A4%E7%9A%84%E9%98%9F%E5%88%97%E5%8D%B4%E6%98%AF%E5%88%86%E9%85%8D%E5%9C%A8heap%E4%B8%8A%E7%9A%84%E3%80%82%E4%B9%9F%E5%B0%B1%E6%98%AF%E8%AF%B4%E4%B8%80%E4%B8%AA%E8%BF%99%E6%A0%B7%E7%9A%84%E4%B8%B4%E6%97%B6%E5%AF%B9%E8%B1%A1%E6%89%80%E6%93%8D%E4%BD%9C%E8%BF%87%E7%9A%84%E5%86%85%E5%AD%98%EF%BC%8C%E4%BE%9D%E7%84%B6%E5%8F%AF%E8%83%BD%E4%BA%A7%E7%94%9F%E7%A2%8E%E7%89%87%E3%80%82%E5%A6%82%E6%9E%9C%E8%BF%99%E6%A0%B7%E7%9A%84%E5%87%BD%E6%95%B0%E8%A2%AB%E9%A2%91%E7%B9%81%E8%B0%83%E7%94%A8%EF%BC%8C%E7%A2%8E%E7%89%87%E5%B0%B1%E4%BC%9A%E9%9D%9E%E5%B8%B8%E5%A4%9A%E3%80%82%E5%B0%BD%E9%87%8F%E6%88%90%E6%89%B9reserve%E4%B8%80%E5%9D%97%E5%86%85%E5%AD%98%E4%BD%BF%E7%94%A8%E3%80%82%E5%87%8F%E5%B0%91%E5%9C%A8%E5%AE%B9%E5%99%A8%E5%B7%B2%E6%BB%A1%E7%9A%84%E6%83%85%E5%86%B5%E4%B8%8B%E4%BB%8D%E7%84%B6push-back%E5%8D%95%E4%B8%AA%E5%85%83%E7%B4%A0%E7%9A%84%E6%93%8D%E4%BD%9C%EF%BC%8C%E8%BF%99%E6%A0%B7%E9%9D%9E%E5%B8%B8%E5%AE%B9%E6%98%93%E4%BA%A7%E7%94%9F%E7%A2%8E%E7%89%87%E3%80%82-ptmalloc%E4%BD%BF%E7%94%A8%E7%BB%8F%E9%AA%8C-%E5%8D%B3%E4%BE%BF%E6%88%91%E4%BB%AC%E5%81%9A%E8%BF%87shrink-to-fit%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88std-vector-v-swap-v-%EF%BC%89%EF%BC%8C%E5%A6%82%E6%9E%9C%E9%87%8C%E9%9D%A2%E6%98%AF%E7%A2%8E%E7%89%87%EF%BC%8C%E9%82%A3%E4%B9%9F%E4%BC%9A%E8%A2%AB%E9%A9%BB%E7%95%99%E5%9C%A8brk%E7%BB%B4%E6%8A%A4%E7%9A%84free-list%E4%B8%AD%EF%BC%8C%E4%B8%8D%E4%BC%9A%E8%A2%AB%E9%87%8A%E6%94%BE%E3%80%82-ptmalloc%E4%BD%BF%E7%94%A8%E7%BB%8F%E9%AA%8C-%E9%95%BF%E6%97%B6%E9%97%B4%E7%9A%84%E7%BA%BF%E4%B8%8A%E6%9C%8D%E5%8A%A1%E6%9B%B4%E5%BA%94%E8%AF%A5%E6%B3%A8%E9%87%8D%E7%BC%96%E7%A0%81%E4%B9%A0%E6%83%AF%EF%BC%8C%E5%B0%BD%E9%87%8F%E5%87%8F%E5%B0%91%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87%E3%80%82-ptmalloc%E4%BD%BF%E7%94%A8%E7%BB%8F%E9%AA%8C-%E6%AF%8F%E4%B8%AA%E7%BA%BF%E7%A8%8B%E8%87%B3%E5%B0%91%E6%9C%89%E4%B8%80%E4%B8%AA%EF%BC%8C%E8%87%B3%E5%A4%9A%E6%9C%89cores-num-8%E4%B8%AA%E8%87%AA%E5%B7%B1%E7%9A%84arena%EF%BC%88%E7%9C%8B%E6%88%90by%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%86%85%E5%AD%98%E6%B1%A0%EF%BC%89%EF%BC%8C%E5%87%8F%E5%B0%91%E9%94%81%E7%9A%84%E4%BD%BF%E7%94%A8%E3%80%82%E4%B8%8D%E5%90%8Carena%E4%B9%8B%E9%97%B4%E4%B8%8D%E8%83%BD%E4%BA%A4%E6%9B%BF%E4%BD%BF%E7%94%A8%E3%80%82%E5%A4%9A%E5%B0%9D%E8%AF%95arena%E6%95%B0%E7%9B%AE%E7%9A%84%E8%AE%BE%E7%BD%AE%EF%BC%8C%E5%AF%B9%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E6%B6%88%E8%80%97%E6%9C%89%E6%8C%BA%E5%A4%A7%E7%9A%84%E5%BD%B1%E5%93%8D%E3%80%82"><span class="nav-number"></span> <span class="nav-text">汇总：  - ptmalloc  - ptmalloc 有一个主分配区(main arena)， 有多个非主分配区。非主分配区只能使用mmap向操作系统批发申请HEAP_MAX_SIZE（64位系统为64MB）大小的虚拟内存。当某个线程调用malloc的时候，会先查看线程私有变量中是否已经存在一个分配区，如果存在则尝试加锁，如果加锁失败则遍历arena链表试图获取一个没加锁的arena， 如果依然获取不到则创建一个新的非主分配区。free()的时候也要获取锁。分配小块内存容易产生碎片，ptmalloc在整理合并的时候也要对arena做加锁操作。在线程多的时候，锁的开销就会增大。  - ptmalloc 用户请求分配的内存使用chunk表示， 每个chunk至少需要8个字节额外的开销。用户free掉的内存不会马上归还操作系统，ptmalloc会统一管理heap和mmap区域的空闲chunk，避免了频繁的系统调用。  - ptmalloc 将相似大小的 chunk 用双向链表链接起来, 这样的一个链表被称为一个 bin。 Ptmalloc 一共 维护了 128 个 bin,并使用一个数组来存储这些 bin  - ptmalloc 数组中的第一个为 unsorted bin, 数组中从 2 开始编号的前 64 个 bin 称为 small bins, 同一个small bin中的chunk具有相同的大小。 small bins后面的bin被称作large bins  - ptmalloc 当free一个chunk并放入bin的时候， 还会检查它前后的chunk 是否也是空闲的, 如果是的话, 会首先把它们合并为一个大的chunk, 然后将合并后的chunk 放到unstored bin中。另外为了提高分配的速度,会把一些小的(不大于64B) chunk先放到一个叫做 fast bins 的容器内。  - ptmalloc 在fast bins和bins都不能满足需求后，会设法在一个叫做top chunk的空间分配内存。对于非主分配区会预先通过mmap分配一大块内存作为top chunk， 当bins和fast bins都不能满足分配需要的时候, c会设法在top chunk中分出一块内存给用户, 如果top chunk本身不够大, 分配程序会重新mmap分配一块内存chunk, 并将top chunk 迁移到新的chunk上，并用单链表链接起来。如果free()的chunk恰好 与 top chunk 相邻,那么这两个 chunk 就会合并成新的 top chunk，如果top chunk大小大于某个阈值才还给操作系统。主分配区类似，不过通过sbrk()分配和调整top chunk的大小，只有heap顶部连续内存空闲超过阈值的时候才能回收内存  - ptmalloc 需要分配的 chunk 足够大,而且 fast bins 和 bins 都不能满足要求,甚至 top chunk 本身也不能满足分配需求时, 会使用 mmap 来直接使用内存映射来将页映射到进程空间  - ptmalloc缺陷 后分配的内存先释放,因为 ptmalloc 收缩内存是从 top chunk 开始,如果与 top chunk 相邻的 chunk 不能释放, top chunk 以下的 chunk 都无法释放。  - ptmalloc缺陷 多线程锁开销大， 需要避免多线程频繁分配释放。  - ptmalloc缺陷 内存从thread的areana中分配， 内存不能从一个arena移动到另一个arena， 就是说如果多线程使用内存不均衡，容易导致内存的浪费。比如说线程1使用了300M内存，完成任务后glibc没有释放给操作系统，线程2开始创建了一个新的arena， 但是线程1的300M却不能用了。  - ptmalloc缺陷 每个chunk至少8字节的开销很大  - ptmalloc缺陷 不定期分配长生命周期的内存容易造成内存碎片，不利于回收。 64位系统最好分配32M以上内存，这是使用mmap的阈值  - ptmalloc使用经验 避免多线程频繁分配和释放内存，会造成频繁加解锁。  - ptmalloc使用经验 不要分配长生命周期的内存块，容易造成内碎片，影响内存回收。  - ptmalloc使用经验 对于动态增长STL容器，要注意它维护的队列却是分配在heap上的。也就是说一个这样的临时对象所操作过的内存，依然可能产生碎片。如果这样的函数被频繁调用，碎片就会非常多。尽量成批reserve一块内存使用。减少在容器已满的情况下仍然push_back单个元素的操作，这样非常容易产生碎片。  - ptmalloc使用经验 即便我们做过shrink_to_fit的工作（std::vector&lt;t*&gt;(v).swap(v)），如果里面是碎片，那也会被驻留在brk维护的free_list中，不会被释放。  - ptmalloc使用经验 长时间的线上服务更应该注重编码习惯，尽量减少内存碎片。  - ptmalloc使用经验 每个线程至少有一个，至多有cores_num*8个自己的arena（看成by线程的内存池），减少锁的使用。不同arena之间不能交替使用。多尝试arena数目的设置，对虚拟内存的消耗有挺大的影响。</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">1.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '7af5a094b50b7b1b57570fcefe9e713b',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

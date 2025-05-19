@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="游戏服务端经验法则">
+<meta property="og:type" content="article">
+<meta property="og:title" content="游戏服务端经验法则">
+<meta property="og:url" content="https://klysisle.space/archives/9d84ce3f.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="游戏服务端经验法则">
+<meta property="og:locale">
+<meta property="og:image" content="https://klysisle.space/images/experience/20001-2048x579.jpg">
+<meta property="og:image" content="https://klysisle.space/images/experience/20001_1.jpg">
+<meta property="og:image" content="https://klysisle.space/images/experience/sequence_containers.png">
+<meta property="og:image" content="https://klysisle.space/images/experience/associative_containers.png">
+<meta property="og:image" content="https://klysisle.space/images/working-flow/flow.svg">
+<meta property="og:image" content="https://klysisle.space/images/working-flow/analysis-problem.svg">
+<meta property="og:image" content="https://klysisle.space/images/%E4%B8%AD%E9%97%B4%E4%BB%B6/lb_nginx.png">
+<meta property="og:image" content="https://klysisle.space/images/%E4%B8%AD%E9%97%B4%E4%BB%B6/mq_1.png">
+<meta property="og:image" content="https://klysisle.space/images/%E4%B8%AD%E9%97%B4%E4%BB%B6/mq_2.png">
+<meta property="og:image" content="https://klysisle.space/images/%E4%B8%AD%E9%97%B4%E4%BB%B6/redis.png">
+<meta property="article:published_time" content="2023-08-19T02:25:05.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.711Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="知识积累">
+<meta property="article:tag" content="游戏">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://klysisle.space/images/experience/20001-2048x579.jpg">
+
+<link rel="canonical" href="https://klysisle.space/archives/9d84ce3f.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>游戏服务端经验法则 | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/9d84ce3f.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          游戏服务端经验法则
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-19 10:25:05" itemprop="dateCreated datePublished" datetime="2023-08-19T10:25:05+08:00">2023-08-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" itemprop="url" rel="index"><span itemprop="name">知识积累</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">游戏服务端经验法则</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="pre"><a href="#pre" class="headerlink" title="pre"></a>pre</h2><ul>
+<li>我是个游戏服务端开发。刚出校门就进入了游戏行业，一直觉得没有学满和对不熟悉行业谨小的性格让自己困在这个行业。</li>
+<li>过往的主要使用的语言是c++，也有两款游戏使用java。重要的节点是九城、盛大、网易，都很深刻。</li>
+<li>一直在一线工作，最开始的做业务，到独立负责模块，再到后来做架构、设计，现在做重构，一直都在写代码</li>
+<li>没有结婚、很少的恋爱经历，过往大部分时间都在工作里，近几年才坚决的想逃避996，也更多的自怨自艾。</li>
+<li>我喜欢开发游戏这件事情，是不是是喜欢的游戏倒还好，我不喜欢当前环境做游戏的这帮人；可谨慎的性格随着年龄上涨越来越严重，也不敢说浪费金钱、健康去押宝理想；在悖论里</li>
+<li>也是近几年，开始在git上整理记录一些东西，上传一些代码片段。</li>
+<li>上述没有太多意义，但觉得出现在这里并不突兀，在时间、荷尔蒙溜走的重复里，想逃掉。</li>
+<li>下面是一些经验的备忘、认为，毕竟很多知识系统都很庞大，关联、影响，记录的完整、正确比简单逐条的备忘、经验复杂的多，轻松一点</li>
+</ul>
+<h2 id="自己-·-羡慕新一代有更好的环境资源"><a href="#自己-·-羡慕新一代有更好的环境资源" class="headerlink" title="自己 · 羡慕新一代有更好的环境资源"></a>自己 · <code>羡慕新一代有更好的环境资源</code></h2><ul>
+<li>开这么个tag，今天看综艺，2个小时看了6期，只看了傻白的主唱和蒲羽，反复听蒲羽雾也至的送别（脑补原词部分更清澈的慢一点更上头</li>
+<li>当前公司是内外网隔离的两台办公机器，一直没觉得会融入团队或者想要融入团队就任性的根据工作需要做自己的事情，团队里只给一个小朋友分享了博客的链接，像蒲羽说的，我羡慕小朋友经历的学生时代有比我当时好太多的环境，上大学之前基本只有高中在网吧摸过电脑打游戏</li>
+<li>当前工作上想实现的东西会有私心的先在外网搭个框架再挪到内网用，可是最近做的时间基类不想麻烦套过去了，没人看，没人用，可能之后的也不会了；也想到自己不是理想中有开源精神的人；需要对手或者观众，即使做的东西是个很应用层的东西</li>
+<li>蒲羽 送别.雾也到达世界 太好了，现场可能会止不住流眼泪，上次是万青现场，秦皇岛，忍着不被看到，旁边是喜欢的女生</li>
+<li>我一直认为技术应该是精致的，当前觉得这种想法不太对，或者说因为太过完美主义不太对；毕竟一直工作在应用层，需求导向</li>
+<li>追求新的技术不是完全是精致的样子，更多是相信技术的演化应该可以让在应用层的我们工作的更轻松，不过当下所处的环境真实发生的和这个理解是相反的，被引入的新的问题被认为是新的技术导致的，限制使用比指导使用轻松的多；</li>
+<li>我个人的认识，基础知识是很重要的，计算机于我已经是个复杂的体系，需要严密的逻辑，这些支撑我发挥创造、基于开源的超越，我是个工匠，想轻松应对赚钱这件事情，有时间和空间看的更多</li>
+<li>这是个应该被反思的问题，计算机没有宇宙的探索浪漫，可对应用者一样是有想象、创造的学科，而且基于经验和实践，应该能让我们更轻松构建上层世界</li>
+<li>经验更多是试错积累的，通过别人的文档看别人得到的经验或者自己积累的经验；可是如果所处不被认为想要成为、构建一个新时代，试错往往不会被接受</li>
+<li>遗憾还没有参与到过理想的环境，也还没有能力、勇气、机会构建理想环境，被推着走，只是希望自己去想、尝试、记录更多东西，如果有机会有更多准备，虽然这个过程可能进度很慢</li>
+</ul>
+<h2 id="语言-·-箱子里的工具总是不够用，但箱子里拿出来的应该用的趁手"><a href="#语言-·-箱子里的工具总是不够用，但箱子里拿出来的应该用的趁手" class="headerlink" title="语言 · 箱子里的工具总是不够用，但箱子里拿出来的应该用的趁手"></a>语言 · <code>箱子里的工具总是不够用，但箱子里拿出来的应该用的趁手</code></h2><ul>
+<li>我自己的主语言是C++，因为做了不少项目，未来的C++也值得期待</li>
+<li>也用Java做过2款休闲游戏，当时主要的考虑是团队技术栈，选型的时候综合考虑团队是否能cover住语言、中间件、组件等，在出问题的时候可以解决掉问题是必须的</li>
+<li>游戏停服一次丢一半玩家的<code>常识</code>让 C++&#x2F;go + lua 的组合变得流行，不过做过<code>无状态的服务</code>之后觉得当前的手游如果不是强mmo的那种样子，战斗服以外的服务使用无状态方式更合适</li>
+<li>在处理简单（偏向解析类）工作的时候，以前最多考虑的是用shell bash，常见的日志解析还是一行shell最简单，其他稍复杂的会选择用python，例如之前用python处理excel配置数据-&gt;定制的json</li>
+<li>一些场景下也选择用 node.js，一些并发场景，例如解析代码文件生成markdown的接口文档</li>
+<li>除了GC，Java和C++一个很大的区别是反射，当然这算是个功能</li>
+</ul>
+<h2 id="设计-·-追求精致，接受不完美"><a href="#设计-·-追求精致，接受不完美" class="headerlink" title="设计 · 追求精致，接受不完美"></a>设计 · <code>追求精致，接受不完美</code></h2><h2 id="进程、服务"><a href="#进程、服务" class="headerlink" title="进程、服务"></a>进程、服务</h2><h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><ul>
+<li>tcp 相比 udp（rudp）使用重度的多</li>
+<li>游戏更多是REQ&#x2F;ACK模型，有序的一来一回，使用任何 rudp 都建议考虑单条消息payload的大小，尽量不要超过 1kbytes(1KB) 或者尽量更小，不然因为丢包造成一条消息总是收不完整造成的用户体验会很差；</li>
+<li>kcp：原理、部分测试（我一直认为网上的测试覆盖并不完整）比TCP更快，但没有用拨测的方式覆盖时间、地区测量之前，我都对他持谨慎态度</li>
+<li>网络拥挤的时候，运营商会选择先丢弃udp包</li>
+<li>BBR 是很有必要做尝试的选择，之前测试过BBR比CUBIC在弱网环境处理包的能力高很多，而且BBR是只在服务端开启就可以得到明显的提升</li>
+<li>对于HTTP的协议，之前上过cloudflare的代理，IOS在目标地址支持QUIC的情况下会选择HTTP3的通讯方式，虽然还没有实际使用过QUIC，不过当前看也是未来打有可能更多应用的方向</li>
+<li>rpc<ul>
+<li>todo: 超时: 服务间通讯的小概率网络问题</li>
+</ul>
+</li>
+</ul>
+<h2 id="数据、对象"><a href="#数据、对象" class="headerlink" title="数据、对象"></a>数据、对象</h2><h3 id="对象模型"><a href="#对象模型" class="headerlink" title="对象模型"></a>对象模型</h3><ul>
+<li>相比近些年热度很高的ecs模型，我更习惯继承链的方式，可能对我来说继承链是更严格的样子</li>
+<li>功能上多继承、数据成员方式上如果是 java 更常用多继承，c++ 倒没有特别的倾向；更多的是如果这个东西很小又想要独立出来会使用多继承，相反如果很复杂，有较多的数据成员的模块，会倾向作为对象的数据成员使用</li>
+</ul>
+<h3 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h3><ul>
+<li>todo: 等幂性：</li>
+<li>todo: 乐观锁:</li>
+<li>C11 基础上越来越多的 non-lock, less-lock 内容（std::atomic内存屏障基础上实现），但我还不是个有足够经验、测试用例去实现、验证一个无锁的功能，所以还是习惯用这种方式：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">non_lock</span> <span class="keyword">final</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Lock = non_lock&gt;</span><br><span class="line"><span class="keyword">class</span> entity_pool &#123;</span><br><span class="line">    <span class="comment">// anything....</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">entity_pool <span class="title">new_handle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> entity_pool&lt;non_lock&gt;::<span class="built_in">instance</span>().<span class="built_in">new_handle</span>(ptr);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">entity_pool <span class="title">new_handle_mt</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> entity_pool&lt;std::mutex&gt;::<span class="built_in">instance</span>().<span class="built_in">new_handle</span>(ptr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><ul>
+<li>容器是离不开的东西</li>
+<li>std::vector 基本是第一选择<ul>
+<li>指针还是栈对象？因为vector是连续的内存空间，空间不够会开辟新的空间，把老的内容拷贝到新的空间，拷贝对于指针来说只是8字节，栈对象基本都更大，但是习惯上还是更常使用栈对象方式，用reserve&#x2F;resize避免拷贝的情况</li>
+<li>reserve: 如果是常驻容器，会动态增长并且不能确定增长频次、上限的情况下可以不做这个，用系统默认的2倍方式；因为是常驻的，认为运行一段时间之后基本不会在有重新开辟空间的情况。特别在意内存占用除外；或者考虑选择 std::list&#x2F;deque&#x2F;queue；如果是临时的，尽量做reserve（虽然经常遗漏）</li>
+<li>resize: 明确长度的时候使用，或者使用c++11的 std::array</li>
+</ul>
+</li>
+<li>std::list 一般在动态缓存场景使用，比如lru_cache</li>
+<li>std::queue&#x2F;deque 明确一端插入一端取出的场景，比如thread_pool’s task</li>
+<li>std::stack 明确先进后出的场景，比如依次打开界面，而后以后打开的界面先关闭的顺序关闭界面</li>
+<li>std::set&#x2F;unordered_set 数据有唯一性的，unordered比non-unordered占用更多的空间，不在意这个占用优先选择 unordered_set，忽略hash本身的消耗</li>
+<li>std::map&#x2F;unordered_map 键值对</li>
+<li>struct hash 实现上优先选择 std::hash</li>
+<li>multi 的容器很少用~</li>
+<li>一些不错的图片：<ul>
+<li><p><a target="_blank" rel="noopener" href="https://belaycpp.com/2022/02/02/i-dont-know-which-container-to-use-and-at-this-point-im-too-afraid-to-ask/">https://belaycpp.com/2022/02/02/i-dont-know-which-container-to-use-and-at-this-point-im-too-afraid-to-ask/</a><br>  <img src="/../images/experience/20001-2048x579.jpg"><br>  <img src="/../images/experience/20001_1.jpg"></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://hackingcpp.com/cpp/cheat_sheets.html#hfold3a">https://hackingcpp.com/cpp/cheat_sheets.html#hfold3a</a><br>  <img src="/../images/experience/sequence_containers.png"><br>  <img src="/../images/experience/associative_containers.png"></p>
+</li>
+</ul>
+</li>
+<li>emplace&#x2F;push<ul>
+<li>写法上：  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">move_test</span> &#123;</span><br><span class="line">    std::string _non_used = <span class="string">&quot;1&quot;</span>;</span><br><span class="line">    <span class="type">int</span> _number = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">move_test</span>(std::string&amp;&amp;, <span class="type">int</span> n) : _number(n) &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;construct :&quot;</span> &lt;&lt; _number &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// test</span></span><br><span class="line">std::vector&lt;move_test&gt; vec;</span><br><span class="line">vec.<span class="built_in">push_back</span>(&#123; <span class="string">&quot;10&quot;</span>, <span class="number">1</span> &#125;);</span><br><span class="line">vec.<span class="built_in">emplace_back</span>(<span class="string">&quot;10&quot;</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>move&#x2F;copy constructor: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/64378721/what-is-the-difference-between-the-copy-constructor-and-move-constructor-in-c">https://stackoverflow.com/questions/64378721/what-is-the-difference-between-the-copy-constructor-and-move-constructor-in-c</a></li>
+</ul>
+<h2 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h2><ul>
+<li>这里一般是指存储玩家数据</li>
+<li>游戏回放数据一般不会有很严格的实时要求，但会有被广播观看需求，认为以文件形式存储以方便同步到cdn更重要</li>
+<li>抛弃掉传统架构的 db_server, 我更倾向的组合是 redis + mongodb，对应无状态的架构方式</li>
+<li>mysql&#x2F;mongodb, redis, leveldb 这些是过往用到比较多也很有代表性的三种数据存储（缓存）；<ul>
+<li>mysql 传统的、关系型<ul>
+<li>游戏更常靠一个玩家一行数据，数据块序列化后存储在 blob 里面，很少会用到事务相关的东西</li>
+<li>依赖 binlog 的时间点回档也是选择 mysql 一个重要的选项</li>
+</ul>
+</li>
+<li>mongodb 集群式的、非关系型<ul>
+<li>当时使用 mongodb 有语言（java）的关系</li>
+<li>mongodb 的 bson 和 json 格式基本一致，数据展示上比 blob 方便太多</li>
+<li>nosql 的特性也使得扩展变得很容易</li>
+<li>如果选择的是云商的PaSS服务，没有很特别的集群需求，standalone 永远是首选</li>
+<li>集群的 mongo 因为 mongoS、mongoC 的方式，效率比单点低</li>
+<li>集群需要考虑清楚使用什么样的分片规则</li>
+<li>当然价钱也是很重要的一个方面</li>
+</ul>
+</li>
+<li>redis 缓存（集群、单点）<ul>
+<li>集群：一般作为数据存储，游戏是个读多写少的场景（MMO常见的做法是使用进程的内存），redis在架构图上一般被画在Hard_DB之前，也表述了redis主要作用是减轻DB读取的压力</li>
+<li>单点：在成本考虑上也经常被用于数据存储，之前就有游戏前期考虑并发压力使用集群方式，后期数据下滑换成了单点</li>
+<li>单点：还有场景是需要使用lua完成一些复杂、原子的操作</li>
+<li>读取策略：先从redis读，读不到从DB读，并写入redis</li>
+<li>写入策略：先写DB，成功后更新redis，失败删除redis数据（数据一致性）</li>
+<li>expire：原则上任何数据都需要设置过期时间（一般2小时），游戏这种数据由热数据变成冷数据基本是玩家的行为；这里对于访问特别频繁、并发量可能很大的数据，过期时间需要加随机值，避免同时过期造成的雪崩</li>
+</ul>
+</li>
+<li>levelDB：需要本地存储场景很合适，也是我的首选</li>
+<li>mysql、mongodb 在数据上用序列化的名词解释，mysql有idl类似protobuf，mongodb没有idl类似json，虽然mongodb会有更多的带宽消耗，不过一般在部署上都是和服务在同一内网区域，带宽的影响可以忽略</li>
+<li>clickhouse 列式数据库，在处理关联查询上相比行式数据库需要读取的数据量更小，优势明显，未来有机会考虑在 event log 这类场景使用这个数据库</li>
+</ul>
+</li>
+<li>进程内存存储和以上存储方式最显著的区别是：<code>进程内存是对象数据(反序列化后的数据)</code>，后者取出来的数据都是需要经过反序列才好再序列化成消息数据给到客户端；一些离线数据场景，也可以直接存储需要给到客户端消息的序列化后的数据在redis&#x2F;db；具体需要看应用场景；考虑是否需要进程对象的（反序列后）<code>lru</code></li>
+</ul>
+<h3 id="事务ACID"><a href="#事务ACID" class="headerlink" title="事务ACID"></a><a target="_blank" rel="noopener" href="https://www.ibm.com/docs/en/cics-ts/5.4?topic=processing-acid-properties-transactions">事务ACID</a></h3><ul>
+<li>Atomicity 原子<blockquote>
+<p>对数据的所有更改都像单个操作一样执行。也就是说，要么执行所有更改，要么不执行任何更改。例如，在将资金从一个帐户转移到另一个帐户的应用程序中，原子性属性可确保如果从一个帐户成功借记，则相应的贷记将记入另一个帐户。</p>
+</blockquote>
+</li>
+<li>Consistency 一致<blockquote>
+<p>当事务开始和结束时，数据处于一致状态。例如，在将资金从一个帐户转移到另一个帐户的应用程序中，一致性属性可确保两个帐户中的资金总价值在每次交易开始和结束时相同。</p>
+</blockquote>
+</li>
+<li>Isolation 隔离<blockquote>
+<p>一个事务的中间状态对于其他事务是不可见的。因此，并发运行的事务看起来是串行化的。例如，在将资金从一个帐户转移到另一个帐户的应用程序中，隔离属性可确保另一笔交易在一个帐户或另一个帐户中看到转移的资金，但不能在两个帐户中看到转移的资金，也不能在两个帐户中都看到转移的资金。</p>
+</blockquote>
+</li>
+<li>Durability 可用<blockquote>
+<p>事务成功完成后，即使发生系统故障，数据更改也会持续存在并且不会撤消。例如，在将资金从一个帐户转移到另一个帐户的应用程序中，持久性属性可确保对每个帐户所做的更改不会被撤销。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p><img src="/../images/working-flow/flow.svg" alt="步骤、流程"></p>
+<h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h2><h2 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h2><h3 id="windows-桌面系统"><a href="#windows-桌面系统" class="headerlink" title="windows&#x2F;桌面系统"></a>windows&#x2F;桌面系统</h3><ul>
+<li>wireshark、fiddler 查看网络、数据包问题，对于手机端，需要一个移动wifi，只能在电脑上抓包</li>
+<li>procexp、tcpview 已经是必然被放在开始菜单自定义组的工具了，分别对应查看进程信息、链接情况</li>
+<li>postman http消息测试，现在也支持websocket了</li>
+<li>terminal: tabby 可以分屏是我比较关注的功能</li>
+</ul>
+<h3 id="linux-命令行"><a href="#linux-命令行" class="headerlink" title="linux&#x2F;命令行"></a>linux&#x2F;命令行</h3><ul>
+<li>htop</li>
+<li>tcpdump</li>
+<li>nc<ul>
+<li>临时监听端口：nc -l 51300. 客户端有链接断开后，监听端也会跟着关闭</li>
+<li>监听端口：nc -lk 51300. 客户端有链接断开后，监听端不会关闭</li>
+</ul>
+</li>
+<li>tc</li>
+</ul>
+<h2 id="运维"><a href="#运维" class="headerlink" title="运维"></a>运维</h2><h3 id="负载"><a href="#负载" class="headerlink" title="负载"></a>负载</h3><ul>
+<li>pre: 大区的游戏越来越多了，或者说混服的玩法越来越多了；过去分区一方面是技术上大区很麻烦，一方面是避免晚来的玩家输在起跑线太多；然后游戏一直在开区、滚服、合服。平台开发基本都是分布式的部署，负载均衡是个很重要的名词</li>
+<li>物理机：机房多活（反亲和）：部署选机器的时候需要避免机器在同一机房，免得机房整体故障<ul>
+<li>如果机房间网络链路优化的不好，多了几次路由、交换机这样的跳转点设备，会导致高并发量下，内部网络转发有一定的差距（没实测过）游戏的场景不太考虑这个问题，并发量远没有达到</li>
+</ul>
+</li>
+<li>域名：DNS 负载：在dns上给一个域名映射多个ip，用轮询、随机、负载、区域解析等条件负载到不同ip；之前游戏在全球部署，尝试使用公司内部dns区域解析的负载方式，但是测试结果不好经常判断错误；</li>
+<li>lvs&#x2F;haproxy&#x2F;nginx 网络负载、代理：这种是开发接触最多的部分了；经常用到的：<ul>
+<li>ha tcp层的端口映射，8001端口映射转发到 10.1.2.100:8000 端口，8002到 10.1.2.101:8000 端口；</li>
+<li>nginx：可以做很多规则，到不同服务、不同进程，卸载tls….需要提前设计利用好 http header</li>
+</ul>
+</li>
+<li>进程、服务内部的负载：上面一些负载策略一般都比较简单，着重在转发需求上，服务内部的负载则比较多考虑服务当前的业务压力，比如当前多少玩家在这个进程上；多数由注册发现进程统计、记录服务负载信息（类似zookeeper、eureka…）比如匹配服务匹配完成需要找一个可用的负载相对较低的战斗服把玩家信息给过去</li>
+</ul>
+<h3 id="部署：网络、业务、数据分离"><a href="#部署：网络、业务、数据分离" class="headerlink" title="部署：网络、业务、数据分离"></a>部署：网络、业务、数据分离</h3><ul>
+<li>网络分离比较容易理解，不想服务所在的宿主机对外暴露，透明的网络层加规则也更方便内部负载扩容，比如nginx</li>
+<li>如果是带tls的需求，对外的服务需要载入证书卸载tls（比如常用的nginx），而内部服务一般不需要tls（比如mysql需要一般都会关闭tls）</li>
+<li>业务服务器是最容易出问题（资源耗尽、crash、无响应）</li>
+<li>数据分离一个是因为数据部分的服务器不能对外（相对网络）、需要稳定（相对业务），另一个原因是数据服务器（mysql、mongodb）这种一般需要禁用 <code>transparent_hugepage</code> (THP)<ul>
+<li>THP 是linux为了提高内存分配效率的东西，一般 <code>1 page = 2M</code>，系统分配内存是先分配虚拟内存地址，需要使用的时候发现没有映射物理内存，内核触发 <code>page fault</code> 分配物理内存，普通页大小是 <code>4k</code>；<code>1G</code> 虚拟内存以 <code>4K</code> 分配的时候需要 <code>1G / 4K = 256 * 1024</code> 次；如果是 THP 的 2M 页只需要 <code>1G / 2M = 500</code> 次 <code>page fault</code> 以此得到更高的效率；但是对于数据库这种访问分散的数据，一次分配 <code>2M</code> 会造成大量的内存碎片，比如<a target="_blank" rel="noopener" href="https://www.mongodb.com/docs/manual/tutorial/transparent-huge-pages/">mongoDB 官网</a>表示建议禁止 THP；mongo 官网解释的更直接，也给了禁用的方法； <a target="_blank" rel="noopener" href="https://www.mongodb.com/docs/manual/reference/ulimit/">这个是 mongoDB 宿主机设置的另一个建议</a>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ cat /proc/meminfo | grep -i &#x27;hugepage&#x27;</span><br><span class="line">HugePages_Total:       0              -- 分配了多少页</span><br><span class="line">HugePages_Free:        0              -- 空闲多少页</span><br><span class="line">HugePages_Rsvd:        0</span><br><span class="line">HugePages_Surp:        0</span><br><span class="line">Hugepagesize:       2048 kB           -- 一页多大</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h3><ul>
+<li>遇事不要慌，能保留现场先保留现场</li>
+<li>不能保留现场的先记录时间点、备份当时的监控、core、log等可以帮助分析问题的信息</li>
+<li>有需要的话能重启先重启，重启前需要判断是否需要回档等，需要回档的话先拉维护，把流量切走</li>
+<li>问题已经出了，不要焦虑，确定问题解决问题才是重点</li>
+</ul>
+<p><img src="/../images/working-flow/analysis-problem.svg" alt="问题分析"></p>
+<h2 id="运营"><a href="#运营" class="headerlink" title="运营"></a>运营</h2><h2 id="迭代"><a href="#迭代" class="headerlink" title="迭代"></a>迭代</h2><h2 id="管理"><a href="#管理" class="headerlink" title="管理"></a>管理</h2><ul>
+<li><p>像简介里说的，我一直在写代码，管理上其实没太多经验；</p>
+</li>
+<li><p>没有尝试、实践、验证过的东西都是不确定、怀疑的态度，经常忽略方法论</p>
+</li>
+<li><p>之前领导明确指出过需要关注方法论的问题，可能我的学习过程总习惯有面镜子参考，之前的同事也都是实战的样子，这个点一直没有做好</p>
+</li>
+<li><p>当前的工作中看到一个很注重方法论的同事，也正在强迫自己学习这个点；用<code>强迫</code>是因为可能他已经确定了自己是朝着管理方向走的，太多只关注方法论可在实际写代码上拉下太多了，这个样子又让我觉得不应该，就在<code>我需要学习</code>和<code>以此为耻</code>之间反复横跳</p>
+</li>
+<li><p>只关注方法论问题很明显，</p>
+<ul>
+<li>比如知道想要提高性能可以做缓存，可实现上release的时候把可复用的数值（比如object uuid）缓存了，get的时候却没有先从缓存拿，导致缓存暴涨；</li>
+<li>再比如我这边做的一些重构核心代码、关键点上都有注释说明，重构过程中的思路、问题点最后会整理成文档放在wiki上，可是同事更倾向直接问为什么这么做，我的内心（代码文档都在你会自己看的么….），好像他只关心这个东西如果换他跟别人讲应该怎么讲，一个只是讲方法论的问题</li>
+<li>并且听完思路表示和他设想的是差不多的，我的内心（那倒是实现掉呀….）</li>
+<li>这位有很强方法论的同事不是我认为好的样子，剥离开只关注他好的地方也容易被日常零碎的事情影响着不想变成这样子</li>
+</ul>
+</li>
+<li><p>不过计算机是一个既定模式的学科，非0既1，不像生物、物理；而且工作只是在应用层，不像芯片制造那种开发需要基础设计、制造的理论；总的来说其实是个简单的东西，我不是个特别有天赋的人，只能勤补拙</p>
+</li>
+<li><p>这样子看其实我需要的可能是相信自己基于基础知识的推断，在架构设计上抓住需要解决问题的重点，不过分在没有实践验证、不够完善这些问题上慌张，更多的时间用来扩宽视野，用新的技术解决新的问题</p>
+</li>
+<li><p>之前晋升答辩，架构设计上注册发现是个单点，因为觉得是个很简单轻量的服务，没想着做成高可用的，可是答辩被老师问到楞在怀疑挂掉重启这个操作是不够的，一下子就不自信了（设计上做了挂掉也不影响其他服务正常运行的样子），这个场景记忆深刻；</p>
+</li>
+<li><p>还是那次答辩，在业务贡献和技术深度两个大方向上选了技术深度，主要的内容基本只在一个技术点上，领导一直觉得需要多加点内容，即使不是我负责的内容，怯懦也实诚的性格没有加更多的东西，答辩被问细节到用了多大mtu，庆幸也只有是自己实际做的才会关注着这个细节</p>
+</li>
+<li><p>这些好像和管理并没有太多关系，也还确实没有太多管理的内容记录</p>
+</li>
+<li><p>游戏开发的工作内容和制造业的定件很像，需求可以被明确到结果的样子，经历了这么多年也几乎没有不可被实现的需求（即便优化不下来的面片也有硬件的更新承载）</p>
+</li>
+<li><p>当前是996的状态，受《重来1、3》这本书和其他可能很多方面可能有成熟却越来越没有激情、身体相比没有10年前的活力的影响，抗拒又无能为力当前的状态，自上传导一个理念比自下向上传导要容易得多，当下所处的环境确实是这样的，我没有信心把我认为好的管理想法传导到上级，索性就被动的被推着走；想到已故的左耳朵耗子，致敬</p>
+</li>
+<li><p>游戏是一个大众产品，和绝大多数工业产品一样明确的分工可以让人专注、发挥所长，明确职责搭建完整产品；我相信每个人都有产品思维，严谨思考更多受态度影响，这可以弥补可能不好改动的设计上的不足；比如一个商店售卖功能，遇到问题发现需要检查客户端输入的购买数量是否合法</p>
+<ul>
+<li>A同学：找到对应位置，添加if语句</li>
+<li>B同学：联想到是否开宝箱等批量使用物品的功能也有类似问题，检查、修改相关代码</li>
+<li>C同学：对于客户端输入的地方都不能信任，数值是最容易越界的地方，考虑在协议层加一个通用的数值类型，根据不同的功能注册策略函数检查这种数值类型，覆盖数值、数值运算等可能越界情况</li>
+</ul>
+</li>
+<li><p>B同学已经是一个积极看待问题的样子了，如果团队里大部分都可以做到这个样子，这个产品在技术层面不会出现太多太严重的问题；保持积极多思考的样子，之后也会用更完善的设计来提前避免这类问题</p>
+</li>
+<li><p>我相信即便是刚入行的程序，明白具体原因都会发散考虑到其他类似场景；可是当前看到的大都是A同学，甚至下次写的时候还是会有相同的问题</p>
+</li>
+<li><p>开发人员停止思考，边缘化技术能力的价值，像是拿着不再打磨而锈迹斑驳的凿刀，像是用灰黄的泥土修补破损的玻璃雕像</p>
+</li>
+<li><ol>
+<li>重复、繁重工作让人觉得工作只是工作这件事情？那么看到新的技术、设计，完成、优化了一个小东西会兴奋一下么？</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>发觉技术的迭代并不能解决自己朝10晚10的状态，干脆得过且过？</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>不一致的想法却无能为力的样子放弃了对项目的想象和热爱？</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>看到抄捷径、卷加班还没有摔跤甚至得到更多糖果时，是想也这么做还是放弃挣扎了呢？</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>或者阴差阳错选错了行业？</li>
+</ol>
+</li>
+<li><ol start="6">
+<li>还有什么让你觉得不适合、甚至厌恶了当前的工作甚至这个行业？</li>
+</ol>
+</li>
+<li><p>这是否是人们对经历的当下丧失或者抗拒了敏感，为什么会这样？如果我是一个管理者，会探究这个问题</p>
+</li>
+<li><p>我理解产品和代码是两回事，也许作为一个管理者在商业的思维下探究的是产品，可作为一个技术管理者需要完全丢弃技术价值才能实现产品理想的探究么？</p>
+</li>
+<li><p>摘自：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/HoFSNCd1U3eoUqYaQiEgwQ">https://mp.weixin.qq.com/s/HoFSNCd1U3eoUqYaQiEgwQ</a></p>
+<blockquote>
+<blockquote>
+<p>谚语曰: “Talk Is Cheap, Show Me The Code”。知易行难，知行合一难。嘴里要讲出来总是轻松，把别人讲过的话记住，组织一下语言，再讲出来，很容易。设计理念你可能道听途说了一些，以为自己掌握了，但是你会做么？有能力去思考、改进自己当前的实践方式和实践中的代码细节么？不客气地说，很多人仅仅是知道并且认同了某个设计理念，进而产生了一种虚假的安心感——自己的技术并不差。但是他根本没有去实践这些设计理念，甚至根本实践不了这些设计理念，从结果来说，他懂不懂这些道理&#x2F;理念，有什么差别？变成了自欺欺人。</p>
+</blockquote>
+</blockquote>
+</li>
+</ul>
+<h2 id="重构-·-习惯的东西更得心应手，也是禁锢自己的枷锁"><a href="#重构-·-习惯的东西更得心应手，也是禁锢自己的枷锁" class="headerlink" title="重构 · 习惯的东西更得心应手，也是禁锢自己的枷锁"></a>重构 · <code>习惯的东西更得心应手，也是禁锢自己的枷锁</code></h2><p>过往基本上都是自己在做事情，从0-1的做，review别人的代码也更多的是看一些完整、规范、细节等；这份工作才真正意义上重构一份代码；到目前为止2023.01-2023.08主要重构了场景、aoi、对象继承关系、对象管理、背包、定时器；记录一些可执行的实践</p>
+<ul>
+<li>先要了解这是个什么类型的游戏，有那些过往经验是可以参考的；比如当前这款是2D MMO，于我参考的比较多的是之前做端游的经验</li>
+<li>看下过往代码的问题，构想好重构后是什么样子的，解决了什么问题（代码很乱也是很严重的问题）；比如之前的背包操作，添加一个物品有10几种函数实现，扣除等比量，很多实现看起来严格的写法（开宝箱）是先遍历检查物品够不够-&gt;检查背包剩余格子够不够-&gt;遍历扣除-&gt;遍历添加，大段大段类似的代码，重构目标很清楚: 用事务的方式操作背包，操作失败回滚就是，成功了最后commit，commit是void返回值的调用。</li>
+<li>捡自己更好cover住的方式：对象模型上，ecs的模型近些年很流行，但是我更熟悉继承方式，而且对于MMO也还是觉得继承方式的对象在场景里处理更直接</li>
+<li>我也热衷追求、使用新的技术，互联网是个瞬息万变的行业，业务推进技术的迭代、演进、革新，遇到新的问题，应该尝试研究、引入新的技术去解决问题，如果一味用老的技术或者架构无法支撑技术的演进，那么这个团队、架构应该是有问题的</li>
+<li>具体操作上：<ul>
+<li>简化日志 <code>friend std::ostream&amp; operator &lt;&lt; (std::ostream&amp; os, xxx* so)</code>，日志是重构过程中很重要的一个点，做好简化，区分级别，先多记录日志</li>
+<li>简化判定  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_ASSERT_RETURN(expr, ret, ...) <span class="keyword">if</span> (!(expr)) &#123;LOGE() &lt;&lt; <span class="string">&quot;MAP_ASSERT_RETURN. &quot;</span> &lt;&lt; #expr &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; _VA_ARGS__; return ret; &#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_ASSERT_BREAK(expr, ret, ...) <span class="keyword">if</span> (!(expr)) &#123;LOGE() &lt;&lt; <span class="string">&quot;MAP_ASSERT_RETURN. &quot;</span> &lt;&lt; #expr &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; _VA_ARGS__; break; &#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_ASSERT_CONTINUE(expr, ret, ...) <span class="keyword">if</span> (!(expr)) &#123;LOGE() &lt;&lt; <span class="string">&quot;MAP_ASSERT_RETURN. &quot;</span> &lt;&lt; #expr &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; _VA_ARGS__; continue; &#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_ASSERT_MESSAGE(expr, ret, ...) <span class="keyword">if</span> (!(expr)) &#123;LOGE() &lt;&lt; <span class="string">&quot;MAP_ASSERT_RETURN. &quot;</span> &lt;&lt; #expr &lt;&lt; <span class="string">&quot;. &quot;</span> &lt;&lt; _VA_ARGS__; &#125;</span></span><br></pre></td></tr></table></figure></li>
+<li>明确好名词，并严格按照这个名词规则来<ul>
+<li>地图 -&gt; map</li>
+<li>场景 -&gt; scene</li>
+<li>配置id -&gt; meta_id</li>
+<li>唯一id -&gt; uuid</li>
+</ul>
+</li>
+<li>用命名空间、用 using rename，一方面可以很直接找到重构用的代码，另外在重构过程中发现数据类型定的不合适还方便修改  <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> map_v2 &#123;</span><br><span class="line">    <span class="keyword">using</span> map_meta_id = <span class="type">uint32_t</span>;</span><br><span class="line">    <span class="keyword">using</span> map_uuid    = <span class="type">uint64_t</span>;</span><br><span class="line">    <span class="type">static</span> <span class="keyword">constexpr</span> map_meta_id invalid_meta_id = <span class="number">0</span>;</span><br><span class="line">&#125;; <span class="comment">// end namespace map_v2</span></span><br></pre></td></tr></table></figure></li>
+<li>合并原有相同作用的函数，一起替换</li>
+<li>多用 <code>explicit</code>、<code>final</code>、<code>const</code>、<code>enum class</code> 等带有限定作用的关键字，多让编译器就检查出问题（平时编码也该如此）</li>
+</ul>
+</li>
+<li>命名上，不喜欢带数据类型的命名方式 <code>m_dwID -&gt; m_id</code>（换数据类型更轻松，auto一样），相比驼峰更喜欢下划线 <code>m_metaId</code> 也可以是 <code>m_metaID</code> 那不如用 <code>m_meta_id</code></li>
+<li>很可能遇到重构过程中，改完之前无法测试的情况，耐心、耐心</li>
+<li>用好 git，diff 工具，很方便</li>
+</ul>
+<h2 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h2><ul>
+<li><p>lb&#x2F;lvs&#x2F;nginx<br><img src="/../images/%E4%B8%AD%E9%97%B4%E4%BB%B6/lb_nginx.png"></p>
+</li>
+<li><p>message queue</p>
+<ul>
+<li>没有MQ<br><img src="/../images/%E4%B8%AD%E9%97%B4%E4%BB%B6/mq_1.png"></li>
+<li>有MQ<br><img src="/../images/%E4%B8%AD%E9%97%B4%E4%BB%B6/mq_2.png"></li>
+</ul>
+</li>
+<li><p>redis（常用的用途）<br><img src="/../images/%E4%B8%AD%E9%97%B4%E4%BB%B6/redis.png"></p>
+</li>
+</ul>
+<h2 id="杂乱的零件"><a href="#杂乱的零件" class="headerlink" title="杂乱的零件"></a>杂乱的零件</h2><h3 id="static-variable"><a href="#static-variable" class="headerlink" title="static variable"></a>static variable</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/3837490/initializing-a-static-variable-in-header">https://stackoverflow.com/questions/3837490/initializing-a-static-variable-in-header</a></p>
+</blockquote>
+<ul>
+<li>头文件有一个<code>static global variable</code>数据的生命，<code>2个引用</code>头文件的地方将产生<code>2个数据副本</code>；</li>
+<li>用c++的方式解决办法是放到类的成员函数里，作为成员函数的局部变量</li>
+<li>C++11 magic static <code>thread-safe</code> 之后，<code>static</code> 使用越来越多<br>（<a target="_blank" rel="noopener" href="https://blog.mbedded.ninja/programming/languages/c-plus-plus/magic-statics%EF%BC%89">https://blog.mbedded.ninja/programming/languages/c-plus-plus/magic-statics）</a><br>这个问题比较容易被踩到；理解原因的同时换种方式，习惯性加上<code>namespace</code>，习惯性把<code>class</code>作为namespace的空间域</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">test</span> &#123;</span><br><span class="line">    <span class="type">static</span> std::map&lt;<span class="type">int</span>, <span class="type">int</span>&gt;&amp; __inner_variable() &#123;</span><br><span class="line">        <span class="type">static</span> std::map&lt;<span class="type">int</span>, <span class="type">int</span>&gt; result;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="std-this-thread-sleep-for"><a href="#std-this-thread-sleep-for" class="headerlink" title="std::this_thread::sleep_for"></a>std::this_thread::sleep_for</h3><ul>
+<li>windows 和 linux 不一样：<a target="_blank" rel="noopener" href="https://github.com/gabime/spdlog/issues/609">https://github.com/gabime/spdlog/issues/609</a></li>
+</ul>
+<h3 id="std-min-max-define-min-max-冲突"><a href="#std-min-max-define-min-max-冲突" class="headerlink" title="std::min&#x2F;max; #define min&#x2F;max 冲突:"></a>std::min&#x2F;max; #define min&#x2F;max 冲突:</h3><blockquote>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max">https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max</a></p>
+</blockquote>
+<ul>
+<li>visual studio pre-define 添加 <code>NOMINMAX</code></li>
+<li>或者在 include win 头文件之前<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> NOMINMAX</span></span><br><span class="line"><span class="meta">#    <span class="keyword">undef</span> min</span></span><br><span class="line"><span class="meta">#    <span class="keyword">undef</span> max</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="template-问题"><a href="#template-问题" class="headerlink" title="template 问题"></a>template 问题</h3><blockquote>
+<p>使用 luaBridge 的时候遇到一个问题，大意是这样:</p>
+</blockquote>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">super_cls</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">super_function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;xyz&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">sub_cls</span> : <span class="keyword">public</span> super_cls &#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// test code</span></span><br><span class="line">lua_bridge</span><br><span class="line">    .<span class="built_in">deriveClass</span>&lt;sub_cls, super_cls&gt;(<span class="string">&quot;sub_cls&quot;</span>)</span><br><span class="line">        .<span class="built_in">addFunction</span>(<span class="string">&quot;super_func&quot;</span>, &amp;sub_cls::super_function)</span><br><span class="line">    .<span class="built_in">endClass</span>()</span><br><span class="line">    ;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>这里编译会报错：<code>no matching function for call to addFunction....</code></li>
+<li>解决办法很简单，修改为 <code>.addFunction(&quot;super_func&quot;, static_cast&lt;void(sub_cls::*)()&gt;(&amp;sub_cls::super_function))</code>即可</li>
+<li>分析这个问题的原因(自己的理解)：<code>addFunction</code> 是模版方式，属于编译期多态，<code>sub_cls</code> 是继承方式运行期多态，调用 <code>addFunction</code> 的模版无法再编译期推导运行期的继承关系，也就无法匹配到 <code>super_function</code> 对 <code>sub_cls</code> 也是可见的</li>
+<li>但是：这种写法在做模版的时候经常写，比如 <code>std::bind(&amp;sub_cls::super_function, sub_cls_point)</code> 是没有问题的 另一段代码:<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> _Cls, <span class="keyword">class</span> _Ret, <span class="keyword">class</span>... _Args&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">caller</span><span class="params">(_Ret(_Cls::*func)(_Args...))</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// test</span></span><br><span class="line"><span class="built_in">caller</span>(&amp;sub_cls::super_function);            <span class="comment">// ok：func=(void (super_cls::*)(super * const))</span></span><br><span class="line"><span class="built_in">caller</span>&lt;sub_cls&gt;(&amp;sub_cls::super_function);   <span class="comment">// error: no matching function for call to caller....</span></span><br></pre></td></tr></table></figure></li>
+<li>luaBridge 也是类似报错行的方式，类的类型是从 <code>deriveClass</code> 调用萃取出来的，导致 <code>addFunction</code> 写法报错</li>
+<li>visual studio 上述写法可以编译通过，应该是做了类似 <code>is_base_of</code> 或者其他什么原因，没有细究</li>
+</ul>
+<h3 id="windows-TCP-SO-REUSEADDR-and-SO-EXCLUSIVEADDRUSE"><a href="#windows-TCP-SO-REUSEADDR-and-SO-EXCLUSIVEADDRUSE" class="headerlink" title="windows TCP SO_REUSEADDR and SO_EXCLUSIVEADDRUSE"></a>windows TCP SO_REUSEADDR and SO_EXCLUSIVEADDRUSE</h3><ul>
+<li>msdn: <a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/win32/winsock/using-so-reuseaddr-and-so-exclusiveaddruse?redirectedfrom=MSDN">https://learn.microsoft.com/zh-cn/windows/win32/winsock/using-so-reuseaddr-and-so-exclusiveaddruse?redirectedfrom=MSDN</a></li>
+<li>stackoverflow: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/14388706/how-do-so-reuseaddr-and-so-reuseport-differ">https://stackoverflow.com/questions/14388706/how-do-so-reuseaddr-and-so-reuseport-differ</a></li>
+<li>SO_REUSEADDR: 基本不应该被使用，没有使用组播（多播）方式的情况下，多个进程可监听统一IP+端口，但是只有1个进程可以收到消息</li>
+<li>SO_EXCLUSIVEADDRUSE: 表现同linux</li>
+<li>端口占用与唤起其他进程问题：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1. A 进程 listen port: 52800</span><br><span class="line">2. system(&#x27;.\B.exe&#x27;); 唤起 B 进程</span><br><span class="line">3. 关闭 A 进程，52800 端口可以在 TCPView 看到还在监听状态</span><br><span class="line">4. 这时候再开启 A 进程将 bind 端口失败</span><br><span class="line">5. 关掉 B 进程，52800 端口就会释放出来</span><br><span class="line"></span><br><span class="line">解决方式：</span><br><span class="line">使用 CreateProcess 替换 system 指令</span><br><span class="line">暂时没有细究为什么</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%9F%A5%E8%AF%86%E7%A7%AF%E7%B4%AF/" rel="tag"># 知识积累</a>
+              <a href="/tags/%E6%B8%B8%E6%88%8F/" rel="tag"># 游戏</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/b8b38dba.html" rel="prev" title="可执行的全球服设计">
+      <i class="fa fa-chevron-left"></i> 可执行的全球服设计
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/b6e30e08.html" rel="next" title="easy datetime">
+      easy datetime <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#pre"><span class="nav-number">1.</span> <span class="nav-text">pre</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%B7%B1-%C2%B7-%E7%BE%A1%E6%85%95%E6%96%B0%E4%B8%80%E4%BB%A3%E6%9C%89%E6%9B%B4%E5%A5%BD%E7%9A%84%E7%8E%AF%E5%A2%83%E8%B5%84%E6%BA%90"><span class="nav-number">2.</span> <span class="nav-text">自己 · 羡慕新一代有更好的环境资源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E8%A8%80-%C2%B7-%E7%AE%B1%E5%AD%90%E9%87%8C%E7%9A%84%E5%B7%A5%E5%85%B7%E6%80%BB%E6%98%AF%E4%B8%8D%E5%A4%9F%E7%94%A8%EF%BC%8C%E4%BD%86%E7%AE%B1%E5%AD%90%E9%87%8C%E6%8B%BF%E5%87%BA%E6%9D%A5%E7%9A%84%E5%BA%94%E8%AF%A5%E7%94%A8%E7%9A%84%E8%B6%81%E6%89%8B"><span class="nav-number">3.</span> <span class="nav-text">语言 · 箱子里的工具总是不够用，但箱子里拿出来的应该用的趁手</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1-%C2%B7-%E8%BF%BD%E6%B1%82%E7%B2%BE%E8%87%B4%EF%BC%8C%E6%8E%A5%E5%8F%97%E4%B8%8D%E5%AE%8C%E7%BE%8E"><span class="nav-number">4.</span> <span class="nav-text">设计 · 追求精致，接受不完美</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E3%80%81%E6%9C%8D%E5%8A%A1"><span class="nav-number">5.</span> <span class="nav-text">进程、服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C"><span class="nav-number">6.</span> <span class="nav-text">网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E3%80%81%E5%AF%B9%E8%B1%A1"><span class="nav-number">7.</span> <span class="nav-text">数据、对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E6%A8%A1%E5%9E%8B"><span class="nav-number">7.1.</span> <span class="nav-text">对象模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86"><span class="nav-number">7.2.</span> <span class="nav-text">数据处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8"><span class="nav-number">7.3.</span> <span class="nav-text">容器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8"><span class="nav-number">8.</span> <span class="nav-text">存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1ACID"><span class="nav-number">8.1.</span> <span class="nav-text">事务ACID</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">9.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E5%85%A8"><span class="nav-number">10.</span> <span class="nav-text">安全</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7"><span class="nav-number">11.</span> <span class="nav-text">工具</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#windows-%E6%A1%8C%E9%9D%A2%E7%B3%BB%E7%BB%9F"><span class="nav-number">11.1.</span> <span class="nav-text">windows&#x2F;桌面系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-%E5%91%BD%E4%BB%A4%E8%A1%8C"><span class="nav-number">11.2.</span> <span class="nav-text">linux&#x2F;命令行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E7%BB%B4"><span class="nav-number">12.</span> <span class="nav-text">运维</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9F%E8%BD%BD"><span class="nav-number">12.1.</span> <span class="nav-text">负载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2%EF%BC%9A%E7%BD%91%E7%BB%9C%E3%80%81%E4%B8%9A%E5%8A%A1%E3%80%81%E6%95%B0%E6%8D%AE%E5%88%86%E7%A6%BB"><span class="nav-number">12.2.</span> <span class="nav-text">部署：网络、业务、数据分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90"><span class="nav-number">12.3.</span> <span class="nav-text">问题分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%90%A5"><span class="nav-number">13.</span> <span class="nav-text">运营</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3"><span class="nav-number">14.</span> <span class="nav-text">迭代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%90%86"><span class="nav-number">15.</span> <span class="nav-text">管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E6%9E%84-%C2%B7-%E4%B9%A0%E6%83%AF%E7%9A%84%E4%B8%9C%E8%A5%BF%E6%9B%B4%E5%BE%97%E5%BF%83%E5%BA%94%E6%89%8B%EF%BC%8C%E4%B9%9F%E6%98%AF%E7%A6%81%E9%94%A2%E8%87%AA%E5%B7%B1%E7%9A%84%E6%9E%B7%E9%94%81"><span class="nav-number">16.</span> <span class="nav-text">重构 · 习惯的东西更得心应手，也是禁锢自己的枷锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E9%97%B4%E4%BB%B6"><span class="nav-number">17.</span> <span class="nav-text">中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%82%E4%B9%B1%E7%9A%84%E9%9B%B6%E4%BB%B6"><span class="nav-number">18.</span> <span class="nav-text">杂乱的零件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#static-variable"><span class="nav-number">18.1.</span> <span class="nav-text">static variable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#std-this-thread-sleep-for"><span class="nav-number">18.2.</span> <span class="nav-text">std::this_thread::sleep_for</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#std-min-max-define-min-max-%E5%86%B2%E7%AA%81"><span class="nav-number">18.3.</span> <span class="nav-text">std::min&#x2F;max; #define min&#x2F;max 冲突:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#template-%E9%97%AE%E9%A2%98"><span class="nav-number">18.4.</span> <span class="nav-text">template 问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#windows-TCP-SO-REUSEADDR-and-SO-EXCLUSIVEADDRUSE"><span class="nav-number">18.5.</span> <span class="nav-text">windows TCP SO_REUSEADDR and SO_EXCLUSIVEADDRUSE</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '6905b07c7924b07ce057f7a68d87f980',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

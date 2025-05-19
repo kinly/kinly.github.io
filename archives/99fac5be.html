@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/header-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/header-icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/header-icon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="naExO9JokuG3a-OHUdrF8UrtMPNf1FyJ5Yt99ihFezY">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"klysisle.space","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.json"};
+  </script>
+
+  <meta name="description" content="protobuf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="protobuf">
+<meta property="og:url" content="https://klysisle.space/archives/99fac5be.html">
+<meta property="og:site_name" content="Klysisle&#39;s 小窝">
+<meta property="og:description" content="protobuf">
+<meta property="og:locale">
+<meta property="og:image" content="https://klysisle.space/images/proto/protobuf_numerical.png">
+<meta property="og:image" content="https://klysisle.space/images/proto/protobuf_numerical-signed.png">
+<meta property="og:image" content="https://klysisle.space/images/proto/protobuf_numerical-fixed.png">
+<meta property="og:image" content="https://klysisle.space/images/proto/protobuf_string.png">
+<meta property="og:image" content="https://klysisle.space/images/proto/string_string.jpg">
+<meta property="og:image" content="https://klysisle.space/images/proto/string_bytes.jpg">
+<meta property="article:published_time" content="2022-11-07T05:39:52.000Z">
+<meta property="article:modified_time" content="2024-12-11T08:54:40.710Z">
+<meta property="article:author" content="Kinly">
+<meta property="article:tag" content="常用备忘">
+<meta property="article:tag" content="protobuf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://klysisle.space/images/proto/protobuf_numerical.png">
+
+<link rel="canonical" href="https://klysisle.space/archives/99fac5be.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>protobuf | Klysisle's 小窝</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Klysisle's 小窝</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Klysisle's 小窝</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://klysisle.space/archives/99fac5be.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/uploads/kinly-avatar.png">
+      <meta itemprop="name" content="Kinly">
+      <meta itemprop="description" content="Klysisle's 小窝">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Klysisle's 小窝">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          protobuf
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-07 13:39:52" itemprop="dateCreated datePublished" datetime="2022-11-07T13:39:52+08:00">2022-11-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-11 16:54:40" itemprop="dateModified" datetime="2024-12-11T16:54:40+08:00">2024-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%9F%A5%E8%AF%86%E5%A4%87%E5%BF%98/" itemprop="url" rel="index"><span itemprop="name">知识备忘</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">protobuf</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>protobuf 基本是 IDL(interface description language) 最常用的序列化&#x2F;反序列化组件了</p>
+<h3 id="2-VS-3"><a href="#2-VS-3" class="headerlink" title="2 VS 3"></a>2 VS 3</h3><ul>
+<li>默认值：<code>proto2</code> 使用 <code>default</code> 明确指明默认值；<code>proto3</code> 不允许自定义默认值，所有字段都有零默认值</li>
+<li>语法  ：<code>proto3</code> 去掉了 <code>required</code>, <code>optional</code> 也不需要了</li>
+<li>枚举  ：<code>proto3</code> 需要一个具有 0 的 enums 作为默认值，会多一个 <code>UNRECOGNIZED</code> 用作没有覆盖的条目；<code>proto2</code> 用第一个作为默认值；</li>
+<li>UTF8 ： string 字段 <code>proto3</code> 会强校验 utf8 编码</li>
+</ul>
+<h3 id="scalar-value-types"><a href="#scalar-value-types" class="headerlink" title="scalar value types"></a>scalar value types</h3><p><code>https://developers.google.com/protocol-buffers/docs/proto3#scalar</code></p>
+<table>
+<thead>
+<tr>
+<th>proto Type</th>
+<th>Notes</th>
+<th>C++ Type</th>
+<th>Java&#x2F;Kotlin Type[1]</th>
+<th>Python Type[3]</th>
+<th>Go Type</th>
+<th>Ruby Type</th>
+<th>C# Type</th>
+<th>PHP Type</th>
+<th>Dart Type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>double</td>
+<td></td>
+<td>double</td>
+<td>double</td>
+<td>float</td>
+<td>float64</td>
+<td>Float</td>
+<td>double</td>
+<td>float</td>
+<td>double</td>
+</tr>
+<tr>
+<td>float</td>
+<td></td>
+<td>float</td>
+<td>float</td>
+<td>float</td>
+<td>float32</td>
+<td>Float</td>
+<td>float</td>
+<td>float</td>
+<td>double</td>
+</tr>
+<tr>
+<td>int32</td>
+<td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead.</td>
+<td>int32</td>
+<td>int</td>
+<td>int</td>
+<td>int32</td>
+<td>Fixnum or Bignum (as required)</td>
+<td>int</td>
+<td>integer</td>
+<td>int</td>
+</tr>
+<tr>
+<td>int64</td>
+<td>Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead.</td>
+<td>int64</td>
+<td>long</td>
+<td>int&#x2F;long[4]</td>
+<td>int64</td>
+<td>Bignum</td>
+<td>long</td>
+<td>integer&#x2F;string[6]</td>
+<td>Int64</td>
+</tr>
+<tr>
+<td>uint32</td>
+<td>Uses variable-length encoding.</td>
+<td>uint32</td>
+<td>int[2]</td>
+<td>int&#x2F;long[4]</td>
+<td>uint32</td>
+<td>Fixnum or Bignum (as required)</td>
+<td>uint</td>
+<td>integer</td>
+<td>int</td>
+</tr>
+<tr>
+<td>uint64</td>
+<td>Uses variable-length encoding.</td>
+<td>uint64</td>
+<td>long[2]</td>
+<td>int&#x2F;long[4]</td>
+<td>uint64</td>
+<td>Bignum</td>
+<td>ulong</td>
+<td>integer&#x2F;string[6]</td>
+<td>Int64</td>
+</tr>
+<tr>
+<td>sint32</td>
+<td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s.</td>
+<td>int32</td>
+<td>int</td>
+<td>int</td>
+<td>int32</td>
+<td>Fixnum or Bignum (as required)</td>
+<td>int</td>
+<td>integer</td>
+<td>int</td>
+</tr>
+<tr>
+<td>sint64</td>
+<td>Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s.</td>
+<td>int64</td>
+<td>long</td>
+<td>int&#x2F;long[4]</td>
+<td>int64</td>
+<td>Bignum</td>
+<td>long</td>
+<td>integer&#x2F;string[6]</td>
+<td>Int64</td>
+</tr>
+<tr>
+<td>fixed32</td>
+<td>Always four bytes. More efficient than uint32 if values are often greater than 228.</td>
+<td>uint32</td>
+<td>int[2]</td>
+<td>int&#x2F;long[4]</td>
+<td>uint32</td>
+<td>Fixnum or Bignum (as required)</td>
+<td>uint</td>
+<td>integer</td>
+<td>int</td>
+</tr>
+<tr>
+<td>fixed64</td>
+<td>Always eight bytes. More efficient than uint64 if values are often greater than 256.</td>
+<td>uint64</td>
+<td>long[2]</td>
+<td>int&#x2F;long[4]</td>
+<td>uint64</td>
+<td>Bignum</td>
+<td>ulong</td>
+<td>integer&#x2F;string[6]</td>
+<td>Int64</td>
+</tr>
+<tr>
+<td>sfixed32</td>
+<td>Always four bytes.</td>
+<td>int32</td>
+<td>int</td>
+<td>int</td>
+<td>int32</td>
+<td>Fixnum or Bignum (as required)</td>
+<td>int</td>
+<td>integer</td>
+<td>int</td>
+</tr>
+<tr>
+<td>sfixed64</td>
+<td>Always eight bytes.</td>
+<td>int64</td>
+<td>long</td>
+<td>int&#x2F;long[4]</td>
+<td>int64</td>
+<td>Bignum</td>
+<td>long</td>
+<td>integer&#x2F;string[6]</td>
+<td>Int64</td>
+</tr>
+<tr>
+<td>bool</td>
+<td></td>
+<td>bool</td>
+<td>boolean</td>
+<td>bool</td>
+<td>bool</td>
+<td>TrueClass&#x2F;FalseClass</td>
+<td>bool</td>
+<td>boolean</td>
+<td>bool</td>
+</tr>
+<tr>
+<td>string</td>
+<td>A string must always contain UTF-8 encoded or 7-bit ASCII text, and cannot be longer than 232.</td>
+<td>string</td>
+<td>String</td>
+<td>str&#x2F;unicode[5]</td>
+<td>string</td>
+<td>String (UTF-8)</td>
+<td>string</td>
+<td>string</td>
+<td>String</td>
+</tr>
+<tr>
+<td>bytes</td>
+<td>May contain any arbitrary sequence of bytes no longer than 232.</td>
+<td>string</td>
+<td>ByteString</td>
+<td>str (Python 2)</td>
+<td>bytes (Python 3)</td>
+<td>[]byte</td>
+<td>String (ASCII-8BIT)</td>
+<td>ByteString</td>
+<td>string</td>
+</tr>
+</tbody></table>
+<h3 id="default-values"><a href="#default-values" class="headerlink" title="default values"></a>default values</h3><ul>
+<li>string: empty string</li>
+<li>bytes: empty bytes</li>
+<li>bool: false</li>
+<li>numeric: 0</li>
+<li>enum: the default value is the first defined enum value, which must be 0</li>
+</ul>
+<h3 id="numerical-类型序列化"><a href="#numerical-类型序列化" class="headerlink" title="numerical 类型序列化"></a>numerical 类型序列化</h3><table>
+<thead>
+<tr>
+<th>编码方式</th>
+<th>key(Type)</th>
+<th>覆盖类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>varint</td>
+<td>0</td>
+<td>int32, int64, uint32, uint64, sint32, sint64, bool, enum</td>
+</tr>
+<tr>
+<td>64-bit (8字节)</td>
+<td>1</td>
+<td>fixed64, sfixed64, double</td>
+</tr>
+<tr>
+<td>32-bit (4字节)</td>
+<td>5</td>
+<td>fixed32, sfixed32, float</td>
+</tr>
+<tr>
+<td>– length delimited</td>
+<td>2</td>
+<td>string, bytes, enbedded messaged, packed repeated fields</td>
+</tr>
+<tr>
+<td>– start group</td>
+<td>3</td>
+<td>groups</td>
+</tr>
+<tr>
+<td>– end group</td>
+<td>4</td>
+<td>groups</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>varint 编码<br>简单点说就是数值越小的数字使用的字节数越少；最高位表示编码是否继续，如果该位为1，表示接下来的字节仍然是该数字的一部分，如果该位为0，表示编码结束。字节里的其余7位用原码补齐，采用低位字节补齐到高位的办法</p>
+</li>
+<li><p>64-bit &#x2F; 32-bit 是固定字节数</p>
+</li>
+</ul>
+<figure class="highlight proto"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> inlay.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">numerical_int</span> &#123;</span><br><span class="line">    <span class="type">int32</span> id = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">message </span><span class="title class_">numerical_sint</span> &#123;</span><br><span class="line">    <span class="type">sint32</span> sid = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">message </span><span class="title class_">numerical_uint</span> &#123;</span><br><span class="line">    <span class="type">uint32</span> uid = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">message </span><span class="title class_">numerical_fixed</span> &#123;</span><br><span class="line">    <span class="type">fixed32</span> fid = <span class="number">1</span>;<span class="number">3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>运行一段小程序，对比 int32 &amp; sint32<br><img src="/images/proto/protobuf_numerical.png" alt="int &amp; sint">  </p>
+</li>
+<li><p>int32 负值数据部分占了10个字节的<br><img src="/images/proto/protobuf_numerical-signed.png" alt="int负值"></p>
+</li>
+<li><p>对于负数 (高位 1)， 大于 1 &lt;&lt; 28 的大数 (高位有部分bit被占用)，varint会额外多占空间，protobuf 分别用 sint &amp; fixed 类型处理这个问题</p>
+</li>
+<li><p>sint32 是为负值做优化 zigZag 编码 (将有符号数统一映射到无符号数的一种编码方案)</p>
+</li>
+<li><p>sint32 因为是映射的zigZag编码方式，是不能和 int32 互转的，例如上面 sint32 里面 1 映射的值实际是 2 </p>
+</li>
+<li><p>fixed32 和 int32<br><img src="/images/proto/protobuf_numerical-fixed.png" alt="fixed &amp; int"></p>
+</li>
+<li><p>fixed32 数据部分是固定 4 字节的（即使实际数据是 1，也是需要 4 字节的），相比 int32, 对于大数值（超过 1 &lt;&lt; 28）可以比 varint 编码方式少 1 byte</p>
+</li>
+<li><p>fixed32 的前缀是 0x0d (1 &lt;&lt; 3 | 5) 这里的 5 表示 numerical 编码方式对应的 key(Type) &#x3D; 5</p>
+</li>
+<li><p>int32 的前缀是 0x08 (1 &lt;&lt; 3 | 0); 由于 int32 &amp; sint32 的编码方式占位是一样的，但实际上用的又是两种，这里对于 int32 &amp; sint32 的互转是会出错的…</p>
+</li>
+</ul>
+<h3 id="string-bytes-类型序列化"><a href="#string-bytes-类型序列化" class="headerlink" title="string&#x2F;bytes 类型序列化"></a>string&#x2F;bytes 类型序列化</h3><ul>
+<li>string &amp; bytes 的序列化规则是一样的：(1 &lt;&lt; 3 | 2) + varint(length) + value</li>
+</ul>
+<p><img src="/images/proto/protobuf_string.png" alt="proto string"></p>
+<ul>
+<li>string 会强制检查value 是否是 utf-8 编码，bytes 是 memcpy 的</li>
+</ul>
+<p><img src="/images/proto/string_string.jpg" alt="string stack"><br><img src="/images/proto/string_bytes.jpg" alt="bytes stack"></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/proto3">https://developers.google.com/protocol-buffers/docs/proto3</a></li>
+</ul>
+
+    </div>
+    
+    
+    
+    <div>
+      
+      <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 本文结束 ------</div>
+        <div style="text-align:center;color: #ccc;font-size:14px;">------ 版权声明：转载请注明出处 ------</div>
+    
+</div>
+      
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B8%B8%E7%94%A8%E5%A4%87%E5%BF%98/" rel="tag"># 常用备忘</a>
+              <a href="/tags/protobuf/" rel="tag"># protobuf</a>
+          </div>
+
+        
+  <div class="post-widgets">
+    <div class="wp_rating">
+      <div id="wpac-rating"></div>
+    </div>
+  </div>
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/archives/ce87bb9c.html" rel="prev" title="ZGC">
+      <i class="fa fa-chevron-left"></i> ZGC
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/archives/41a6a3ab.html" rel="next" title="知识点备忘">
+      知识点备忘 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-VS-3"><span class="nav-number">2.</span> <span class="nav-text">2 VS 3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scalar-value-types"><span class="nav-number">3.</span> <span class="nav-text">scalar value types</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#default-values"><span class="nav-number">4.</span> <span class="nav-text">default values</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#numerical-%E7%B1%BB%E5%9E%8B%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">numerical 类型序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#string-bytes-%E7%B1%BB%E5%9E%8B%E5%BA%8F%E5%88%97%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">string&#x2F;bytes 类型序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Kinly"
+      src="/uploads/kinly-avatar.png">
+  <p class="site-author-name" itemprop="name">Kinly</p>
+  <div class="site-description" itemprop="description">Klysisle's 小窝</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title"><i class="fa fa-link fa-fw"></i>
+      friendly
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://gqw.github.io/" title="https:&#x2F;&#x2F;gqw.github.io&#x2F;" rel="noopener" target="_blank">顾起威's blog</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kinly</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var canonicalURL, curProtocol;
+      //Get the <link> tag
+      var x=document.getElementsByTagName("link");
+		//Find the last canonical URL
+		if(x.length > 0){
+			for (i=0;i<x.length;i++){
+				if(x[i].rel.toLowerCase() == 'canonical' && x[i].href){
+					canonicalURL=x[i].href;
+				}
+			}
+		}
+    //Get protocol
+	    if (!canonicalURL){
+	    	curProtocol = window.location.protocol.split(':')[0];
+	    }
+	    else{
+	    	curProtocol = canonicalURL.split(':')[0];
+	    }
+      //Get current URL if the canonical URL does not exist
+	    if (!canonicalURL) canonicalURL = window.location.href;
+	    //Assign script content. Replace current URL with the canonical URL
+      !function(){var e=/([http|https]:\/\/[a-zA-Z0-9\_\.]+\.baidu\.com)/gi,r=canonicalURL,t=document.referrer;if(!e.test(r)){var n=(String(curProtocol).toLowerCase() === 'https')?"https://sp0.baidu.com/9_Q4simg2RQJ8t7jm9iCKT-xh_/s.gif":"//api.share.baidu.com/s.gif";t?(n+="?r="+encodeURIComponent(document.referrer),r&&(n+="&l="+r)):r&&(n+="?l="+r);var i=new Image;i.src=n}}(window);})();
+  </script>
+
+
+
+  <script>
+  if (CONFIG.page.isPost) {
+    wpac_init = window.wpac_init || [];
+    wpac_init.push({
+      widget: 'Rating',
+      id    : ,
+      el    : 'wpac-rating',
+      color : 'fc6423'
+    });
+    (function() {
+      if ('WIDGETPACK_LOADED' in window) return;
+      WIDGETPACK_LOADED = true;
+      var mc = document.createElement('script');
+      mc.type = 'text/javascript';
+      mc.async = true;
+      mc.src = '//embed.widgetpack.com/widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(mc, s.nextSibling);
+    })();
+  }
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '6741134bc57bd79787a9',
+      clientSecret: 'ce6491d7fecebe5bf246e104cbae0f3412cc9c92',
+      repo        : 'kinly.github.io',
+      owner       : 'kinly',
+      admin       : ['kinly'],
+      id          : '69f7cb1b7cc3059b770540ae3e43a343',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
